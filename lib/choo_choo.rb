@@ -1,9 +1,12 @@
+require "choo_choo_parsing"
 require "choo_choo/version"
-
-require 'choo_choo/parser'
-require 'choo_choo/xml_builder'
-require 'choo_choo/edi_object'
+require "choo_choo/remittance_object"
+require "choo_choo/charge_level_object"
+require "choo_choo/check_level_object"
+require "choo_choo/claim_level_object"
 
 module ChooChoo
-  # Your code goes here...
+  def self.parse_remittance(filestring)
+    _parse_remittance(filestring, filestring.length)
+  end
 end
