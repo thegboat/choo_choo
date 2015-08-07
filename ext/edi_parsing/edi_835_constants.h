@@ -50,5 +50,20 @@
 #define MAX_KEY_SIZE 10
 #define MAX_ERROR_SIZE 100
 
+#define ISA_SEGMENT_NOT_DETECTED_FIRST    1
+#define MORE_THAN_ONE_ISA_SEGMENT_FOUND   2
+#define WRONG_NUMBER_OF_ELEMENTS_FOR_ISA  3
+#define MISSING_GS_SEGMENT                4
+#define MISSING_ST_SEGMENT                5
+#define INVALID_GS_SEGMENT                6
+#define INVALID_ST_SEGMENT                7
+#define INVALID_N1_SEGMENT                8
+#define INVALID_LX_SEGMENT                9
+#define INVALID_CLP_SEGMENT               10
+#define INVALID_SVC_SEGMENT               11
+#define INVALID_GE_SEGMENT                12
+#define INVALID_IEA_SEGMENT               13
+
+
 #endif
 

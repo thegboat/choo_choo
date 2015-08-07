@@ -41,7 +41,7 @@ struct property_struct
 
 struct parser_struct
 {
-  int errors[MAX_ERROR_SIZE];
+  short errors[MAX_ERROR_SIZE];
   char *str;
   segment_t *loop;
   segment_t *interchange;

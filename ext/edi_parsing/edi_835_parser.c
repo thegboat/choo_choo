@@ -14,6 +14,8 @@ void parse835(parser_t *parser, char *ediFile){
   while(NULL != parser->str && !parser->finished && !parser->failure){
     parse835Segment(parser);
     parser->str = strtok_r(NULL, SEGMENT_SEPARATOR, &saveptr);
+
+    validateParser(parser);
   }
 }
 
@@ -57,17 +59,22 @@ void attachSegment(parser_t *parser, segment_t *segment){
     isaHandler(parser, segment);
   }else if(NULL == parser->loop || NULL == parser->interchange){
     parseFail(parser);
+  }else if(parser->interchange->elements != 16){
+    parseFail(parser);
   }else if(isIEA(segment->name)){
     ieaHandler(parser, segment);
-    parser->finished = true;
   }else if(isGS(segment->name)){
     gsHandler(parser, segment);
   }else if(NULL == parser->functional){
+    parseFail(parser);
+  }else if(parser->functional->elements != 8){
     parseFail(parser);
   }else if(isGE(segment->name)){
     geHandler(parser, segment);
   }else if(isST(segment->name)){
     stHandler(parser, segment);
+  }else if(parser->transaction->elements != 2){
+    parseFail(parser);
   }else if(NULL == parser->transaction){
     parseFail(parser);
   }else if(isSE(segment->name)){
@@ -101,8 +108,6 @@ void gsHandler(parser_t *parser, segment_t *segment){
     addChildSegment(parser->interchange, segment);
     parser->functional = segment;
     parser->loop = segment;
-  }else if(NULL != parser->functional){
-   parseFail(parser);
   }else{
    parseFail(parser);
   }
@@ -193,6 +198,26 @@ void ieaHandler(parser_t *parser, segment_t *segment){
     parser->loop = segment;
   }else{
     parseFail(parser);
+  }
+}
+
+void validateParser(parser_t *parser){
+  if(!parser->finished){
+    if(!isSE(parser->transaction->name)){
+      parseFail(parser);
+    }else if(parser->transaction->elements != 2){
+      parseFail(parser);
+    }else if(!isGE(parser->functional->name)){
+      parseFail(parser);
+    }else if(parser->functional->elements != 2){
+      parseFail(parser);
+    }else if(parser->interchange->elements != 2){
+      parseFail(parser);
+    }else if(!isGE(parser->functional->name)){
+      parseFail(parser);
+    }else else{
+      parser->finished = true;
+    }
   }
 }
 
