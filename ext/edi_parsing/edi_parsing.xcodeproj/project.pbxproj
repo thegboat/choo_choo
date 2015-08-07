@@ -10,7 +10,6 @@
 		2F5EFADA1B734C3B000A42D6 /* edi_835_constants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = edi_835_constants.h; sourceTree = "<group>"; };
 		2F5EFADB1B734C3B000A42D6 /* edi_835_inspection.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = edi_835_inspection.c; sourceTree = "<group>"; };
 		2F5EFADC1B734C3B000A42D6 /* edi_835_interface.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = edi_835_interface.c; sourceTree = "<group>"; };
-		2F5EFADE1B734C3B000A42D6 /* edi_835_loop.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = edi_835_loop.c; sourceTree = "<group>"; };
 		2F5EFADF1B734C3B000A42D6 /* edi_835_parser.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = edi_835_parser.c; sourceTree = "<group>"; };
 		2F5EFAE01B734C3B000A42D6 /* edi_835_parser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = edi_835_parser.h; sourceTree = "<group>"; };
 		2F5EFAE11B734C3B000A42D6 /* edi_835_segment.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = edi_835_segment.c; sourceTree = "<group>"; };
@@ -23,7 +22,6 @@
 				2F5EFADA1B734C3B000A42D6 /* edi_835_constants.h */,
 				2F5EFADB1B734C3B000A42D6 /* edi_835_inspection.c */,
 				2F5EFADC1B734C3B000A42D6 /* edi_835_interface.c */,
-				2F5EFADE1B734C3B000A42D6 /* edi_835_loop.c */,
 				2F5EFADF1B734C3B000A42D6 /* edi_835_parser.c */,
 				2F5EFAE01B734C3B000A42D6 /* edi_835_parser.h */,
 				2F5EFAE11B734C3B000A42D6 /* edi_835_segment.c */,
