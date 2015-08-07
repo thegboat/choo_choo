@@ -46,5 +46,9 @@
 #define SEGMENT_SEPARATOR       "~"
 #define REPITITION_SEPARATOR       "^"
 
+#define MAX_NAME_SIZE 5
+#define MAX_KEY_SIZE 10
+#define MAX_ERROR_SIZE 100
+
 #endif
 

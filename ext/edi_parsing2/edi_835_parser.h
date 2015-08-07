@@ -99,24 +99,30 @@ void buildKey(char *key, char *seg_name, short seg_cnt, short elem_cnt);
 void attachSegment(parser_t *parser, segment_t *segment);
 void addChildSegment(segment_t *parent, segment_t *child);
 
-/* loop */
-void loopInitializer(loop_t *loop, const char *name);
-void addSegment(loop_t *loop, segment_t * child);
-
 /* parser */
 
 void parse835(parser_t *parser, char *ediFile);
-void nextSegment(parser_t *parser);
 void parse835Segment(parser_t *parser);
 void parse835Element(char *str, segment_t *segment, short seg_cnt);
-void moveLoopIfNecessary(parser_t *parser);
+
+
 void parseFail(parser_t *parser);
 void parserFree(parser_t *parser);
-void loopFree(loop_t *loop);
+void loopFree(segment_t *segment_t);
 void segmentFree(segment_t *segment);
 void propertyFree(property_t *property);
-
-void resetDetail(parser_t *parser);
-void resetClaim(parser_t *parser);
+void parserInitialization(parser_t *parser);
+void attachSegment(parser_t *parser, segment_t *segment);
+void isaHandler(parser_t *parser, segment_t *segment);
+void gsHandler(parser_t *parser, segment_t *segment);
+void stHandler(parser_t *parser, segment_t *segment);
+void n1Handler(parser_t *parser, segment_t *segment);
+void lxHandler(parser_t *parser, segment_t *segment);
+void clpHandler(parser_t *parser, segment_t *segment);
+void svcHandler(parser_t *parser, segment_t *segment);
+void plbHandler(parser_t *parser, segment_t *segment);
+void seHandler(parser_t *parser, segment_t *segment);
+void geHandler(parser_t *parser, segment_t *segment);
+void ieaHandler(parser_t *parser, segment_t *segment);
 
 #endif

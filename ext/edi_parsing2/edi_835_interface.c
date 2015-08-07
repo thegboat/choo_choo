@@ -22,14 +22,14 @@ void choo_choo_edi_835_free(VALUE self){
   }
 }
 
-VALUE edi_835_isa(VALUE self){
-  parser_t *parser;
-  Data_Get_Struct(self, parser_t, parser);
-  VALUE hash = rb_class_new_instance(0, NULL, cChooChooHash);
-  rb_funcall(hash, )
-  rb_funcall(obj, rb_intern("=="), 1, Qnil);
-  return hash;
-}
+// VALUE edi_835_isa(VALUE self){
+//   parser_t *parser;
+//   Data_Get_Struct(self, parser_t, parser);
+//   VALUE hash = rb_class_new_instance(0, NULL, cChooChooHash);
+//   rb_funcall(hash, )
+//   rb_funcall(obj, rb_intern("=="), 1, Qnil);
+//   return hash;
+// }
 
 VALUE choo_choo_edi_835_alloc(VALUE self) {
   parser_t *parser = calloc(1,sizeof(parser_t));
@@ -53,7 +53,7 @@ void Init_edi_parsing(void) {
 
   rb_define_alloc_func(cEDI_835, choo_choo_edi_835_alloc);
   rb_define_singleton_method(mChooChoo, "_c_parse_835", choo_choo_parse_835, 1);
-  rb_define_method(cEDI_835, "interchange_loop", edi_835_isa, 0);
+  // rb_define_method(cEDI_835, "interchange_loop", edi_835_isa, 0);
 
   id_hash_store = rb_intern("store");
 

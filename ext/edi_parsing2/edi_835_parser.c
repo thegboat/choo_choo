@@ -58,7 +58,7 @@ void attachSegment(parser_t *parser, segment_t *segment){
   }else if(NULL == parser->loop || NULL == parser->interchange){
     parseFail(parser);
   }else if(isIEA(segment->name)){
-    iea(parser, segment);
+    ieaHandler(parser, segment);
     parser->finished = true;
   }else if(isGS(segment->name)){
     gsHandler(parser, segment);
@@ -99,21 +99,21 @@ void isaHandler(parser_t *parser, segment_t *segment){
 void gsHandler(parser_t *parser, segment_t *segment){
   if(parser->loop == parser->interchange){
     addChildSegment(parser->interchange, segment);
-    parser->functional = segment
+    parser->functional = segment;
     parser->loop = segment;
   }else if(NULL != parser->functional){
    parseFail(parser);
-  else{
+  }else{
    parseFail(parser);
   }
 }
 
 void stHandler(parser_t *parser, segment_t *segment){
-  if(parser->loop == parser->functional)
+  if(parser->loop == parser->functional){
     addChildSegment(parser->functional, segment);
     parser->transaction = segment;
     parser->loop = segment;
-  else{
+  }else{
    parseFail(parser);
   }
 }
@@ -121,11 +121,11 @@ void stHandler(parser_t *parser, segment_t *segment){
 void n1Handler(parser_t *parser, segment_t *segment){
   if(parser->loop == parser->transaction){
     addChildSegment(parser->functional, segment);
-    parser->payer = segment
+    parser->payer = segment;
     parser->loop = segment;
   }else if(parser->loop == parser->payer){
     addChildSegment(parser->payer, segment);
-    parser->payee = segment
+    parser->payee = segment;
     parser->loop = segment;
   }else{
     parseFail(parser);
@@ -133,10 +133,11 @@ void n1Handler(parser_t *parser, segment_t *segment){
 }
 
 void lxHandler(parser_t *parser, segment_t *segment){
-  if(parser->loop == parser->payee)
+  if(parser->loop == parser->payee){
     addChildSegment(parser->payee, segment);
     parser->header = segment;
     parser->loop = segment;
+  }
   else{
    parseFail(parser);
   }
@@ -186,7 +187,7 @@ void geHandler(parser_t *parser, segment_t *segment){
 }
 
 void ieaHandler(parser_t *parser, segment_t *segment){
-  if(parser->loop == parser->interchange && isGE(parser->functional-name)){
+  if(parser->loop == parser->interchange && isGE(parser->functional->name)){
     parser->interchange->tail = segment;
     parser->interchange = segment;
     parser->loop = segment;
@@ -204,7 +205,7 @@ void parserInitialization(parser_t *parser){
   parser->failure = false;
   parser->finished = false;
   parser->interchange = NULL;
-  parser->segment = NULL;  
+  parser->loop = NULL;
   parser->functional = NULL;
   parser->transaction = NULL;
   parser->payer = NULL;
@@ -214,18 +215,17 @@ void parserInitialization(parser_t *parser){
 }
 
 void parserFree(parser_t *parser){
-  loopFree(parser->interchange);
-  loopFree(parser->functional);
-  loopFree(parser->transaction);
-  loopFree(parser->payer);
-  loopFree(parser->payee);
-  loopFree(parser->header);
   loopFree(parser->claim);
-  loopFree(parser->service);
+  loopFree(parser->header);
+  loopFree(parser->payee);
+  loopFree(parser->payer);
+  loopFree(parser->transaction);
+  loopFree(parser->functional);
+  loopFree(parser->interchange);
   free(parser);
 }
 
-void loopFree(loop_t *loop){
+void loopFree(segment_t *loop){
   segment_t *segment;
   segment_t *tmp;
   segment = loop->firstSegment;
