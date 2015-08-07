@@ -52,6 +52,41 @@ void parse835Element(char *str, segment_t *segment, short seg_cnt){
   segment->elements = cnt;
 }
 
+void attachSegment(parser_t *parser, segment_t *segment){
+  if(isISA(segment->name)){
+    isaHandler(parser, segment);
+  }else if(NULL == parser->loop || NULL == parser->interchange){
+    parseFail(parser);
+  }else if(isIEA(segment->name)){
+    iea(parser, segment);
+    parser->finished = true;
+  }else if(isGS(segment->name)){
+    gsHandler(parser, segment);
+  }else if(NULL == parser->functional){
+    parseFail(parser);
+  }else if(isGE(segment->name)){
+    geHandler(parser, segment);
+  }else if(isST(segment->name)){
+    stHandler(parser, segment);
+  }else if(NULL == parser->transaction){
+    parseFail(parser);
+  }else if(isSE(segment->name)){
+    seHandler(parser, segment);
+  }else if(isN1(segment->name)){
+    n1Handler(parser, segment);
+  }else if(NULL == parser->payer || NULL == parser->payee){
+    parseFail(parser);
+  }else if(isLX(segment->name)){
+    lxHandler(parser, segment);
+  }else if(isCLP(segment->name)){
+    clpHandler(parser, segment);
+  }else if(isSVC(segment->name)){
+    svcHandler(parser, segment);
+  }else if(isPLB(segment->name)){
+    plbHandler(parser, segment);
+  }
+}
+
 void isaHandler(parser_t *parser, segment_t *segment){
   if(NULL == parser->interchange){
     parser->interchange = segment;
@@ -62,14 +97,12 @@ void isaHandler(parser_t *parser, segment_t *segment){
 }
 
 void gsHandler(parser_t *parser, segment_t *segment){
-  if(parser->loop == parser->interchange)
-    if(NULL == parser->functional){
-      addChildSegment(parser->interchange, segment);
-    }else{
-      addSegment(parser->functional, segment);
-    }
+  if(parser->loop == parser->interchange){
+    addChildSegment(parser->interchange, segment);
     parser->functional = segment
     parser->loop = segment;
+  }else if(NULL != parser->functional){
+   parseFail(parser);
   else{
    parseFail(parser);
   }
@@ -77,11 +110,7 @@ void gsHandler(parser_t *parser, segment_t *segment){
 
 void stHandler(parser_t *parser, segment_t *segment){
   if(parser->loop == parser->functional)
-    if(NULL == parser->transaction){
-      addChildSegment(parser->functional, segment);
-    }else{
-      addSegment(parser->transaction, segment);
-    }
+    addChildSegment(parser->functional, segment);
     parser->transaction = segment;
     parser->loop = segment;
   else{
@@ -90,32 +119,22 @@ void stHandler(parser_t *parser, segment_t *segment){
 }
 
 void n1Handler(parser_t *parser, segment_t *segment){
-  if(parser->loop == parser->functional){
-    if(NULL == parser->payer){
-      addChildSegment(parser->functional, segment);
-    }else{
-      addSegment(parser->payer, segment);
-    }
+  if(parser->loop == parser->transaction){
+    addChildSegment(parser->functional, segment);
     parser->payer = segment
     parser->loop = segment;
   }else if(parser->loop == parser->payer){
-    if(NULL == parser->payee){
-      addChildSegment(parser->payer, segment);
-    }else{
-      addSegment(parser->payee, segment);
-    }
+    addChildSegment(parser->payer, segment);
     parser->payee = segment
     parser->loop = segment;
+  }else{
+    parseFail(parser);
   }
 }
 
 void lxHandler(parser_t *parser, segment_t *segment){
   if(parser->loop == parser->payee)
-    if(NULL == parser->header){
-      addChildSegment(parser->payee, segment);
-    }else{
-      addSegment(parser->header, segment);
-    }
+    addChildSegment(parser->payee, segment);
     parser->header = segment;
     parser->loop = segment;
   else{
@@ -124,79 +143,61 @@ void lxHandler(parser_t *parser, segment_t *segment){
 }
 
 void clpHandler(parser_t *parser, segment_t *segment){
-  if(NULL == parser->claim){
+  if(parser->loop == parser->service || parser->loop == parser->claim || parser->loop == parser->header){
+    parser->service = NULL;
     addChildSegment(parser->header, segment);
-  }else if(parser->loop == parser->claim || parser->service){
-    addSegment(parser->claim, segment);
-  }else if(parser->service){
-
+    parser->claim = segment;
+    parser->loop = segment;
   }else{
-   parseFail(parser);
+    parseFail(parser);
   }
+}
+
+void svcHandler(parser_t *parser, segment_t *segment){
+  if(parser->loop == parser->claim || parser->loop == parser->service){
+    addChildSegment(parser->claim, segment);
+    parser->service = segment;
+    parser->loop = segment;
+  }else{
+    parseFail(parser);
+  }
+}
+
+void plbHandler(parser_t *parser, segment_t *segment){
+  addChildSegment(parser->header, segment);
   parser->claim = segment;
   parser->loop = segment;
 }
 
-void attachSegment(parser_t *parser, segment_t *segment){
-  if(isISA(segment->name)){
-    isaHandler(parser, segment);
-  }else if(NULL == parser->loop || NULL == parser->interchange){
+void seHandler(parser_t *parser, segment_t *segment){
+  addChildSegment(parser->functional, segment);
+  parser->transaction = segment;
+  parser->loop = parser->functional;
+}
+
+void geHandler(parser_t *parser, segment_t *segment){
+  if(parser->loop == parser->functional && isSE(parser->transaction->name)){
+    addChildSegment(parser->interchange, segment);
+    parser->functional = segment;
+    parser->loop = parser->interchange;
+  }else{
     parseFail(parser);
-  }else if(isGS(segment->name)){
-    gsHandler(parser, segment);
-  }else if(isST(segment->name)){
-    stHandler(parser, segment);
-  }else if(isN1(segment->name)){
-    n1Handler(parser, segment);
-  }else if(isLX(segment->name)){
-    lxHandler(parser, segment);
-  }else if(isCLP(segment->name)){
-  }else if(isSVC(segment->name)){
-    resetDetail(parser);
-    if(isCLP(parser->segment->name) && !isSVC(parser->service->name)){
-      parser->service = calloc(1,sizeof(loop_t));
-      loopInitializer(parser->service, SVC_SEGMENT);
-      parser->loop = parser->service;
-    }else if(isSVC(parser->service->name)){
-      parser->loop = parser->service;
-    }
-  }else if(isPLB(segment->name)){
-    if(isST(parser->transaction->name)){
-      parser->loop = parser->transaction;
-      resetClaim(parser);
-    }else{
-      parseFail(parser);
-    }
-  }else if(isGE(segment->name)){
-    if(isST(parser->segment->name) && isGS(parser->functional->name)){
-      parser->loop = parser->functional;
-      resetClaim(parser);
-    }else{
-      parseFail(parser);
-    }
-  }else if(isIEA(segment->name)){
-    if(isGS(parser->segment->name) && isISA(parser->interchange->name)){
-      parser->loop = parser->interchange;
-      resetClaim(parser);
-    }else{
-      parseFail(parser);
-    }
+  }
+}
+
+void ieaHandler(parser_t *parser, segment_t *segment){
+  if(parser->loop == parser->interchange && isGE(parser->functional-name)){
+    parser->interchange->tail = segment;
+    parser->interchange = segment;
+    parser->loop = segment;
+  }else{
+    parseFail(parser);
   }
 }
 
 void parseFail(parser_t *parser){
   parser->failure = true;
   parser->finished = true;
-}
-
-void resetDetail(parser_t *parser){
-  parser->curSvc = NULL;
-}
-
-
-void resetClaim(parser_t *parser){
-  parser->curSvc = NULL;
-  parser->curClp = NULL;
 }
 
 void parserInitialization(parser_t *parser){

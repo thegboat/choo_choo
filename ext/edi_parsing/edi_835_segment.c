@@ -52,30 +52,3 @@ void addChildSegment(segment_t *parent, segment_t *child){
     parent->lastSegment = child;
   }
 }
-
-void attachSegment(parser_t *parser, segment_t *segment){
-  if(isCLP(segment->name)){
-    parser->curClp = segment;
-    addSegment(parser->loop, segment);
-  }else if(isSVC(segment->name)){
-    parser->curSvc = segment;
-    addChildSegment(parser->curClp, segment);
-    addSegment(parser->loop, segment);
-  }else if(isSVC(parser->curSvc->name)){
-    addChildSegment(parser->curSvc, segment);
-  }else if(isCLP(parser->curClp->name)){
-    addChildSegment(parser->curClp, segment);
-  }else{
-    addSegment(parser->loop, segment);
-  }
-}
-
-void addSegment(loop_t *loop, segment_t * child){
-  if(NULL == loop->firstSegment){
-    loop->firstSegment = child;
-  }else{
-    loop->lastSegment->tail = child;
-    child->head = loop->lastSegment;
-  }
-  loop->lastSegment = child;
-}

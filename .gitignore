@@ -9,3 +9,7 @@
 /tmp/
 /lib/edi_parsing.bundle
 /.irb-save-history
+/ext/edi_parsing/edi_parsing.xcodeproj/
+/ext/edi_parsing/ruby
+/ext/edi_parsing/Makefile
+/lib/edi_parsing.bundle
