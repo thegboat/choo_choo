@@ -55,7 +55,7 @@
 #define WRONG_NUMBER_OF_ELEMENTS_FOR_ISA  3
 #define MISSING_GS_SEGMENT                4
 #define MISSING_ST_SEGMENT                5
-#define INVALID_GS_SEGMENT                6
+#define INVALID_SE_SEGMENT                6
 #define INVALID_ST_SEGMENT                7
 #define INVALID_N1_SEGMENT                8
 #define INVALID_LX_SEGMENT                9
@@ -63,6 +63,16 @@
 #define INVALID_SVC_SEGMENT               11
 #define INVALID_GE_SEGMENT                12
 #define INVALID_IEA_SEGMENT               13
+#define WRONG_NUMBER_OF_ELEMENTS_FOR_SE   14
+#define WRONG_NUMBER_OF_ELEMENTS_FOR_GE   15
+#define WRONG_NUMBER_OF_ELEMENTS_FOR_IEA  16
+#define MISSING_SE_SEGMENT                17
+#define MISSING_GE_SEGMENT                18
+#define WRONG_NUMBER_OF_ELEMENTS_FOR_GS   19
+#define WRONG_NUMBER_OF_ELEMENTS_FOR_ST   20
+#define INVALID_PAYER_LOOP                21
+#define INVALID_GS_SEGMENT                22
+#define MISSING_PAYER_LOOP                23
 
 
 #endif

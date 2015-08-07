@@ -58,31 +58,31 @@ void attachSegment(parser_t *parser, segment_t *segment){
   if(isISA(segment->name)){
     isaHandler(parser, segment);
   }else if(NULL == parser->loop || NULL == parser->interchange){
-    parseFail(parser);
+    parseFail(parser, ISA_SEGMENT_NOT_DETECTED_FIRST);
   }else if(parser->interchange->elements != 16){
-    parseFail(parser);
+    parseFail(parser, WRONG_NUMBER_OF_ELEMENTS_FOR_ISA);
   }else if(isIEA(segment->name)){
     ieaHandler(parser, segment);
   }else if(isGS(segment->name)){
     gsHandler(parser, segment);
   }else if(NULL == parser->functional){
-    parseFail(parser);
+    parseFail(parser, MISSING_GS_SEGMENT);
   }else if(parser->functional->elements != 8){
-    parseFail(parser);
+    parseFail(parser, WRONG_NUMBER_OF_ELEMENTS_FOR_GS);
   }else if(isGE(segment->name)){
     geHandler(parser, segment);
   }else if(isST(segment->name)){
     stHandler(parser, segment);
   }else if(parser->transaction->elements != 2){
-    parseFail(parser);
+    parseFail(parser, WRONG_NUMBER_OF_ELEMENTS_FOR_ST);
   }else if(NULL == parser->transaction){
-    parseFail(parser);
+    parseFail(parser, MISSING_ST_SEGMENT);
   }else if(isSE(segment->name)){
     seHandler(parser, segment);
   }else if(isN1(segment->name)){
     n1Handler(parser, segment);
   }else if(NULL == parser->payer || NULL == parser->payee){
-    parseFail(parser);
+    parseFail(parser, MISSING_PAYER_LOOP);
   }else if(isLX(segment->name)){
     lxHandler(parser, segment);
   }else if(isCLP(segment->name)){
@@ -99,7 +99,7 @@ void isaHandler(parser_t *parser, segment_t *segment){
     parser->interchange = segment;
     parser->loop = segment;
   }else{
-    parseFail(parser);
+    parseFail(parser, MORE_THAN_ONE_ISA_SEGMENT_FOUND);
   }
 }
 
@@ -109,7 +109,7 @@ void gsHandler(parser_t *parser, segment_t *segment){
     parser->functional = segment;
     parser->loop = segment;
   }else{
-   parseFail(parser);
+   parseFail(parser, INVALID_GS_SEGMENT);
   }
 }
 
@@ -119,7 +119,7 @@ void stHandler(parser_t *parser, segment_t *segment){
     parser->transaction = segment;
     parser->loop = segment;
   }else{
-   parseFail(parser);
+   parseFail(parser, INVALID_ST_SEGMENT);
   }
 }
 
@@ -133,7 +133,7 @@ void n1Handler(parser_t *parser, segment_t *segment){
     parser->payee = segment;
     parser->loop = segment;
   }else{
-    parseFail(parser);
+    parseFail(parser, INVALID_N1_SEGMENT);
   }
 }
 
@@ -144,7 +144,7 @@ void lxHandler(parser_t *parser, segment_t *segment){
     parser->loop = segment;
   }
   else{
-   parseFail(parser);
+   parseFail(parser, INVALID_LX_SEGMENT);
   }
 }
 
@@ -155,7 +155,7 @@ void clpHandler(parser_t *parser, segment_t *segment){
     parser->claim = segment;
     parser->loop = segment;
   }else{
-    parseFail(parser);
+    parseFail(parser, INVALID_CLP_SEGMENT);
   }
 }
 
@@ -165,7 +165,7 @@ void svcHandler(parser_t *parser, segment_t *segment){
     parser->service = segment;
     parser->loop = segment;
   }else{
-    parseFail(parser);
+    parseFail(parser, INVALID_SVC_SEGMENT);
   }
 }
 
@@ -187,7 +187,7 @@ void geHandler(parser_t *parser, segment_t *segment){
     parser->functional = segment;
     parser->loop = parser->interchange;
   }else{
-    parseFail(parser);
+    parseFail(parser, INVALID_GE_SEGMENT);
   }
 }
 
@@ -197,33 +197,47 @@ void ieaHandler(parser_t *parser, segment_t *segment){
     parser->interchange = segment;
     parser->loop = segment;
   }else{
-    parseFail(parser);
+    parseFail(parser, INVALID_IEA_SEGMENT);
   }
 }
 
 void validateParser(parser_t *parser){
   if(!parser->finished){
     if(!isSE(parser->transaction->name)){
-      parseFail(parser);
-    }else if(parser->transaction->elements != 2){
-      parseFail(parser);
-    }else if(!isGE(parser->functional->name)){
-      parseFail(parser);
-    }else if(parser->functional->elements != 2){
-      parseFail(parser);
-    }else if(parser->interchange->elements != 2){
-      parseFail(parser);
-    }else if(!isGE(parser->functional->name)){
-      parseFail(parser);
-    }else else{
-      parser->finished = true;
+      parseFail(parser, MISSING_SE_SEGMENT);
     }
+
+    if(parser->transaction->elements != 2){
+      parseFail(parser, WRONG_NUMBER_OF_ELEMENTS_FOR_SE);
+    }
+
+    if(!isGE(parser->functional->name)){
+      parseFail(parser, MISSING_GE_SEGMENT);
+    }
+
+    if(parser->functional->elements != 2){
+      parseFail(parser, WRONG_NUMBER_OF_ELEMENTS_FOR_GE);
+    }
+
+    if(!isIEA(parser->functional->name)){
+      parseFail(parser, MISSING_IEA_SEGMENT);
+    }
+
+    if(parser->interchange->elements != 2){
+      parseFail(parser, WRONG_NUMBER_OF_ELEMENTS_FOR_IEA);
+    }
+    parser->finished = true;
   }
 }
 
-void parseFail(parser_t *parser){
+void parseFail(parser_t *parser, short error){
   parser->failure = true;
   parser->finished = true;
+  
+  if(parser->error_count < MAX_ERROR_SIZE){
+    parser->error[parser->error_count] = error;
+    parser->error_count++;
+  }
 }
 
 void parserInitialization(parser_t *parser){
@@ -237,6 +251,7 @@ void parserInitialization(parser_t *parser){
   parser->payee = NULL;
   parser->header = NULL;
   parser->claim = NULL;
+  error_count = 0;
 }
 
 void parserFree(parser_t *parser){

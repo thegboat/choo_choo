@@ -42,6 +42,7 @@ struct property_struct
 struct parser_struct
 {
   short errors[MAX_ERROR_SIZE];
+  short error_count;
   char *str;
   segment_t *loop;
   segment_t *interchange;
@@ -106,7 +107,7 @@ void parse835Segment(parser_t *parser);
 void parse835Element(char *str, segment_t *segment, short seg_cnt);
 
 
-void parseFail(parser_t *parser);
+void parseFail(parser_t *parser, short error);
 void parserFree(parser_t *parser);
 void loopFree(segment_t *segment_t);
 void segmentFree(segment_t *segment);
