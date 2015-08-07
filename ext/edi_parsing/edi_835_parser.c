@@ -8,38 +8,34 @@
 #include "edi_835_parser.h"
 
 void parse835(parser_t *parser, char *ediFile){
-  parser->finished = false;
-  parser->failure = false;
+  parserInitialization(parser);
   char *saveptr;
   parser->str = strtok_r(ediFile, SEGMENT_SEPARATOR, &saveptr);
   while(NULL != parser->str && !parser->finished && !parser->failure){
-    moveLoopIfNecessary(parser);
     parse835Segment(parser);
     parser->str = strtok_r(NULL, SEGMENT_SEPARATOR, &saveptr);
   }
 }
 
 void parse835Segment(parser_t *parser){
-  if(!parser->finished && !parser->failure){
-    segment_t *segment = calloc(1,sizeof(segment_t));
-    char *tok;
-    char *saveptr;
-    short cnt = 0;
-    tok = strtok_r(parser->str, ELEMENT_SEPARATOR, &saveptr);
-    setSegmentName(segment, tok);
-    attachSegment(parser, segment);
-    tok = strtok_r(NULL, ELEMENT_SEPARATOR, &saveptr);
-    while (tok != NULL)
-    {
-      cnt++;
-      if(NULL != strstr(tok, COMPONENT_SEPARATOR)){
-        parse835Element(tok, segment, cnt);
-      }else{
-        buildProperty(segment, tok, cnt, 0);
-      }
-      tok = strtok_r(NULL, ELEMENT_SEPARATOR, &saveptr);
+  segment_t *segment = calloc(1,sizeof(segment_t));
+  char *tok;
+  char *saveptr;
+  short cnt = 0;
+  tok = strtok_r(parser->str, ELEMENT_SEPARATOR, &saveptr);
+  setSegmentName(segment, tok);
+  tok = strtok_r(NULL, ELEMENT_SEPARATOR, &saveptr);
+  while (tok != NULL)
+  {
+    cnt++;
+    if(NULL != strstr(tok, COMPONENT_SEPARATOR)){
+      parse835Element(tok, segment, cnt);
+    }else{
+      buildProperty(segment, tok, cnt, 0);
     }
+    tok = strtok_r(NULL, ELEMENT_SEPARATOR, &saveptr);
   }
+  attachSegment(parser, segment);
 }
 
 void parse835Element(char *str, segment_t *segment, short seg_cnt){
@@ -56,86 +52,130 @@ void parse835Element(char *str, segment_t *segment, short seg_cnt){
   segment->elements = cnt;
 }
 
-void moveLoopIfNecessary(parser_t *parser){
-  if(isISA(parser->str)){
-    if(!isISA(parser->loop->name)){
-      parser->interchange = calloc(1,sizeof(loop_t));
-      loopInitializer(parser->interchange, ISA_SEGMENT);
-      parser->loop = parser->interchange;
+void isaHandler(parser_t *parser, segment_t *segment){
+  if(NULL == parser->interchange){
+    parser->interchange = segment;
+    parser->loop = segment;
+  }else{
+    parseFail(parser);
+  }
+}
+
+void gsHandler(parser_t *parser, segment_t *segment){
+  if(parser->loop == parser->interchange)
+    if(NULL == parser->functional){
+      addChildSegment(parser->interchange, segment);
     }else{
-      //more than one isa
-      parseFail(parser);
+      addSegment(parser->functional, segment);
     }
-  }else if(isGS(parser->str)){
-    if(isISA(parser->loop->name) && !isGS(parser->functional->name)){
-      parser->functional = calloc(1,sizeof(loop_t));
-      loopInitializer(parser->functional, GS_SEGMENT);
-      parser->loop = parser->functional;
+    parser->functional = segment
+    parser->loop = segment;
+  else{
+   parseFail(parser);
+  }
+}
+
+void stHandler(parser_t *parser, segment_t *segment){
+  if(parser->loop == parser->functional)
+    if(NULL == parser->transaction){
+      addChildSegment(parser->functional, segment);
     }else{
-      parseFail(parser);
+      addSegment(parser->transaction, segment);
     }
-  }else if(isST(parser->str)){
-    if(isGS(parser->loop->name) && !isST(parser->transaction->name)){
-      parser->transaction = calloc(1,sizeof(loop_t));
-      loopInitializer(parser->transaction, ST_SEGMENT);
-      parser->loop = parser->transaction;
+    parser->transaction = segment;
+    parser->loop = segment;
+  else{
+   parseFail(parser);
+  }
+}
+
+void n1Handler(parser_t *parser, segment_t *segment){
+  if(parser->loop == parser->functional){
+    if(NULL == parser->payer){
+      addChildSegment(parser->functional, segment);
     }else{
-      parseFail(parser);
+      addSegment(parser->payer, segment);
     }
-  }else if(isN1(parser->str)){
-    if(isST(parser->loop->name) && !isPR(parser->payer->name)){
-      parser->payer = calloc(1,sizeof(loop_t));
-      loopInitializer(parser->payer, PR_LOOP);
-      parser->loop = parser->payer;
-    }else if(isPR(parser->loop->name) && !isPE(parser->payee->name)){
-      parser->payee = calloc(1,sizeof(loop_t));
-      loopInitializer(parser->payee, PE_LOOP);
-      parser->loop = parser->payee;
+    parser->payer = segment
+    parser->loop = segment;
+  }else if(parser->loop == parser->payer){
+    if(NULL == parser->payee){
+      addChildSegment(parser->payer, segment);
     }else{
-      parseFail(parser);
+      addSegment(parser->payee, segment);
     }
-  }else if(isLX(parser->str)){
-    if(isPE(parser->loop->name) && !isLX(parser->header->name)){
-      parser->header = calloc(1,sizeof(loop_t));
-      loopInitializer(parser->header, LX_SEGMENT);
-      parser->loop = parser->header;
+    parser->payee = segment
+    parser->loop = segment;
+  }
+}
+
+void lxHandler(parser_t *parser, segment_t *segment){
+  if(parser->loop == parser->payee)
+    if(NULL == parser->header){
+      addChildSegment(parser->payee, segment);
     }else{
-      parseFail(parser);
+      addSegment(parser->header, segment);
     }
-  }else if(isCLP(parser->str)){
-    resetClaim(parser);
-    if(isLX(parser->loop->name) && !isCLP(parser->claim->name)){
-      parser->claim = calloc(1,sizeof(loop_t));
-      loopInitializer(parser->claim, CLP_SEGMENT);
-      parser->loop = parser->claim;
-    }else if(isCLP(parser->claim->name)){
-      parser->loop = parser->claim;
-    }
-  }else if(isSVC(parser->str)){
+    parser->header = segment;
+    parser->loop = segment;
+  else{
+   parseFail(parser);
+  }
+}
+
+void clpHandler(parser_t *parser, segment_t *segment){
+  if(NULL == parser->claim){
+    addChildSegment(parser->header, segment);
+  }else if(parser->loop == parser->claim || parser->service){
+    addSegment(parser->claim, segment);
+  }else if(parser->service){
+
+  }else{
+   parseFail(parser);
+  }
+  parser->claim = segment;
+  parser->loop = segment;
+}
+
+void attachSegment(parser_t *parser, segment_t *segment){
+  if(isISA(segment->name)){
+    isaHandler(parser, segment);
+  }else if(NULL == parser->loop || NULL == parser->interchange){
+    parseFail(parser);
+  }else if(isGS(segment->name)){
+    gsHandler(parser, segment);
+  }else if(isST(segment->name)){
+    stHandler(parser, segment);
+  }else if(isN1(segment->name)){
+    n1Handler(parser, segment);
+  }else if(isLX(segment->name)){
+    lxHandler(parser, segment);
+  }else if(isCLP(segment->name)){
+  }else if(isSVC(segment->name)){
     resetDetail(parser);
-    if(isCLP(parser->loop->name) && !isSVC(parser->service->name)){
+    if(isCLP(parser->segment->name) && !isSVC(parser->service->name)){
       parser->service = calloc(1,sizeof(loop_t));
       loopInitializer(parser->service, SVC_SEGMENT);
       parser->loop = parser->service;
     }else if(isSVC(parser->service->name)){
       parser->loop = parser->service;
     }
-  }else if(isPLB(parser->str)){
+  }else if(isPLB(segment->name)){
     if(isST(parser->transaction->name)){
       parser->loop = parser->transaction;
       resetClaim(parser);
     }else{
       parseFail(parser);
     }
-  }else if(isGE(parser->str)){
-    if(isST(parser->loop->name) && isGS(parser->functional->name)){
+  }else if(isGE(segment->name)){
+    if(isST(parser->segment->name) && isGS(parser->functional->name)){
       parser->loop = parser->functional;
       resetClaim(parser);
     }else{
       parseFail(parser);
     }
-  }else if(isIEA(parser->str)){
-    if(isGS(parser->loop->name) && isISA(parser->interchange->name)){
+  }else if(isIEA(segment->name)){
+    if(isGS(parser->segment->name) && isISA(parser->interchange->name)){
       parser->loop = parser->interchange;
       resetClaim(parser);
     }else{
@@ -157,6 +197,19 @@ void resetDetail(parser_t *parser){
 void resetClaim(parser_t *parser){
   parser->curSvc = NULL;
   parser->curClp = NULL;
+}
+
+void parserInitialization(parser_t *parser){
+  parser->failure = false;
+  parser->finished = false;
+  parser->interchange = NULL;
+  parser->segment = NULL;  
+  parser->functional = NULL;
+  parser->transaction = NULL;
+  parser->payer = NULL;
+  parser->payee = NULL;
+  parser->header = NULL;
+  parser->claim = NULL;
 }
 
 void parserFree(parser_t *parser){

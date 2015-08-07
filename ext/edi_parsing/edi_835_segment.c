@@ -69,3 +69,13 @@ void attachSegment(parser_t *parser, segment_t *segment){
     addSegment(parser->loop, segment);
   }
 }
+
+void addSegment(loop_t *loop, segment_t * child){
+  if(NULL == loop->firstSegment){
+    loop->firstSegment = child;
+  }else{
+    loop->lastSegment->tail = child;
+    child->head = loop->lastSegment;
+  }
+  loop->lastSegment = child;
+}

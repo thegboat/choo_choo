@@ -18,7 +18,6 @@
 typedef struct segment_struct segment_t;
 typedef struct property_struct property_t;
 typedef struct parser_struct parser_t;
-typedef struct loop_struct loop_t;
 
 struct segment_struct
 {
@@ -40,28 +39,19 @@ struct property_struct
   property_t *tail;
 };
 
-struct loop_struct
-{
-  char name[MAX_NAME_SIZE+1];
-  segment_t *firstSegment;
-  segment_t *lastSegment; 
-};
-
 struct parser_struct
 {
   int errors[MAX_ERROR_SIZE];
   char *str;
-  segment_t *curClp;
-  segment_t *curSvc;
-  loop_t *loop;
-  loop_t *interchange;
-  loop_t *functional;
-  loop_t *transaction;
-  loop_t *payer;
-  loop_t *payee;
-  loop_t *header;
-  loop_t *claim;
-  loop_t *service;
+  segment_t *loop;
+  segment_t *interchange;
+  segment_t *functional;
+  segment_t *transaction;
+  segment_t *payer;
+  segment_t *payee;
+  segment_t *header;
+  segment_t *claim;
+  segment_t *service;
   bool failure;
   bool finished;
 };
