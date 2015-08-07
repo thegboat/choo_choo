@@ -7,3 +7,5 @@
 /pkg/
 /spec/reports/
 /tmp/
+/lib/edi_parsing.bundle
+/.irb-save-history

@@ -1,2 +1,0 @@
-class ChooChoo::RemittanceObject
-end
