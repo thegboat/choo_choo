@@ -9,6 +9,7 @@
 #ifndef edi_835_parser_h
 #define edi_835_parser_h
 
+
 #include <stdbool.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -24,6 +25,7 @@ struct segment_struct
   char name[MAX_NAME_SIZE+1];
   segment_t *head;
   segment_t *tail;
+  segment_t *parent;
   property_t *firstProperty;
   property_t *lastProperty;
   segment_t *firstSegment;
@@ -42,7 +44,7 @@ struct property_struct
 struct parser_struct
 {
   short errors[MAX_ERROR_SIZE];
-  short error_count;
+  short errorCount;
   char *str;
   segment_t *loop;
   segment_t *interchange;
@@ -53,6 +55,9 @@ struct parser_struct
   segment_t *header;
   segment_t *claim;
   segment_t *service;
+  segment_t *trailer;
+  char componentSeparator[2];
+  long segmentCount;
   bool failure;
   bool finished;
 };
@@ -94,7 +99,7 @@ bool isPE(char *src);
 /* segment */
 
 void buildProperty(segment_t *segment, char *data, short seg_cnt, short elem_cnt);
-void setSegmentName(segment_t *segment, char *src);
+void segmentInitializer(segment_t *segment, char *src);
 void addProperty(segment_t *segment, property_t *property);
 void buildKey(char *key, char *seg_name, short seg_cnt, short elem_cnt);
 void attachSegment(parser_t *parser, segment_t *segment);
@@ -104,10 +109,13 @@ void addChildSegment(segment_t *parent, segment_t *child);
 
 void parse835(parser_t *parser, char *ediFile);
 void parse835Segment(parser_t *parser);
-void parse835Element(char *str, segment_t *segment, short seg_cnt);
+void parse835Element(char *str, const char componentSeparator[2], segment_t *segment, short seg_cnt);
 
-
+void rewindParser(parser_t *parser);
+segment_t *rewindLoop(segment_t *loop);
 void parseFail(parser_t *parser, short error);
+void defaultHandler(parser_t *parser, segment_t *segment);
+void validateParser(parser_t *parser);
 void parserFree(parser_t *parser);
 void loopFree(segment_t *segment_t);
 void segmentFree(segment_t *segment);

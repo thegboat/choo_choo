@@ -42,13 +42,13 @@
 #define PE_LOOP "PE"
 
 #define ELEMENT_SEPARATOR       "*"
-#define COMPONENT_SEPARATOR     ":"
 #define SEGMENT_SEPARATOR       "~"
 #define REPITITION_SEPARATOR       "^"
 
 #define MAX_NAME_SIZE 5
 #define MAX_KEY_SIZE 10
-#define MAX_ERROR_SIZE 100
+#define MAX_ERROR_SIZE 10
+#define MAX_THREADS 2
 
 #define ISA_SEGMENT_NOT_DETECTED_FIRST    1
 #define MORE_THAN_ONE_ISA_SEGMENT_FOUND   2
@@ -73,6 +73,8 @@
 #define INVALID_PAYER_LOOP                21
 #define INVALID_GS_SEGMENT                22
 #define MISSING_PAYER_LOOP                23
+#define MISSING_IEA_SEGMENT               24
+#define INVALID_COMPONENT_SEPARATOR       25
 
 
 #endif

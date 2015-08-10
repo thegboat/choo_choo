@@ -1,9 +1,14 @@
+
+
+require "json"
+require "stringio"
 require "edi_parsing"
+require "oj"
+require "ox"
 require "choo_choo/version"
+require "choo_choo/parser"
+require "choo_choo/edi_835"
 
 module ChooChoo
 
-  def self.parse_835(file_string)
-    _c_parse_835(file_string)
-  end
 end

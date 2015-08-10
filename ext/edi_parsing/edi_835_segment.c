@@ -7,11 +7,12 @@
 //
 #include "edi_835_parser.h"
 
-void setSegmentName(segment_t *segment, char *src){
+void segmentInitializer(segment_t *segment, char *src){
   long idx = strlen(src);
   idx = idx-1 > MAX_NAME_SIZE ? MAX_NAME_SIZE : idx;
   memcpy(segment->name,src,idx);
   segment->name[idx+1] = '\0';
+  segment->elements = 0;
 }
 
 void addProperty(segment_t *segment, property_t *property){
@@ -45,10 +46,10 @@ void buildKey(char *key, char *seg_name, short seg_cnt, short elem_cnt){
 void addChildSegment(segment_t *parent, segment_t *child){
   if(NULL == parent->firstSegment){
     parent->firstSegment = child;
-    parent->lastSegment = child;
   }else{
     parent->lastSegment->tail = child;
-    child->head = parent->lastSegment->tail;
-    parent->lastSegment = child;
+    child->head = parent->lastSegment;
   }
+  parent->lastSegment = child;
+  child->parent = parent;
 }

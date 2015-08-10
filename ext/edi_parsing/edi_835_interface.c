@@ -8,54 +8,107 @@
 #include <ruby.h>
 #include "edi_835_parser.h"
 
-ID id_hash_store;
-
 VALUE mChooChoo;
-VALUE cEDI_835;
-VALUE cChooChooHash;
+VALUE cSegment;
+VALUE cParser;
+VALUE cInterchangeLoop;
 
-void choo_choo_edi_835_free(VALUE self){
+static VALUE interchange_loop_alloc(VALUE self);
+static void interchange_loop_free(VALUE self);
+static VALUE choo_choo_parse_835(VALUE segment, VALUE isa_str);
+static VALUE choo_choo_parse_835(VALUE segment, VALUE isa_str);
+static VALUE interchange_loop_to_hash(VALUE self);
+static VALUE segment_to_hash(segment_t *segment);
+void Init_edi_parsing(void);
+
+static VALUE interchange_loop_alloc(VALUE self){
+  parser_t *parser = calloc(1, sizeof(parser_t));
+  return Data_Wrap_Struct(self, NULL, interchange_loop_free, parser);
+}
+
+static void interchange_loop_free(VALUE self){
   parser_t *parser;
   Data_Get_Struct(self, parser_t, parser);
-  if(NULL != parser){
-    parserFree(parser);
-  }
+  parserFree(parser);
 }
 
-// VALUE edi_835_isa(VALUE self){
-//   parser_t *parser;
-//   Data_Get_Struct(self, parser_t, parser);
-//   VALUE hash = rb_class_new_instance(0, NULL, cChooChooHash);
-//   rb_funcall(hash, )
-//   rb_funcall(obj, rb_intern("=="), 1, Qnil);
-//   return hash;
-// }
-
-VALUE choo_choo_edi_835_alloc(VALUE self) {
-  parser_t *parser = calloc(1,sizeof(parser_t));
-  parser->finished = false;
-  parser->failure = false;
-  return Data_Wrap_Struct(self, NULL, choo_choo_edi_835_free, parser);
-}
-
-VALUE choo_choo_parse_835(VALUE self, VALUE edi_file_string){
-  char *ediFile = StringValueCStr(edi_file_string);
+static VALUE choo_choo_parse_835(VALUE segment, VALUE isa_str){
+  char *c_isa_str = StringValueCStr(isa_str);
+  VALUE isa = rb_class_new_instance(0, NULL, cInterchangeLoop);
   parser_t *parser;
-  VALUE edi835 = rb_class_new_instance(0, NULL, cEDI_835);
-  Data_Get_Struct(edi835, parser_t, parser);
-  parse835(parser, ediFile);
-  return edi835;
+  Data_Get_Struct(isa, parser_t, parser);
+
+  parse835(parser, c_isa_str);
+
+  VALUE isas = rb_ary_new();
+  rb_ary_push(isas, isa);
+  return isas;
+}
+
+static VALUE parser_max_threads(){
+  return INT2NUM(MAX_THREADS);
+}
+
+static VALUE interchange_loop_to_hash(VALUE self){
+  VALUE hash = rb_iv_get(self, "@to_hash");
+  if(hash != Qnil){
+    return hash;
+  }else{
+    parser_t *parser;
+    Data_Get_Struct(self, parser_t, parser);
+    if(parser->failure){
+      hash = rb_hash_new(); 
+    }else{
+      rewindParser(parser);
+      hash = segment_to_hash(parser->interchange);
+    }
+  }
+  rb_iv_set(self, "@to_hash", hash);
+  return hash;
+}
+
+static VALUE interchange_loop_errors(VALUE self){
+  parser_t *parser;
+  VALUE array = rb_ary_new();
+  Data_Get_Struct(self, parser_t, parser);
+  for(short i; i<parser->errorCount;i++){
+    rb_ary_push(array, INT2NUM(parser->errors[i]));
+  }
+  return array;
+}
+
+static VALUE segment_to_hash(segment_t *segment){
+  property_t *property = segment->firstProperty;
+  segment_t *child = segment->firstSegment;
+  VALUE proxy = rb_hash_new();
+  VALUE children = rb_ary_new();
+
+  while(NULL != property){
+    VALUE key = ID2SYM(rb_intern(property->key));
+    rb_hash_aset(proxy, key, rb_str_new_cstr(property->value));
+    property = property->tail;
+  }
+
+  while(NULL != child){
+    rb_ary_push(children, segment_to_hash(child));
+    child = child->tail;
+  }
+
+  rb_hash_aset(proxy, ID2SYM(rb_intern("name")), rb_str_new_cstr(segment->name));
+  rb_hash_aset(proxy, ID2SYM(rb_intern("children")), children);
+  return proxy;
 }
 
 void Init_edi_parsing(void) {
   mChooChoo = rb_define_module("ChooChoo");
-  cEDI_835 = rb_define_class_under(mChooChoo, "EDI_835", rb_cObject);
+  cSegment = rb_define_class_under(mChooChoo, "Segment", rb_cObject);
+  cInterchangeLoop = rb_define_class_under(mChooChoo, "InterchangeLoop", rb_cObject);
+  cParser = rb_define_class_under(mChooChoo, "Parser", rb_cObject);
 
-  rb_define_alloc_func(cEDI_835, choo_choo_edi_835_alloc);
-  rb_define_singleton_method(mChooChoo, "_c_parse_835", choo_choo_parse_835, 1);
-  // rb_define_method(cEDI_835, "interchange_loop", edi_835_isa, 0);
+  rb_define_method(cParser, "_c_parse_835", choo_choo_parse_835, 1);
+  rb_define_method(cParser, "max_threads", parser_max_threads, 0);
 
-  id_hash_store = rb_intern("store");
-
-  cChooChooHash = rb_const_get(mChooChoo, rb_intern("Hash"));
+  rb_define_alloc_func(cInterchangeLoop, interchange_loop_alloc);
+  rb_define_method(cInterchangeLoop, "to_hash", interchange_loop_to_hash, 0);
+  rb_define_method(cInterchangeLoop, "_errors", interchange_loop_errors, 0);
 }

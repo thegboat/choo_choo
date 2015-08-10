@@ -7,38 +7,38 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		5245A2BC1B75299A0065AC1B /* edi_835_constants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = edi_835_constants.h; sourceTree = "<group>"; };
-		5245A2BD1B75299A0065AC1B /* edi_835_inspection.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = edi_835_inspection.c; sourceTree = "<group>"; };
-		5245A2BE1B75299A0065AC1B /* edi_835_interface.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = edi_835_interface.c; sourceTree = "<group>"; };
-		5245A2BF1B75299A0065AC1B /* edi_835_parser.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = edi_835_parser.c; sourceTree = "<group>"; };
-		5245A2C01B75299A0065AC1B /* edi_835_parser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = edi_835_parser.h; sourceTree = "<group>"; };
-		5245A2C11B75299A0065AC1B /* edi_835_segment.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = edi_835_segment.c; sourceTree = "<group>"; };
+		2F794FC51B77E2330092869F /* edi_835_segment.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = edi_835_segment.c; path = ../edi_835_segment.c; sourceTree = "<group>"; };
+		2FF307061B75985000CCF7C5 /* edi_835_constants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = edi_835_constants.h; path = ../edi_835_constants.h; sourceTree = "<group>"; };
+		2FF307071B75985000CCF7C5 /* edi_835_inspection.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = edi_835_inspection.c; path = ../edi_835_inspection.c; sourceTree = "<group>"; };
+		2FF307081B75985000CCF7C5 /* edi_835_interface.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = edi_835_interface.c; path = ../edi_835_interface.c; sourceTree = "<group>"; };
+		2FF307091B75985000CCF7C5 /* edi_835_parser.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = edi_835_parser.c; path = ../edi_835_parser.c; sourceTree = "<group>"; };
+		2FF3070A1B75985000CCF7C5 /* edi_835_parser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = edi_835_parser.h; path = ../edi_835_parser.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
-		5245A2B11B7528820065AC1B = {
+		2FF306FB1B75974300CCF7C5 = {
 			isa = PBXGroup;
 			children = (
-				5245A2BC1B75299A0065AC1B /* edi_835_constants.h */,
-				5245A2BD1B75299A0065AC1B /* edi_835_inspection.c */,
-				5245A2BE1B75299A0065AC1B /* edi_835_interface.c */,
-				5245A2BF1B75299A0065AC1B /* edi_835_parser.c */,
-				5245A2C01B75299A0065AC1B /* edi_835_parser.h */,
-				5245A2C11B75299A0065AC1B /* edi_835_segment.c */,
+				2FF307061B75985000CCF7C5 /* edi_835_constants.h */,
+				2FF307071B75985000CCF7C5 /* edi_835_inspection.c */,
+				2FF307081B75985000CCF7C5 /* edi_835_interface.c */,
+				2F794FC51B77E2330092869F /* edi_835_segment.c */,
+				2FF307091B75985000CCF7C5 /* edi_835_parser.c */,
+				2FF3070A1B75985000CCF7C5 /* edi_835_parser.h */,
 			);
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXLegacyTarget section */
-		5245A2B61B7528820065AC1B /* edi_parsing */ = {
+		2FF307001B75974300CCF7C5 /* edi_parsing */ = {
 			isa = PBXLegacyTarget;
 			buildArgumentsString = "$(ACTION)";
-			buildConfigurationList = 5245A2B91B7528820065AC1B /* Build configuration list for PBXLegacyTarget "edi_parsing" */;
+			buildConfigurationList = 2FF307031B75974300CCF7C5 /* Build configuration list for PBXLegacyTarget "edi_parsing" */;
 			buildPhases = (
 			);
 			buildToolPath = /usr/bin/make;
-			buildWorkingDirectory = /Users/carecloud/dev/choo_choo/ext/edi_parsing;
+			buildWorkingDirectory = /Users/gradygriffin/dev/choo_choo/ext/edi_parsing;
 			dependencies = (
 			);
 			name = edi_parsing;
@@ -48,35 +48,35 @@
 /* End PBXLegacyTarget section */
 
 /* Begin PBXProject section */
-		5245A2B21B7528820065AC1B /* Project object */ = {
+		2FF306FC1B75974300CCF7C5 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0640;
+				LastUpgradeCheck = 0630;
 				ORGANIZATIONNAME = "Grady Griffin";
 				TargetAttributes = {
-					5245A2B61B7528820065AC1B = {
-						CreatedOnToolsVersion = 6.4;
+					2FF307001B75974300CCF7C5 = {
+						CreatedOnToolsVersion = 6.3.2;
 					};
 				};
 			};
-			buildConfigurationList = 5245A2B51B7528820065AC1B /* Build configuration list for PBXProject "edi_parsing" */;
+			buildConfigurationList = 2FF306FF1B75974300CCF7C5 /* Build configuration list for PBXProject "edi_parsing" */;
 			compatibilityVersion = "Xcode 6.3";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 			);
-			mainGroup = 5245A2B11B7528820065AC1B;
+			mainGroup = 2FF306FB1B75974300CCF7C5;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				5245A2B61B7528820065AC1B /* edi_parsing */,
+				2FF307001B75974300CCF7C5 /* edi_parsing */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin XCBuildConfiguration section */
-		5245A2B71B7528820065AC1B /* Debug */ = {
+		2FF307011B75974300CCF7C5 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -118,7 +118,7 @@
 			};
 			name = Debug;
 		};
-		5245A2B81B7528820065AC1B /* Release */ = {
+		2FF307021B75974300CCF7C5 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -153,7 +153,7 @@
 			};
 			name = Release;
 		};
-		5245A2BA1B7528820065AC1B /* Debug */ = {
+		2FF307041B75974300CCF7C5 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				DEBUGGING_SYMBOLS = YES;
@@ -165,7 +165,7 @@
 			};
 			name = Debug;
 		};
-		5245A2BB1B7528820065AC1B /* Release */ = {
+		2FF307051B75974300CCF7C5 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				OTHER_CFLAGS = "";
@@ -177,25 +177,25 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		5245A2B51B7528820065AC1B /* Build configuration list for PBXProject "edi_parsing" */ = {
+		2FF306FF1B75974300CCF7C5 /* Build configuration list for PBXProject "edi_parsing" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				5245A2B71B7528820065AC1B /* Debug */,
-				5245A2B81B7528820065AC1B /* Release */,
+				2FF307011B75974300CCF7C5 /* Debug */,
+				2FF307021B75974300CCF7C5 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		5245A2B91B7528820065AC1B /* Build configuration list for PBXLegacyTarget "edi_parsing" */ = {
+		2FF307031B75974300CCF7C5 /* Build configuration list for PBXLegacyTarget "edi_parsing" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				5245A2BA1B7528820065AC1B /* Debug */,
-				5245A2BB1B7528820065AC1B /* Release */,
+				2FF307041B75974300CCF7C5 /* Debug */,
+				2FF307051B75974300CCF7C5 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = 5245A2B21B7528820065AC1B /* Project object */;
+	rootObject = 2FF306FC1B75974300CCF7C5 /* Project object */;
 }

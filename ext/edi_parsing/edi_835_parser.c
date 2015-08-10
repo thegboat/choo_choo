@@ -14,9 +14,9 @@ void parse835(parser_t *parser, char *ediFile){
   while(NULL != parser->str && !parser->finished && !parser->failure){
     parse835Segment(parser);
     parser->str = strtok_r(NULL, SEGMENT_SEPARATOR, &saveptr);
-
-    validateParser(parser);
+    parser->segmentCount++;
   }
+  validateParser(parser);
 }
 
 void parse835Segment(parser_t *parser){
@@ -25,33 +25,33 @@ void parse835Segment(parser_t *parser){
   char *saveptr;
   short cnt = 0;
   tok = strtok_r(parser->str, ELEMENT_SEPARATOR, &saveptr);
-  setSegmentName(segment, tok);
+  segmentInitializer(segment, tok);
   tok = strtok_r(NULL, ELEMENT_SEPARATOR, &saveptr);
   while (tok != NULL)
   {
     cnt++;
-    if(NULL != strstr(tok, COMPONENT_SEPARATOR)){
-      parse835Element(tok, segment, cnt);
+    if(strlen(parser->componentSeparator) == 1 && NULL != strstr(tok, parser->componentSeparator)){
+      parse835Element(tok, parser->componentSeparator, segment, cnt);
     }else{
       buildProperty(segment, tok, cnt, 0);
     }
     tok = strtok_r(NULL, ELEMENT_SEPARATOR, &saveptr);
   }
+  segment->elements = cnt;
   attachSegment(parser, segment);
 }
 
-void parse835Element(char *str, segment_t *segment, short seg_cnt){
+void parse835Element(char *str, const char componentSeparator[2], segment_t *segment, short seg_cnt){
   char *tok;
   char *saveptr;
   short cnt = 0;
-  tok = strtok_r(str, COMPONENT_SEPARATOR, &saveptr);
+  tok = strtok_r(str, componentSeparator, &saveptr);
   while (tok != NULL)
   {
     cnt++;
     buildProperty(segment, tok, seg_cnt, cnt);
-    tok = strtok_r(NULL, COMPONENT_SEPARATOR, &saveptr);
+    tok = strtok_r(NULL, componentSeparator, &saveptr);
   }
-  segment->elements = cnt;
 }
 
 void attachSegment(parser_t *parser, segment_t *segment){
@@ -59,8 +59,6 @@ void attachSegment(parser_t *parser, segment_t *segment){
     isaHandler(parser, segment);
   }else if(NULL == parser->loop || NULL == parser->interchange){
     parseFail(parser, ISA_SEGMENT_NOT_DETECTED_FIRST);
-  }else if(parser->interchange->elements != 16){
-    parseFail(parser, WRONG_NUMBER_OF_ELEMENTS_FOR_ISA);
   }else if(isIEA(segment->name)){
     ieaHandler(parser, segment);
   }else if(isGS(segment->name)){
@@ -81,8 +79,6 @@ void attachSegment(parser_t *parser, segment_t *segment){
     seHandler(parser, segment);
   }else if(isN1(segment->name)){
     n1Handler(parser, segment);
-  }else if(NULL == parser->payer || NULL == parser->payee){
-    parseFail(parser, MISSING_PAYER_LOOP);
   }else if(isLX(segment->name)){
     lxHandler(parser, segment);
   }else if(isCLP(segment->name)){
@@ -91,7 +87,13 @@ void attachSegment(parser_t *parser, segment_t *segment){
     svcHandler(parser, segment);
   }else if(isPLB(segment->name)){
     plbHandler(parser, segment);
+  }else{
+    defaultHandler(parser, segment);
   }
+}
+
+void defaultHandler(parser_t *parser, segment_t *segment){
+  addChildSegment(parser->loop, segment);
 }
 
 void isaHandler(parser_t *parser, segment_t *segment){
@@ -101,10 +103,21 @@ void isaHandler(parser_t *parser, segment_t *segment){
   }else{
     parseFail(parser, MORE_THAN_ONE_ISA_SEGMENT_FOUND);
   }
+
+  if(parser->interchange->elements != 16){
+    parseFail(parser, WRONG_NUMBER_OF_ELEMENTS_FOR_ISA);
+  }else{
+    if(strlen(parser->interchange->lastProperty->value) != 1){
+      parseFail(parser, INVALID_COMPONENT_SEPARATOR);
+    }else{
+      parser->componentSeparator[0] = parser->interchange->lastProperty->value[0];
+      parser->componentSeparator[1] = '\0';
+    }
+  }
 }
 
 void gsHandler(parser_t *parser, segment_t *segment){
-  if(parser->loop == parser->interchange){
+  if(parser->loop == parser->interchange || (parser->loop == parser->functional && NULL != parser->trailer && isGE(parser->trailer->name))){
     addChildSegment(parser->interchange, segment);
     parser->functional = segment;
     parser->loop = segment;
@@ -114,7 +127,7 @@ void gsHandler(parser_t *parser, segment_t *segment){
 }
 
 void stHandler(parser_t *parser, segment_t *segment){
-  if(parser->loop == parser->functional){
+  if(parser->loop == parser->functional || (parser->loop == parser->transaction && NULL != parser->trailer && isSE(parser->trailer->name))){
     addChildSegment(parser->functional, segment);
     parser->transaction = segment;
     parser->loop = segment;
@@ -138,7 +151,9 @@ void n1Handler(parser_t *parser, segment_t *segment){
 }
 
 void lxHandler(parser_t *parser, segment_t *segment){
-  if(parser->loop == parser->payee){
+  if(NULL == parser->payer || NULL == parser->payee){
+    parseFail(parser, MISSING_PAYER_LOOP);
+  }else if(parser->loop == parser->payee){
     addChildSegment(parser->payee, segment);
     parser->header = segment;
     parser->loop = segment;
@@ -176,26 +191,26 @@ void plbHandler(parser_t *parser, segment_t *segment){
 }
 
 void seHandler(parser_t *parser, segment_t *segment){
-  addChildSegment(parser->functional, segment);
-  parser->transaction = segment;
-  parser->loop = parser->functional;
+  addChildSegment(parser->transaction, segment);
+  parser->loop = parser->transaction;
+  parser->trailer = segment;
 }
 
 void geHandler(parser_t *parser, segment_t *segment){
-  if(parser->loop == parser->functional && isSE(parser->transaction->name)){
-    addChildSegment(parser->interchange, segment);
-    parser->functional = segment;
-    parser->loop = parser->interchange;
+  if(parser->loop == parser->transaction && isSE(parser->transaction->lastSegment->name)){
+    addChildSegment(parser->functional, segment);
+    parser->loop = parser->functional;
+    parser->trailer = segment;
   }else{
     parseFail(parser, INVALID_GE_SEGMENT);
   }
 }
 
 void ieaHandler(parser_t *parser, segment_t *segment){
-  if(parser->loop == parser->interchange && isGE(parser->functional->name)){
-    parser->interchange->tail = segment;
-    parser->interchange = segment;
-    parser->loop = segment;
+  if(parser->loop == parser->functional && isGE(parser->functional->lastSegment->name)){
+    addChildSegment(parser->interchange, segment);
+    parser->loop = parser->interchange;
+    parser->trailer = segment;
   }else{
     parseFail(parser, INVALID_IEA_SEGMENT);
   }
@@ -205,25 +220,19 @@ void validateParser(parser_t *parser){
   if(!parser->finished){
     if(!isSE(parser->transaction->name)){
       parseFail(parser, MISSING_SE_SEGMENT);
-    }
-
-    if(parser->transaction->elements != 2){
+    }else if(parser->transaction->elements != 2){
       parseFail(parser, WRONG_NUMBER_OF_ELEMENTS_FOR_SE);
     }
 
     if(!isGE(parser->functional->name)){
       parseFail(parser, MISSING_GE_SEGMENT);
-    }
-
-    if(parser->functional->elements != 2){
+    }else if(parser->functional->elements != 2){
       parseFail(parser, WRONG_NUMBER_OF_ELEMENTS_FOR_GE);
     }
 
-    if(!isIEA(parser->functional->name)){
+    if(!isIEA(parser->interchange->name)){
       parseFail(parser, MISSING_IEA_SEGMENT);
-    }
-
-    if(parser->interchange->elements != 2){
+    }else if(parser->interchange->elements != 2){
       parseFail(parser, WRONG_NUMBER_OF_ELEMENTS_FOR_IEA);
     }
     parser->finished = true;
@@ -234,9 +243,9 @@ void parseFail(parser_t *parser, short error){
   parser->failure = true;
   parser->finished = true;
   
-  if(parser->error_count < MAX_ERROR_SIZE){
-    parser->error[parser->error_count] = error;
-    parser->error_count++;
+  if(parser->errorCount < MAX_ERROR_SIZE){
+    parser->errors[parser->errorCount] = error;
+    parser->errorCount++;
   }
 }
 
@@ -251,42 +260,71 @@ void parserInitialization(parser_t *parser){
   parser->payee = NULL;
   parser->header = NULL;
   parser->claim = NULL;
-  error_count = 0;
+  parser->errorCount = 0;
+  parser->segmentCount = 0;
+  parser->componentSeparator[0] = '\0';
+}
+
+void rewindParser(parser_t *parser){
+  parser->interchange = rewindLoop(parser->interchange);
+  parser->functional = rewindLoop(parser->functional);
+  parser->transaction = rewindLoop(parser->transaction);
+  parser->payer = rewindLoop(parser->payer);
+  parser->payee = rewindLoop(parser->payee);
+  parser->header = rewindLoop(parser->header);
+  parser->claim = rewindLoop(parser->claim);
+  parser->loop = parser->interchange;
+}
+
+segment_t *rewindLoop(segment_t *loop){
+  segment_t *tmp;
+  tmp = loop;
+  while(NULL != tmp){
+    loop = tmp;
+    tmp = loop->head;
+  }
+  return loop;
 }
 
 void parserFree(parser_t *parser){
-  loopFree(parser->claim);
-  loopFree(parser->header);
-  loopFree(parser->payee);
-  loopFree(parser->payer);
-  loopFree(parser->transaction);
-  loopFree(parser->functional);
-  loopFree(parser->interchange);
-  free(parser);
+  if(NULL != parser){
+    rewindParser(parser);
+    loopFree(parser->claim);
+    loopFree(parser->header);
+    loopFree(parser->payee);
+    loopFree(parser->payer);
+    loopFree(parser->transaction);
+    loopFree(parser->functional);
+    loopFree(parser->interchange);
+    free(parser);
+  }
 }
 
 void loopFree(segment_t *loop){
-  segment_t *segment;
-  segment_t *tmp;
-  segment = loop->firstSegment;
-  while(NULL != segment){
-    tmp = segment->tail;
-    segmentFree(segment);
-    segment = tmp;
+  if(NULL != loop){
+    segment_t *segment;
+    segment_t *tmp;
+    segment = loop->firstSegment;
+    while(NULL != segment){
+      tmp = segment->tail;
+      if(segment != loop) segmentFree(segment);
+      segment = tmp;
+    }
   }
-  free(loop);
 }
 
 void segmentFree(segment_t *segment){
-  property_t *property;
-  property_t *tmp;
-  property = segment->firstProperty;
-  while(NULL != property){
-    tmp = property->tail;
-    propertyFree(property);
-    property = tmp;
+  if(NULL != segment){
+    property_t *property;
+    property_t *tmp;
+    property = segment->firstProperty;
+    while(NULL != property){
+      tmp = property->tail;
+      propertyFree(property);
+      property = tmp;
+    }
+    free(segment);
   }
-  free(segment);
 }
 
 void propertyFree(property_t *property){
