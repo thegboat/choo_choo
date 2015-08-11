@@ -16,6 +16,7 @@ void parse835(parser_t *parser, char *ediFile){
     parser->str = strtok_r(NULL, SEGMENT_SEPARATOR, &saveptr);
     parser->segmentCount++;
   }
+  parserCleanup(parser);
   validateParser(parser);
 }
 
@@ -31,26 +32,29 @@ void parse835Segment(parser_t *parser){
   {
     cnt++;
     if(strlen(parser->componentSeparator) == 1 && NULL != strstr(tok, parser->componentSeparator)){
-      parse835Element(tok, parser->componentSeparator, segment, cnt);
+      parse835Element(parser, tok, segment, cnt);
     }else{
       buildProperty(segment, tok, cnt, 0);
+      indexProperty(parser, segment->lastProperty);
     }
     tok = strtok_r(NULL, ELEMENT_SEPARATOR, &saveptr);
   }
   segment->elements = cnt;
   attachSegment(parser, segment);
+  indexSegment(parser, segment);
 }
 
-void parse835Element(char *str, const char componentSeparator[2], segment_t *segment, short seg_cnt){
+void parse835Element(parser_t *parser, char *str, segment_t *segment, short seg_cnt){
   char *tok;
   char *saveptr;
   short cnt = 0;
-  tok = strtok_r(str, componentSeparator, &saveptr);
+  tok = strtok_r(str, parser->componentSeparator, &saveptr);
   while (tok != NULL)
   {
     cnt++;
     buildProperty(segment, tok, seg_cnt, cnt);
-    tok = strtok_r(NULL, componentSeparator, &saveptr);
+    indexProperty(parser, segment->lastProperty);
+    tok = strtok_r(NULL, parser->componentSeparator, &saveptr);
   }
 }
 
@@ -239,6 +243,24 @@ void validateParser(parser_t *parser){
   }
 }
 
+void indexProperty(parser_t *parser, property_t *property){
+  if(PROPERTY_INDEX_RESIZE % parser->propertySeq == 0){
+    parser->propertyPkey = realloc(parser->propertyPkey, sizeof(property_t**)*(parser->propertySeq+ PROPERTY_INDEX_RESIZE));
+  }
+  parser->propertyPkey[parser->propertySeq] = property;
+  property->pkey = parser->propertySeq;
+  parser->propertySeq++;
+}
+
+void indexSegment(parser_t *parser, segment_t *segment){
+  if(SEGMENT_INDEX_RESIZE % parser->segmentSeq == 0){
+    parser->segmentPkey = realloc(parser->segmentPkey, sizeof(segment_t**)*(parser->segmentSeq+ SEGMENT_INDEX_RESIZE));
+  }
+  parser->segmentPkey[parser->segmentSeq] = segment;
+  segment->pkey = parser->segmentSeq;
+  parser->segmentSeq++;
+}
+
 void parseFail(parser_t *parser, short error){
   parser->failure = true;
   parser->finished = true;
@@ -263,6 +285,10 @@ void parserInitialization(parser_t *parser){
   parser->errorCount = 0;
   parser->segmentCount = 0;
   parser->componentSeparator[0] = '\0';
+  parser->segmentSeq = 0;
+  parser->propertySeq = 0;
+  parser->segmentPkey = malloc(sizeof(segment_t **)*SEGMENT_INDEX_RESIZE);
+  parser->propertyPkey = malloc(sizeof(property_t **)*PROPERTY_INDEX_RESIZE);
 }
 
 void rewindParser(parser_t *parser){
@@ -274,6 +300,16 @@ void rewindParser(parser_t *parser){
   parser->header = rewindLoop(parser->header);
   parser->claim = rewindLoop(parser->claim);
   parser->loop = parser->interchange;
+}
+
+void parserCleanup(parser_t *parser){
+  if(SEGMENT_INDEX_RESIZE % parser->segmentSeq != 0){
+    parser->segmentPkey = realloc(parser->segmentPkey, sizeof(segment_t**)*parser->segmentSeq);
+  }
+
+  if(PROPERTY_INDEX_RESIZE % parser->propertySeq != 0){
+    parser->propertyPkey = realloc(parser->propertyPkey, sizeof(property_t**)*parser->propertySeq);
+  }
 }
 
 segment_t *rewindLoop(segment_t *loop){

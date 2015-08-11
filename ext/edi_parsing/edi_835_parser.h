@@ -31,6 +31,7 @@ struct segment_struct
   segment_t *firstSegment;
   segment_t *lastSegment;
   short elements;
+  int pkey;
 };
 
 struct property_struct
@@ -39,6 +40,7 @@ struct property_struct
   char *value;
   property_t *head;
   property_t *tail;
+  int pkey;
 };
 
 struct parser_struct
@@ -56,6 +58,10 @@ struct parser_struct
   segment_t *claim;
   segment_t *service;
   segment_t *trailer;
+  int segmentSeq;
+  int propertySeq;
+  segment_t **segmentPkey;
+  property_t **propertyPkey;
   char componentSeparator[2];
   long segmentCount;
   bool failure;
@@ -109,7 +115,7 @@ void addChildSegment(segment_t *parent, segment_t *child);
 
 void parse835(parser_t *parser, char *ediFile);
 void parse835Segment(parser_t *parser);
-void parse835Element(char *str, const char componentSeparator[2], segment_t *segment, short seg_cnt);
+void parse835Element(parser_t *parser, char *str, segment_t *segment, short seg_cnt);
 
 void rewindParser(parser_t *parser);
 segment_t *rewindLoop(segment_t *loop);
@@ -133,5 +139,8 @@ void plbHandler(parser_t *parser, segment_t *segment);
 void seHandler(parser_t *parser, segment_t *segment);
 void geHandler(parser_t *parser, segment_t *segment);
 void ieaHandler(parser_t *parser, segment_t *segment);
+void parserCleanup(parser_t *parser);
+void indexSegment(parser_t *parser, segment_t *segment);
+void indexProperty(parser_t *parser, property_t *property);
 
 #endif
