@@ -31,7 +31,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "74"
             endingLineNumber = "74"
-            landmarkName = "attachSegment()"
+            landmarkName = "attach835Segment()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -47,7 +47,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "64"
             endingLineNumber = "64"
-            landmarkName = "attachSegment()"
+            landmarkName = "attach835Segment()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -62,22 +62,8 @@
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "60"
-            endingLineNumber = "60">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "../edi_835_parser.c"
-            timestampString = "460693976.923444"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "38"
-            endingLineNumber = "38"
-            landmarkName = "parse835Segment()"
+            endingLineNumber = "60"
+            landmarkName = "parse835Element()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -93,7 +79,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "82"
             endingLineNumber = "82"
-            landmarkName = "attachSegment()"
+            landmarkName = "attach835Segment()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -108,7 +94,9 @@
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "79"
-            endingLineNumber = "79">
+            endingLineNumber = "79"
+            landmarkName = "segment_to_hash()"
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -123,7 +111,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "65"
             endingLineNumber = "65"
-            landmarkName = "interchange_loop_to_hash()"
+            landmarkName = "interchange_loop_errors()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -171,7 +159,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "68"
             endingLineNumber = "68"
-            landmarkName = "interchange_loop_to_hash()"
+            landmarkName = "interchange_loop_errors()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -313,7 +301,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "252"
             endingLineNumber = "252"
-            landmarkName = "indexProperty()"
+            landmarkName = "validate835Parser()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -391,7 +379,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "259"
             endingLineNumber = "259"
-            landmarkName = "indexSegment()"
+            landmarkName = "validate835Parser()"
             landmarkType = "7">
             <Locations>
                <Location
@@ -439,7 +427,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "191"
             endingLineNumber = "191"
-            landmarkName = "plbHandler()"
+            landmarkName = "svc835Handler()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

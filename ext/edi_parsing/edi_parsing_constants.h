@@ -1,12 +1,12 @@
 //
-//  edi_835_constants.h
+//  edi_parsing_constants.h
 //  choo_choo_parser
 //
 //  Created by Grady Griffin on 8/3/15.
 //  Copyright (c) 2015 Grady Griffin. All rights reserved.
 //
-#ifndef edi_835_constants_h
-#define edi_835_constants_h
+#ifndef edi_parsing_constants_h
+#define edi_parsing_constants_h
 
 #define ISA_SEGMENT "ISA"
 #define IEA_SEGMENT "IEA"

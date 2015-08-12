@@ -1,11 +1,10 @@
 //
-//  edi_835_interface.c
+//  edi_parsing_interface.c
 //  choo_choo_parser
 //
 //  Created by Grady Griffin on 8/3/15.
 //  Copyright (c) 2015 Grady Griffin. All rights reserved.
 //
-#include <ruby.h>
 #include "edi_835_parser.h"
 
 VALUE mChooChoo;
@@ -22,21 +21,21 @@ static VALUE segment_to_hash(segment_t *segment);
 void Init_edi_parsing(void);
 
 static VALUE interchange_loop_alloc(VALUE self){
-  parser_t *parser = calloc(1, sizeof(parser_t));
+  parser835_t *parser = edi_parsing_calloc(1, sizeof(parser835_t));
   return Data_Wrap_Struct(self, NULL, interchange_loop_free, parser);
 }
 
 static void interchange_loop_free(VALUE self){
-  parser_t *parser;
-  Data_Get_Struct(self, parser_t, parser);
-  parserFree(parser);
+  parser835_t *parser;
+  Data_Get_Struct(self, parser835_t, parser);
+  parser835Free(parser);
 }
 
 static VALUE choo_choo_parse_835(VALUE segment, VALUE isa_str){
   char *c_isa_str = StringValueCStr(isa_str);
   VALUE isa = rb_class_new_instance(0, NULL, cInterchangeLoop);
-  parser_t *parser;
-  Data_Get_Struct(isa, parser_t, parser);
+  parser835_t *parser;
+  Data_Get_Struct(isa, parser835_t, parser);
 
   parse835(parser, c_isa_str);
 
@@ -49,28 +48,22 @@ static VALUE parser_max_threads(){
   return INT2NUM(MAX_THREADS);
 }
 
-static VALUE interchange_loop_to_hash(VALUE self){
-  VALUE hash = rb_iv_get(self, "@to_hash");
-  if(hash != Qnil){
-    return hash;
+static VALUE interchange_loop_to_hash(VALUE self){  
+  parser835_t *parser;
+  Data_Get_Struct(self, parser835_t, parser);
+  if(parser->failure){
+    return rb_hash_new(); 
   }else{
-    parser_t *parser;
-    Data_Get_Struct(self, parser_t, parser);
-    if(parser->failure){
-      hash = rb_hash_new(); 
-    }else{
-      rewindParser(parser);
-      hash = segment_to_hash(parser->interchange);
-    }
+    rewind835Parser(parser);
+    return segment_to_hash(parser->interchange);
   }
-  rb_iv_set(self, "@to_hash", hash);
-  return hash;
+
 }
 
 static VALUE interchange_loop_errors(VALUE self){
-  parser_t *parser;
+  parser835_t *parser;
   VALUE array = rb_ary_new();
-  Data_Get_Struct(self, parser_t, parser);
+  Data_Get_Struct(self, parser835_t, parser);
   for(short i; i<parser->errorCount;i++){
     rb_ary_push(array, INT2NUM(parser->errors[i]));
   }

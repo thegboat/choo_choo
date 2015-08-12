@@ -5,7 +5,7 @@
 //  Created by Grady Griffin on 8/3/15.
 //  Copyright (c) 2015 Grady Griffin. All rights reserved.
 //
-#include "edi_835_parser.h"
+#include "edi_parsing.h"
 
 bool identify(char *src, const char *seg){
   if(NULL == src || strlen(src) < strlen(seg)){

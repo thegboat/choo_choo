@@ -1,5 +1,5 @@
 //
-//  edi_835_segment.c
+//  edi_parsing_segment.c
 //  choo_choo_parser
 //
 //  Created by Grady Griffin on 8/3/15.
@@ -27,9 +27,9 @@ void addProperty(segment_t *segment, property_t *property){
 }
 
 void buildProperty(segment_t *segment, char *data, short seg_cnt, short elem_cnt){
-  property_t *property = calloc(1,sizeof(property_t));
+  property_t *property = edi_parsing_calloc(1,sizeof(property_t));
   buildKey(property->key, segment->name, seg_cnt, elem_cnt);
-  property->value = calloc(strlen(data),sizeof(char));
+  property->value = edi_parsing_calloc(strlen(data),sizeof(char));
   memcpy(property->value, data, strlen(data));
   addProperty(segment, property);
 }
@@ -52,4 +52,46 @@ void addChildSegment(segment_t *parent, segment_t *child){
   }
   parent->lastSegment = child;
   child->parent = parent;
+}
+
+void loopFree(segment_t *loop){
+  if(NULL != loop){
+    segment_t *segment;
+    segment_t *tmp;
+    segment = loop->firstSegment;
+    while(NULL != segment){
+      tmp = segment->tail;
+      if(segment != loop) segmentFree(segment);
+      segment = tmp;
+    }
+  }
+}
+
+void segmentFree(segment_t *segment){
+  if(NULL != segment){
+    property_t *property;
+    property_t *tmp;
+    property = segment->firstProperty;
+    while(NULL != property){
+      tmp = property->tail;
+      propertyFree(property);
+      property = tmp;
+    }
+    free(segment);
+  }
+}
+
+void propertyFree(property_t *property){
+  free(property->value);
+  free(property);
+}
+
+segment_t *rewindLoop(segment_t *loop){
+  segment_t *tmp;
+  tmp = loop;
+  while(NULL != tmp){
+    loop = tmp;
+    tmp = loop->head;
+  }
+  return loop;
 }
