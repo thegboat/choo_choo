@@ -7,57 +7,18 @@
 //
 #include "edi_835_parser.h"
 
+
 void parse835(parser835_t *parser, char *ediFile){
   parser835Initialization(parser);
   char *saveptr;
   parser->str = strtok_r(ediFile, SEGMENT_SEPARATOR, &saveptr);
-  while(NULL != parser->str && !parser->finished && !parser->failure){
-    parse835Segment(parser);
-    parser->str = strtok_r(NULL, SEGMENT_SEPARATOR, &saveptr);
+  while(NULL != parser->super->str && !parser->super.finished && !parser->super->failure){
+    parseSegment(&parser->super);
+    attach835Segment(parser, segment);
+    parser->super.str = strtok_r(NULL, SEGMENT_SEPARATOR, &saveptr);
   }
   parser835Cleanup(parser);
   validate835Parser(parser);
-}
-
-void parse835Segment(parser835_t *parser){
-  segment_t *segment = edi_parsing_calloc(1,sizeof(segment_t));
-  char *tok;
-  char *saveptr;
-  short cnt = 0;
-  tok = strtok_r(parser->str, ELEMENT_SEPARATOR, &saveptr);
-  segmentInitializer(segment, tok);
-  segment->pkey = parser->sequence;
-  tok = strtok_r(NULL, ELEMENT_SEPARATOR, &saveptr);
-  while (tok != NULL)
-  {
-    cnt++;
-    if(strlen(parser->componentSeparator) == 1 && NULL != strstr(tok, parser->componentSeparator)){
-      parse835Element(parser, tok, segment, cnt);
-    }else{
-      parser->sequence++;
-      buildProperty(segment, tok, cnt, 0);
-      segment->lastProperty->pkey = parser->sequence;
-      tsearch((void *) segment->lastProperty, &parser->propertyTree, compareNode)
-    }
-    tok = strtok_r(NULL, ELEMENT_SEPARATOR, &saveptr);
-  }
-  segment->elements = cnt;
-  attach835Segment(parser, segment);
-}
-
-void parse835Element(parser835_t *parser, char *str, segment_t *segment, short seg_cnt){
-  char *tok;
-  char *saveptr;
-  short cnt = 0;
-  tok = strtok_r(str, parser->componentSeparator, &saveptr);
-  while (tok != NULL)
-  {
-    cnt++;
-    parser->sequence++;
-    buildProperty(segment, tok, seg_cnt, cnt);
-    segment->lastProperty->pkey = parser->sequence
-    tok = strtok_r(NULL, parser->componentSeparator, &saveptr);
-  }
 }
 
 void attach835Segment(parser835_t *parser, segment_t *segment){
@@ -107,7 +68,7 @@ void isa835Handler(parser835_t *parser, segment_t *segment){
   if(NULL == parser->interchange){
     parser->interchange = segment;
     parser->loop = segment;
-    parser->depth = 1;
+    parser->super.depth = 1;
   }else{
     parse835Fail(parser, MORE_THAN_ONE_ISA_SEGMENT_FOUND);
   }
@@ -129,7 +90,7 @@ void gs835Handler(parser835_t *parser, segment_t *segment){
     addChildSegment(parser->interchange, segment);
     parser->functional = segment;
     parser->loop = segment;
-    parser->depth = 2;
+    parser->super.depth = 2;
   }else{
    parse835Fail(parser, INVALID_GS_SEGMENT);
   }
@@ -140,7 +101,7 @@ void st835Handler(parser835_t *parser, segment_t *segment){
     addChildSegment(parser->functional, segment);
     parser->transaction = segment;
     parser->loop = segment;
-    parser->depth = 3;
+    parser->super.depth = 3;
   }else{
    parse835Fail(parser, INVALID_ST_SEGMENT);
   }
@@ -151,12 +112,12 @@ void n1835Handler(parser835_t *parser, segment_t *segment){
     addChildSegment(parser->functional, segment);
     parser->payer = segment;
     parser->loop = segment;
-    parser->depth = 4;
+    parser->super.depth = 4;
   }else if(parser->loop == parser->payer){
     addChildSegment(parser->payer, segment);
     parser->payee = segment;
     parser->loop = segment;
-    parser->depth = 5;
+    parser->super.depth = 5;
   }else{
     parse835Fail(parser, INVALID_N1_SEGMENT);
   }
@@ -169,7 +130,7 @@ void lx835Handler(parser835_t *parser, segment_t *segment){
     addChildSegment(parser->payee, segment);
     parser->header = segment;
     parser->loop = segment;
-    parser->depth = 6;
+    parser->super.depth = 6;
   }
   else{
    parse835Fail(parser, INVALID_LX_SEGMENT);
@@ -182,7 +143,7 @@ void clp835Handler(parser835_t *parser, segment_t *segment){
     addChildSegment(parser->header, segment);
     parser->claim = segment;
     parser->loop = segment;
-    parser->depth = 7;
+    parser->super.depth = 7;
   }else{
     parse835Fail(parser, INVALID_CLP_SEGMENT);
   }
@@ -193,7 +154,7 @@ void svc835Handler(parser835_t *parser, segment_t *segment){
     addChildSegment(parser->claim, segment);
     parser->service = segment;
     parser->loop = segment;
-    parser->depth = 8;
+    parser->super.depth = 8;
   }else{
     parse835Fail(parser, INVALID_SVC_SEGMENT);
   }
@@ -203,14 +164,14 @@ void plb835Handler(parser835_t *parser, segment_t *segment){
   addChildSegment(parser->header, segment);
   parser->claim = segment;
   parser->loop = segment;
-  parser->depth = 6;
+  parser->super.depth = 6;
 }
 
 void se835Handler(parser835_t *parser, segment_t *segment){
   addChildSegment(parser->transaction, segment);
   parser->loop = parser->transaction;
   parser->trailer = segment;
-  parser->depth = 3
+  parser->super.depth = 3
 }
 
 void ge835Handler(parser835_t *parser, segment_t *segment){
@@ -218,7 +179,7 @@ void ge835Handler(parser835_t *parser, segment_t *segment){
     addChildSegment(parser->functional, segment);
     parser->loop = parser->functional;
     parser->trailer = segment;
-    parser->depth = 2
+    parser->super.depth = 2
   }else{
     parse835Fail(parser, INVALID_GE_SEGMENT);
   }
@@ -229,7 +190,7 @@ void iea835Handler(parser835_t *parser, segment_t *segment){
     addChildSegment(parser->interchange, segment);
     parser->loop = parser->interchange;
     parser->trailer = segment;
-    parser->depth = 1
+    parser->super.depth = 1
   }else{
     parse835Fail(parser, INVALID_IEA_SEGMENT);
   }
@@ -269,8 +230,6 @@ void parse835Fail(parser835_t *parser, short error){
 }
 
 void parser835Initialization(parser835_t *parser){
-  parser->failure = false;
-  parser->finished = false;
   parser->interchange = NULL;
   parser->loop = NULL;
   parser->functional = NULL;
@@ -280,9 +239,13 @@ void parser835Initialization(parser835_t *parser){
   parser->header = NULL;
   parser->claim = NULL;
   parser->root = NULL;
-  parser->errorCount = 0;
-  parser->sequence = 0;
-  parser->componentSeparator[0] = '\0';
+  parser->super.failure = false;
+  parser->super.finished = false;
+  parser->super.errorCount = 0;
+  parser->super.depth = 0;
+  parser->super.segmentCount = 0;
+  parser->super.propertyCount = 0;
+  parser->super.componentSeparator[0] = '\0';
 }
 
 void rewind835Parser(parser835_t *parser){

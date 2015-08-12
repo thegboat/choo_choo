@@ -15,9 +15,7 @@ typedef struct parser835_struct parser835_t;
 
 struct parser835_struct
 {
-  short errors[MAX_ERROR_SIZE];
-  short errorCount;
-  char *str;
+  parser_t super;
   segment_t *loop;
   segment_t *interchange;
   segment_t *functional;
@@ -28,12 +26,6 @@ struct parser835_struct
   segment_t *claim;
   segment_t *service;
   segment_t *trailer;
-  char componentSeparator[2];
-  long depth;
-  long sequence;
-  bool failure;
-  bool finished;
-  void *root;
 };
 
 /* parser */

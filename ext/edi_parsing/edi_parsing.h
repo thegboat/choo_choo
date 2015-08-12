@@ -18,6 +18,20 @@
 
 typedef struct segment_struct segment_t;
 typedef struct property_struct property_t;
+typedef struct parser_struct parser_t;
+
+struct parser_struct
+{
+  short errors[MAX_ERROR_SIZE];
+  short errorCount;
+  char *str;
+  char componentSeparator[2];
+  int depth;
+  int segmentCount;
+  int propertyCount;
+  bool failure;
+  bool finished;
+};
 
 struct segment_struct
 {
@@ -29,9 +43,9 @@ struct segment_struct
   property_t *lastProperty;
   segment_t *firstSegment;
   segment_t *lastSegment;
-  long elements;
-  long depth;
-  long pkey;
+  int elements;
+  int depth;
+  int pkey;
 };
 
 struct property_struct
@@ -40,7 +54,7 @@ struct property_struct
   char *value;
   property_t *head;
   property_t *tail;
-  long pkey;
+  int pkey;
 };
 
 /* inspection */
@@ -88,9 +102,22 @@ void segmentFree(segment_t *segment);
 void propertyFree(property_t *property);
 segment_t *rewindLoop(segment_t *loop);
 void loopFree(segment_t *segment_t);
-void *edi_parsing_calloc(size_t nitems, size_t size);
-void *edi_parsing_malloc(size_t size);
+void *ediParsingCalloc(size_t nitems, size_t size);
+void *ediParsingMalloc(size_t size);
+void parseElement(segment_t *segment, char *str, const char componentSeparator[2], short seg_cnt);
+void parseSegment(parser_t *parser);
+VALUE segment_to_hash(segment_t *segment);
 
-int compare835node(const void *pa, const void *pb);
+/* interface */
+
+VALUE interchange_loop_alloc(VALUE self);
+void interchange_loop_free(VALUE self);
+VALUE choo_choo_parse_835(VALUE segment, VALUE isa_str);
+VALUE choo_choo_parse_835(VALUE segment, VALUE isa_str);
+VALUE interchange_loop_to_hash(VALUE self);
+VALUE segment_to_hash(segment_t *segment);
+void Init_edi_parsing(void);
+void Init_edi_835_parsing(void);
+
 
 #endif

@@ -1,10 +1,5 @@
 module ChooChoo
-  class InterchangeLoop
-
-    def to_h
-      to_hash
-    end
-
+  class InterchangeLoop < Segment
 
     def errors
       _errors

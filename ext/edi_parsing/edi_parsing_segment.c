@@ -27,9 +27,9 @@ void addProperty(segment_t *segment, property_t *property){
 }
 
 void buildProperty(segment_t *segment, char *data, short seg_cnt, short elem_cnt){
-  property_t *property = edi_parsing_calloc(1,sizeof(property_t));
+  property_t *property = ediParsingCalloc(1,sizeof(property_t));
   buildKey(property->key, segment->name, seg_cnt, elem_cnt);
-  property->value = edi_parsing_calloc(strlen(data),sizeof(char));
+  property->value = ediParsingCalloc(strlen(data),sizeof(char));
   memcpy(property->value, data, strlen(data));
   addProperty(segment, property);
 }
@@ -94,4 +94,26 @@ segment_t *rewindLoop(segment_t *loop){
     tmp = loop->head;
   }
   return loop;
+}
+
+VALUE segment_to_hash(segment_t *segment){
+  property_t *property = segment->firstProperty;
+  segment_t *child = segment->firstSegment;
+  VALUE proxy = rb_hash_new();
+  VALUE children = rb_ary_new();
+
+  while(NULL != property){
+    VALUE key = ID2SYM(rb_intern(property->key));
+    rb_hash_aset(proxy, key, rb_str_new_cstr(property->value));
+    property = property->tail;
+  }
+
+  while(NULL != child){
+    rb_ary_push(children, segment_to_hash(child));
+    child = child->tail;
+  }
+
+  rb_hash_aset(proxy, ID2SYM(rb_intern("name")), rb_str_new_cstr(segment->name));
+  rb_hash_aset(proxy, ID2SYM(rb_intern("children")), children);
+  return proxy;
 }
