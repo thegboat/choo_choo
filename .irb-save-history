@@ -1,16 +1,3 @@
-  def initialize(a, b, c)
-    @a = a
-    @b = b
-    @c = c
-  end
-end
-obj = Sample.new(1, "bee", ['x', :y, 7.0])
-xml = Ox.dump(obj)
-ChooChoo.test_string2
-ChooChoo.test_string2.length
-ChooChoo.benchmark(100000)
-ChooChoo.test_string
-result = ChooChoo::Parser.parse_835(ChooChoo.test_string2)
 ChooChoo.test_string2.split('~').length
 ChooChoo.test_string.split('~').length
 exit
@@ -97,4 +84,17 @@ ChooChoo::Parser
 ChooChoo::Parser.max_threads
 ChooChoo::Parser.new('i'),max_threads
 ChooChoo::Parser.new('i').max_threads
+exit
+ChooChoo.to_hash
+ChooChoo.to_hash
+exit
+ChooChoo.to_hash
+exit
+ChooChoo.to_hash
+exit
+exit
+ChooChoo.to_hash
+exit
+ChooChoo.to_hash
+_.class
 exit

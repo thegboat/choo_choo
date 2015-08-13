@@ -5,7 +5,7 @@
 //  Created by Grady Griffin on 8/3/15.
 //  Copyright (c) 2015 Grady Griffin. All rights reserved.
 //
-#include "edi_835_parser.h"
+#include "edi_parsing.h"
 
 void segmentInitializer(segment_t *segment, char *src){
   long idx = strlen(src);
@@ -27,9 +27,10 @@ void addProperty(segment_t *segment, property_t *property){
 }
 
 void buildProperty(segment_t *segment, char *data, short seg_cnt, short elem_cnt){
-  property_t *property = ediParsingCalloc(1,sizeof(property_t));
+  property_t *property = ediParsingMalloc(sizeof(property_t));
+  property->owner = segment;
   buildKey(property->key, segment->name, seg_cnt, elem_cnt);
-  property->value = ediParsingCalloc(strlen(data),sizeof(char));
+  property->value = ediParsingMalloc(sizeof(char)*strlen(data));
   memcpy(property->value, data, strlen(data));
   addProperty(segment, property);
 }
@@ -108,12 +109,14 @@ VALUE segment_to_hash(segment_t *segment){
     property = property->tail;
   }
 
-  while(NULL != child){
-    rb_ary_push(children, segment_to_hash(child));
-    child = child->tail;
+  if(NULL != child){
+    while(NULL != child){
+      rb_ary_push(children, segment_to_hash(child));
+      child = child->tail;
+    }
+    rb_hash_aset(proxy, ID2SYM(rb_intern("children")), children);
   }
 
   rb_hash_aset(proxy, ID2SYM(rb_intern("name")), rb_str_new_cstr(segment->name));
-  rb_hash_aset(proxy, ID2SYM(rb_intern("children")), children);
   return proxy;
 }

@@ -5,15 +5,16 @@
 //  Created by Grady Griffin on 8/3/15.
 //  Copyright (c) 2015 Grady Griffin. All rights reserved.
 //
-#include "edi_835_parser.h"
+#include "edi_parsing.h"
 
 
 void parse835(parser835_t *parser, char *ediFile){
   parser835Initialization(parser);
+  segment_t *segment;
   char *saveptr;
-  parser->str = strtok_r(ediFile, SEGMENT_SEPARATOR, &saveptr);
-  while(NULL != parser->super->str && !parser->super.finished && !parser->super->failure){
-    parseSegment(&parser->super);
+  parser->super.str = strtok_r(ediFile, SEGMENT_SEPARATOR, &saveptr);
+  while(NULL != parser->super.str && !parser->super.finished && !parser->super.failure){
+    segment = parseSegment(&parser->super);
     attach835Segment(parser, segment);
     parser->super.str = strtok_r(NULL, SEGMENT_SEPARATOR, &saveptr);
   }
@@ -25,23 +26,23 @@ void attach835Segment(parser835_t *parser, segment_t *segment){
   if(isISA(segment->name)){
     isa835Handler(parser, segment);
   }else if(NULL == parser->loop || NULL == parser->interchange){
-    parse835Fail(parser, ISA_SEGMENT_NOT_DETECTED_FIRST);
+    parserFail(&parser->super, ISA_SEGMENT_NOT_DETECTED_FIRST);
   }else if(isIEA(segment->name)){
     iea835Handler(parser, segment);
   }else if(isGS(segment->name)){
     gs835Handler(parser, segment);
   }else if(NULL == parser->functional){
-    parse835Fail(parser, MISSING_GS_SEGMENT);
+    parserFail(&parser->super, MISSING_GS_SEGMENT);
   }else if(parser->functional->elements != 8){
-    parse835Fail(parser, WRONG_NUMBER_OF_ELEMENTS_FOR_GS);
+    parserFail(&parser->super, WRONG_NUMBER_OF_ELEMENTS_FOR_GS);
   }else if(isGE(segment->name)){
     ge835Handler(parser, segment);
   }else if(isST(segment->name)){
     st835Handler(parser, segment);
   }else if(parser->transaction->elements != 2){
-    parse835Fail(parser, WRONG_NUMBER_OF_ELEMENTS_FOR_ST);
+    parserFail(&parser->super, WRONG_NUMBER_OF_ELEMENTS_FOR_ST);
   }else if(NULL == parser->transaction){
-    parse835Fail(parser, MISSING_ST_SEGMENT);
+    parserFail(&parser->super, MISSING_ST_SEGMENT);
   }else if(isSE(segment->name)){
     se835Handler(parser, segment);
   }else if(isN1(segment->name)){
@@ -70,17 +71,17 @@ void isa835Handler(parser835_t *parser, segment_t *segment){
     parser->loop = segment;
     parser->super.depth = 1;
   }else{
-    parse835Fail(parser, MORE_THAN_ONE_ISA_SEGMENT_FOUND);
+    parserFail(&parser->super, MORE_THAN_ONE_ISA_SEGMENT_FOUND);
   }
 
   if(parser->interchange->elements != 16){
-    parse835Fail(parser, WRONG_NUMBER_OF_ELEMENTS_FOR_ISA);
+    parserFail(&parser->super, WRONG_NUMBER_OF_ELEMENTS_FOR_ISA);
   }else{
     if(strlen(parser->interchange->lastProperty->value) != 1){
-      parse835Fail(parser, INVALID_COMPONENT_SEPARATOR);
+      parserFail(&parser->super, INVALID_COMPONENT_SEPARATOR);
     }else{
-      parser->componentSeparator[0] = parser->interchange->lastProperty->value[0];
-      parser->componentSeparator[1] = '\0';
+      parser->super.componentSeparator[0] = parser->interchange->lastProperty->value[0];
+      parser->super.componentSeparator[1] = '\0';
     }
   }
 }
@@ -92,7 +93,7 @@ void gs835Handler(parser835_t *parser, segment_t *segment){
     parser->loop = segment;
     parser->super.depth = 2;
   }else{
-   parse835Fail(parser, INVALID_GS_SEGMENT);
+   parserFail(&parser->super, INVALID_GS_SEGMENT);
   }
 }
 
@@ -103,7 +104,7 @@ void st835Handler(parser835_t *parser, segment_t *segment){
     parser->loop = segment;
     parser->super.depth = 3;
   }else{
-   parse835Fail(parser, INVALID_ST_SEGMENT);
+   parserFail(&parser->super, INVALID_ST_SEGMENT);
   }
 }
 
@@ -119,13 +120,13 @@ void n1835Handler(parser835_t *parser, segment_t *segment){
     parser->loop = segment;
     parser->super.depth = 5;
   }else{
-    parse835Fail(parser, INVALID_N1_SEGMENT);
+    parserFail(&parser->super, INVALID_N1_SEGMENT);
   }
 }
 
 void lx835Handler(parser835_t *parser, segment_t *segment){
   if(NULL == parser->payer || NULL == parser->payee){
-    parse835Fail(parser, MISSING_PAYER_LOOP);
+    parserFail(&parser->super, MISSING_PAYER_LOOP);
   }else if(parser->loop == parser->payee){
     addChildSegment(parser->payee, segment);
     parser->header = segment;
@@ -133,7 +134,7 @@ void lx835Handler(parser835_t *parser, segment_t *segment){
     parser->super.depth = 6;
   }
   else{
-   parse835Fail(parser, INVALID_LX_SEGMENT);
+   parserFail(&parser->super, INVALID_LX_SEGMENT);
   }
 }
 
@@ -145,7 +146,7 @@ void clp835Handler(parser835_t *parser, segment_t *segment){
     parser->loop = segment;
     parser->super.depth = 7;
   }else{
-    parse835Fail(parser, INVALID_CLP_SEGMENT);
+    parserFail(&parser->super, INVALID_CLP_SEGMENT);
   }
 }
 
@@ -156,7 +157,7 @@ void svc835Handler(parser835_t *parser, segment_t *segment){
     parser->loop = segment;
     parser->super.depth = 8;
   }else{
-    parse835Fail(parser, INVALID_SVC_SEGMENT);
+    parserFail(&parser->super, INVALID_SVC_SEGMENT);
   }
 }
 
@@ -171,7 +172,7 @@ void se835Handler(parser835_t *parser, segment_t *segment){
   addChildSegment(parser->transaction, segment);
   parser->loop = parser->transaction;
   parser->trailer = segment;
-  parser->super.depth = 3
+  parser->super.depth = 3;
 }
 
 void ge835Handler(parser835_t *parser, segment_t *segment){
@@ -179,9 +180,9 @@ void ge835Handler(parser835_t *parser, segment_t *segment){
     addChildSegment(parser->functional, segment);
     parser->loop = parser->functional;
     parser->trailer = segment;
-    parser->super.depth = 2
+    parser->super.depth = 2;
   }else{
-    parse835Fail(parser, INVALID_GE_SEGMENT);
+    parserFail(&parser->super, INVALID_GE_SEGMENT);
   }
 }
 
@@ -190,43 +191,38 @@ void iea835Handler(parser835_t *parser, segment_t *segment){
     addChildSegment(parser->interchange, segment);
     parser->loop = parser->interchange;
     parser->trailer = segment;
-    parser->super.depth = 1
+    parser->super.depth = 1;
   }else{
-    parse835Fail(parser, INVALID_IEA_SEGMENT);
+    parserFail(&parser->super, INVALID_IEA_SEGMENT);
   }
 }
 
 void validate835Parser(parser835_t *parser){
-  if(!parser->finished){
-    if(!isSE(parser->transaction->name)){
-      parse835Fail(parser, MISSING_SE_SEGMENT);
-    }else if(parser->transaction->elements != 2){
-      parse835Fail(parser, WRONG_NUMBER_OF_ELEMENTS_FOR_SE);
+  if(!parser->super.finished){
+    if(!isSE(parser->transaction->lastSegment->name)){
+      parserFail(&parser->super, MISSING_SE_SEGMENT);
+    }else if(parser->transaction->lastSegment->elements != 2){
+      parserFail(&parser->super, WRONG_NUMBER_OF_ELEMENTS_FOR_SE);
     }
 
-    if(!isGE(parser->functional->name)){
-      parse835Fail(parser, MISSING_GE_SEGMENT);
-    }else if(parser->functional->elements != 2){
-      parse835Fail(parser, WRONG_NUMBER_OF_ELEMENTS_FOR_GE);
+    if(!isGE(parser->functional->lastSegment->name)){
+      parserFail(&parser->super, MISSING_GE_SEGMENT);
+    }else if(parser->functional->lastSegment->elements != 2){
+      parserFail(&parser->super, WRONG_NUMBER_OF_ELEMENTS_FOR_GE);
     }
 
-    if(!isIEA(parser->interchange->name)){
-      parse835Fail(parser, MISSING_IEA_SEGMENT);
-    }else if(parser->interchange->elements != 2){
-      parse835Fail(parser, WRONG_NUMBER_OF_ELEMENTS_FOR_IEA);
+    if(!isIEA(parser->interchange->lastSegment->name)){
+      parserFail(&parser->super, MISSING_IEA_SEGMENT);
+    }else if(parser->interchange->lastSegment->elements != 2){
+      parserFail(&parser->super, WRONG_NUMBER_OF_ELEMENTS_FOR_IEA);
     }
-    parser->finished = true;
   }
+  parser->super.finished = true;
 }
 
-void parse835Fail(parser835_t *parser, short error){
-  parser->failure = true;
-  parser->finished = true;
-  
-  if(parser->errorCount < MAX_ERROR_SIZE){
-    parser->errors[parser->errorCount] = error;
-    parser->errorCount++;
-  }
+void build835Indexes(parser835_t *parser){
+  rewind835Parser(parser);
+  buildIndexes(&parser->super, parser->interchange);
 }
 
 void parser835Initialization(parser835_t *parser){
@@ -238,7 +234,6 @@ void parser835Initialization(parser835_t *parser){
   parser->payee = NULL;
   parser->header = NULL;
   parser->claim = NULL;
-  parser->root = NULL;
   parser->super.failure = false;
   parser->super.finished = false;
   parser->super.errorCount = 0;
