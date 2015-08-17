@@ -55,19 +55,6 @@ void addChildSegment(segment_t *parent, segment_t *child){
   child->parent = parent;
 }
 
-void loopFree(segment_t *loop){
-  if(NULL != loop){
-    segment_t *segment;
-    segment_t *tmp;
-    segment = loop->firstSegment;
-    while(NULL != segment){
-      tmp = segment->tail;
-      if(segment != loop) segmentFree(segment);
-      segment = tmp;
-    }
-  }
-}
-
 void segmentFree(segment_t *segment){
   if(NULL != segment){
     property_t *property;

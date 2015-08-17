@@ -10,12 +10,12 @@ module ChooChoo
 
     def descendants(*names)
       names = prepare_names(names)
-      send(c_meth_to_sym("descendants"), names)
+      _c_descendants(names)
     end
 
     def children(*names)
       names = prepare_names(names)
-      segments = send(c_meth_to_sym("children"), names)
+      segments = _c_children(names)
       segments.select! { |segment| names.include?(segment.name.to_sym) } unless names.empty?
       segments
     end
@@ -42,14 +42,10 @@ module ChooChoo
     end
 
     def valid_segments
-      case @document_type
-      when :"835" then EDI835.valid_segments
+      case document_type
+      when "835" then EDI835.valid_segments
       else raise Exception
       end
-    end
-
-    def c_meth_to_sym(meth)
-      :"_c_#{@document_type}_#{meth}"
     end
   end
 end

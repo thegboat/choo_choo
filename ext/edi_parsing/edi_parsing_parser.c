@@ -67,8 +67,13 @@ void parserInitialization(parser_t *parser){
 }
 
 void parserFree(parser_t *parser){
+  if(NULL != parser->primaryIndex){
+    for(int i=0; i<parser->segmentCount;i++){
+      segmentFree(parser->primaryIndex[i]);
+    }
+    free(parser->primaryIndex);
+  }
   if(NULL != parser->nameIndex) free(parser->nameIndex);
-  if(NULL != parser->primaryIndex) free(parser->primaryIndex);
   free(parser);
 }
 

@@ -7,96 +7,119 @@
 
 #include "edi_parsing.h"
 
-static parser835_t *segment835Parser(VALUE segment_rb);
+static void interchange_loop_free(VALUE self);
+static VALUE interchange_loop_alloc(VALUE self);
+static void segment_free(VALUE self);
+static VALUE segment_alloc(VALUE self);
+static VALUE choo_choo_parse_835(VALUE segment, VALUE isa_str);
+static VALUE interchange_loop_to_hash(VALUE self);
+static VALUE interchange_loop_errors(VALUE self);
+static VALUE segment_parent(VALUE self);
+static VALUE segment_children(VALUE self, VALUE names);
+static anchor_t *getAnchor(VALUE segment_rb);
+static VALUE segment_find(VALUE self, VALUE names);
+static VALUE documentType(VALUE self);
 
-void interchange_loop_835_free(VALUE self){
-  parser835_t *parser;
-  Data_Get_Struct(self, parser835_t, parser);
-  parser835Free(parser);
+static void interchange_loop_free(VALUE self){
+  anchor_t *anchor;
+  Data_Get_Struct(self, anchor_t, anchor);
+  parserFree(anchor->parser);
+  free(anchor);
 }
 
-VALUE interchange_loop_835_alloc(VALUE self){
-  parser835_t *parser = (parser835_t *)ediParsingMalloc(sizeof(parser835_t));
-  parser->super = (parser_t *)ediParsingMalloc(sizeof(parser_t));
-  return Data_Wrap_Struct(self, NULL, interchange_loop_835_free, parser);
+static VALUE interchange_loop_alloc(VALUE self){
+  parser_t *parser = (parser_t *)ediParsingMalloc(sizeof(parser_t));
+  anchor_t *anchor = (anchor_t *)ediParsingMalloc(sizeof(anchor_t));
+  parserInitialization(parser);
+  strcpy(parser->documentType, "835");
+  anchor->parser = parser;
+  return Data_Wrap_Struct(self, NULL, interchange_loop_free, anchor);
 }
 
-VALUE choo_choo_parse_835(VALUE segment, VALUE isa_str){
+static void segment_free(VALUE self){
+  anchor_t *anchor;
+  Data_Get_Struct(self, anchor_t, anchor);
+  free(anchor);
+}
+
+static VALUE segment_alloc(VALUE self){
+  anchor_t *anchor = (anchor_t *)ediParsingMalloc(sizeof(anchor_t));
+  return Data_Wrap_Struct(self, NULL, segment_free, anchor);
+}
+
+static VALUE choo_choo_parse_835(VALUE segment, VALUE isa_str){
   char *c_isa_str = StringValueCStr(isa_str);
   VALUE mChooChoo = rb_define_module("ChooChoo");
   VALUE cSegment = rb_define_class_under(mChooChoo, "Segment", rb_cObject);
   VALUE cInterchangeLoop = rb_define_class_under(mChooChoo, "InterchangeLoop", rb_cObject);
 
   VALUE isa = rb_class_new_instance(0, NULL, cInterchangeLoop);
-  parser835_t *parser;
-  Data_Get_Struct(isa, parser835_t, parser);
+  anchor_t *anchor;
+  Data_Get_Struct(isa, anchor_t, anchor);
 
-  parse835(parser, c_isa_str);
-  rewind835Parser(parser);
-  rb_iv_set(isa, DOCUMENT_TYPE_KEY, ID2SYM(rb_intern("835")));
-  rb_iv_set(isa, NODE_KEY, INT2NUM(0));
-  rb_iv_set(isa, ISA_LINK, isa);
-  rb_iv_set(isa, PROPERTIES, propertiesToHash(parser->interchange->firstProperty));
+  parse835(anchor, c_isa_str);
+  rb_iv_set(isa, PROPERTIES, propertiesToHash(anchor->segment->firstProperty));
   VALUE isas = rb_ary_new();
   rb_ary_push(isas, isa);
+  segment_children(isa, rb_ary_new());
   return isas;
 }
 
-VALUE interchange_loop_835_to_hash(VALUE self){  
-  parser835_t *parser;
-  Data_Get_Struct(self, parser835_t, parser);
-  if(parser->super->failure){
+static VALUE interchange_loop_to_hash(VALUE self){  
+  anchor_t *anchor = getAnchor(self);
+  if(anchor->parser->failure){
     return rb_hash_new(); 
   }else{
-    rewind835Parser(parser);
-    return segmentToHash(parser->interchange);
+    return segmentToHash(anchor->parser->root);
   }
 
 }
 
-VALUE interchange_loop_835_errors(VALUE self){
-  parser835_t *parser;
+static VALUE interchange_loop_errors(VALUE self){
+  anchor_t *anchor = getAnchor(self);
   VALUE array = rb_ary_new();
-  Data_Get_Struct(self, parser835_t, parser);
-  for(short i; i<parser->super->errorCount;i++){
-    rb_ary_push(array, INT2NUM(parser->super->errors[i]));
+  for(short i; i<anchor->parser->errorCount;i++){
+    rb_ary_push(array, INT2NUM(anchor->parser->errors[i]));
   }
   return array;
 }
 
-VALUE segment835parent(VALUE self){
-  parser835_t *parser = segment835Parser(self);
-  return segmentParent(parser->super, self);
+static VALUE segment_parent(VALUE self){
+  anchor_t *anchor = getAnchor(self);
+  return buildSegmentNode(anchor->parser, anchor->segment);
 }
 
-VALUE segment835children(VALUE self, VALUE names){
-  parser835_t *parser = segment835Parser(self);
-  return segmentChildren(parser->super, self, names);
+static VALUE segment_children(VALUE self, VALUE names){
+  anchor_t *anchor = getAnchor(self);
+  return segmentChildren(anchor->parser, anchor->segment, names);
 }
 
-static parser835_t *segment835Parser(VALUE segment_rb){
-  parser835_t *parser;
-  VALUE isa = rb_iv_get(segment_rb, ISA_LINK);
-  Data_Get_Struct(isa, parser835_t, parser);
-  return parser;
+static anchor_t *getAnchor(VALUE segment_rb){
+  anchor_t *anchor;
+  Data_Get_Struct(segment_rb, anchor_t, anchor);
+  return anchor;
 }
 
-VALUE segment835Find(VALUE self, VALUE names){
-  parser835_t *parser = segment835Parser(self);
-  return segmentFind(parser->super, self, names);
+static VALUE segment_find(VALUE self, VALUE names){
+  anchor_t *anchor = getAnchor(self);
+  return segmentFind(anchor->parser, anchor->segment, names);
 }
 
-VALUE buildSegmentNode(VALUE isa, segment_t *segment){
-  VALUE document_type = rb_iv_get(isa, DOCUMENT_TYPE_KEY);
+VALUE buildSegmentNode(parser_t *parser, segment_t *segment){
+  anchor_t *anchor;
   VALUE mChooChoo = rb_define_module("ChooChoo");
   VALUE cSegment = rb_define_class_under(mChooChoo, "Segment", rb_cObject);
   VALUE segment_rb = rb_class_new_instance(0, NULL, cSegment);
-  rb_iv_set(segment_rb, SEGMENT_NAME, ID2SYM(rb_intern(segment->name)));
-  rb_iv_set(segment_rb, DOCUMENT_TYPE_KEY, document_type);
-  rb_iv_set(segment_rb, NODE_KEY, INT2NUM(segment->pkey));
-  rb_iv_set(segment_rb, ISA_LINK, isa);
+  Data_Get_Struct(segment_rb, anchor_t, anchor);
+  anchor->parser = parser;
+  anchor->segment = segment;
   rb_iv_set(segment_rb, PROPERTIES, propertiesToHash(segment->firstProperty));
   return segment_rb;
+}
+
+static VALUE documentType(VALUE self){
+  anchor_t *anchor = getAnchor(self);
+  return rb_str_new_cstr(anchor->parser->documentType);
 }
 
 void Init_edi_parsing(void) {
@@ -107,14 +130,17 @@ void Init_edi_parsing(void) {
 
   rb_define_method(cParser, "_c_parse_835", choo_choo_parse_835, 1);
 
-  rb_define_private_method(cSegment, "_c_835_descendants", segment835Find, 1);
-  rb_define_private_method(cSegment, "_c_835_children", segment835children, 1);
-  rb_define_private_method(cSegment, "_c_835_parent", segment835parent, 0);
+  rb_define_alloc_func(cSegment, segment_alloc);
+  rb_define_private_method(cSegment, "_c_descendants", segment_find, 1);
+  rb_define_private_method(cSegment, "_c_children", segment_children, 1);
+  rb_define_private_method(cSegment, "_c_parent", segment_parent, 0);
+  rb_define_method(cSegment, "document_type", documentType, 0);
   
-  rb_define_private_method(cInterchangeLoop, "_c_835_descendants", segment835Find, 1);
-  rb_define_private_method(cInterchangeLoop, "_c_835_children", segment835children, 1);
+  rb_define_private_method(cInterchangeLoop, "_c_descendants", segment_find, 1);
+  rb_define_private_method(cInterchangeLoop, "_c_children", segment_children, 1);
+  rb_define_method(cInterchangeLoop, "document_type", documentType, 0);
 
-  rb_define_alloc_func(cInterchangeLoop, interchange_loop_835_alloc);
-  rb_define_method(cInterchangeLoop, "to_hash", interchange_loop_835_to_hash, 0);
-  rb_define_method(cInterchangeLoop, "_errors", interchange_loop_835_errors, 0);
+  rb_define_alloc_func(cInterchangeLoop, interchange_loop_alloc);
+  rb_define_method(cInterchangeLoop, "to_hash", interchange_loop_to_hash, 0);
+  rb_define_method(cInterchangeLoop, "_errors", interchange_loop_errors, 0);
 }

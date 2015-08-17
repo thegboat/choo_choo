@@ -34,31 +34,19 @@ VALUE propertiesToHash(property_t *property){
   return hash;
 }
 
-VALUE segmentChildren(parser_t *parser, VALUE segment_rb, VALUE names){
-  segment_t *segment = getNode(parser, segment_rb);
+VALUE segmentChildren(parser_t *parser, segment_t *segment, VALUE names){
   segment_t *child = segment->firstSegment;
   VALUE children = rb_ary_new();
 
   if(NULL != child){
-    VALUE isa = rb_iv_get(segment_rb, ISA_LINK);
     while(NULL != child){
-      VALUE child_rb = buildSegmentNode(isa, child);
+      VALUE child_rb = buildSegmentNode(parser, child);
       rb_ary_push(children, child_rb);
       child = child->tail;
     }
   }
 
   return children;
-}
-
-VALUE segmentParent(parser_t *parser, VALUE segment_rb){
-  segment_t *segment = getNode(parser, segment_rb);
-  if(NULL == segment->parent){
-    return Qnil;
-  }else{
-    VALUE isa = rb_iv_get(segment_rb, ISA_LINK);
-    return buildSegmentNode(isa, segment->parent);
-  }
 }
 
 VALUE segmentToHash(segment_t *segment){
@@ -78,18 +66,16 @@ VALUE segmentToHash(segment_t *segment){
   return proxy;
 }
 
-VALUE segmentFind(parser_t *parser, VALUE segment_rb, VALUE names){
-  const segment_t *segment = getNode(parser, segment_rb);
+VALUE segmentFind(parser_t *parser, segment_t *segment, VALUE names){
   VALUE result = rb_ary_new();
   const int length = NUM2INT(rb_funcall(names, rb_intern("length"), 0));
-  VALUE isa = rb_iv_get(segment_rb, ISA_LINK);
   segment_t *descendant;
 
   if(length == 0){
     int max = (segment->boundary - segment->pkey) + 1;
     for(int i=1;i<max;i++){
       descendant = parser->primaryIndex[i+segment->pkey];
-      VALUE child_rb = buildSegmentNode(isa, descendant);
+      VALUE child_rb = buildSegmentNode(parser, descendant);
       rb_ary_push(result, child_rb);
     }
   }else{
@@ -104,7 +90,7 @@ VALUE segmentFind(parser_t *parser, VALUE segment_rb, VALUE names){
         for(int i=0;i<max;i++){
           descendant = parser->nameIndex[i+stat.upper];
           if(descendant->pkey > segment->pkey && descendant->pkey <= segment->boundary){
-            VALUE child_rb = buildSegmentNode(isa, descendant);
+            VALUE child_rb = buildSegmentNode(parser, descendant);
             rb_ary_push(result, child_rb);
           }
         }

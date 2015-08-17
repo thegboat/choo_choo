@@ -8,21 +8,49 @@
 
 #include "edi_parsing.h"
 
-void parse835(parser835_t *parser, char *ediFile){
+
+static void attach835Segment(parser835_t *parser, segment_t *segment);
+static void rewind835Parser(parser835_t *parser);
+static void default835Handler(parser835_t *parser, segment_t *segment);
+static void validate835Parser(parser835_t *parser);
+static void parser835Free(parser835_t *parser);
+static void parser835Initialization(parser835_t *parser);
+static void isa835Handler(parser835_t *parser, segment_t *segment);
+static void gs835Handler(parser835_t *parser, segment_t *segment);
+static void st835Handler(parser835_t *parser, segment_t *segment);
+static void n1835Handler(parser835_t *parser, segment_t *segment);
+static void lx835Handler(parser835_t *parser, segment_t *segment);
+static void clp835Handler(parser835_t *parser, segment_t *segment);
+static void svc835Handler(parser835_t *parser, segment_t *segment);
+static void plb835Handler(parser835_t *parser, segment_t *segment);
+static void se835Handler(parser835_t *parser, segment_t *segment);
+static void ge835Handler(parser835_t *parser, segment_t *segment);
+static void iea835Handler(parser835_t *parser, segment_t *segment);
+static void parser835Cleanup(parser835_t *parser);
+static void build835Indexes(parser835_t *parser);
+
+void parse835(anchor_t *anchor, char *ediFile){
+  parser_t *super = anchor->parser;
+  parser835_t *parser = (parser835_t *)ediParsingMalloc(sizeof(parser835_t));
+  parser->super = super;
   parser835Initialization(parser);
   segment_t *segment;
   char *saveptr;
-  parser->super->str = strtok_r(ediFile, SEGMENT_SEPARATOR, &saveptr);
-  while(NULL != parser->super->str && !parser->super->finished && !parser->super->failure){
-    segment = parseSegment(parser->super);
+  super->str = strtok_r(ediFile, SEGMENT_SEPARATOR, &saveptr);
+  while(NULL != super->str && !super->finished && !super->failure){
+    segment = parseSegment(super);
     attach835Segment(parser, segment);
-    parser->super->str = strtok_r(NULL, SEGMENT_SEPARATOR, &saveptr);
+    super->str = strtok_r(NULL, SEGMENT_SEPARATOR, &saveptr);
   }
   parser835Cleanup(parser);
   validate835Parser(parser);
+  rewind835Parser(parser);
+  super->root = parser->interchange;
+  anchor->segment = parser->interchange;
+  parser835Free(parser);
 }
 
-void attach835Segment(parser835_t *parser, segment_t *segment){
+static void attach835Segment(parser835_t *parser, segment_t *segment){
   if(isISA(segment->name)){
     isa835Handler(parser, segment);
   }else if(NULL == parser->loop || NULL == parser->interchange){
@@ -60,11 +88,11 @@ void attach835Segment(parser835_t *parser, segment_t *segment){
   }
 }
 
-void default835Handler(parser835_t *parser, segment_t *segment){
+static void default835Handler(parser835_t *parser, segment_t *segment){
   addChildSegment(parser->loop, segment);
 }
 
-void isa835Handler(parser835_t *parser, segment_t *segment){
+static void isa835Handler(parser835_t *parser, segment_t *segment){
   if(NULL == parser->interchange){
     parser->interchange = segment;
     parser->loop = segment;
@@ -84,7 +112,7 @@ void isa835Handler(parser835_t *parser, segment_t *segment){
   }
 }
 
-void gs835Handler(parser835_t *parser, segment_t *segment){
+static void gs835Handler(parser835_t *parser, segment_t *segment){
   if(parser->loop == parser->interchange || (parser->loop == parser->functional && NULL != parser->trailer && isGE(parser->trailer->name))){
     addChildSegment(parser->interchange, segment);
     parser->functional = segment;
@@ -94,7 +122,7 @@ void gs835Handler(parser835_t *parser, segment_t *segment){
   }
 }
 
-void st835Handler(parser835_t *parser, segment_t *segment){
+static void st835Handler(parser835_t *parser, segment_t *segment){
   if(parser->loop == parser->functional || (parser->loop == parser->transaction && NULL != parser->trailer && isSE(parser->trailer->name))){
     addChildSegment(parser->functional, segment);
     parser->transaction = segment;
@@ -104,7 +132,7 @@ void st835Handler(parser835_t *parser, segment_t *segment){
   }
 }
 
-void n1835Handler(parser835_t *parser, segment_t *segment){
+static void n1835Handler(parser835_t *parser, segment_t *segment){
   if(parser->loop == parser->transaction){
     addChildSegment(parser->functional, segment);
     parser->payer = segment;
@@ -118,7 +146,7 @@ void n1835Handler(parser835_t *parser, segment_t *segment){
   }
 }
 
-void lx835Handler(parser835_t *parser, segment_t *segment){
+static void lx835Handler(parser835_t *parser, segment_t *segment){
   if(NULL == parser->payer || NULL == parser->payee){
     parserFail(parser->super, MISSING_PAYER_LOOP);
   }else if(parser->loop == parser->payee){
@@ -131,7 +159,7 @@ void lx835Handler(parser835_t *parser, segment_t *segment){
   }
 }
 
-void clp835Handler(parser835_t *parser, segment_t *segment){
+static void clp835Handler(parser835_t *parser, segment_t *segment){
   if(parser->loop == parser->service || parser->loop == parser->claim || parser->loop == parser->header){
     parser->service = NULL;
     addChildSegment(parser->header, segment);
@@ -142,7 +170,7 @@ void clp835Handler(parser835_t *parser, segment_t *segment){
   }
 }
 
-void svc835Handler(parser835_t *parser, segment_t *segment){
+static void svc835Handler(parser835_t *parser, segment_t *segment){
   if(parser->loop == parser->claim || parser->loop == parser->service){
     addChildSegment(parser->claim, segment);
     parser->service = segment;
@@ -152,19 +180,19 @@ void svc835Handler(parser835_t *parser, segment_t *segment){
   }
 }
 
-void plb835Handler(parser835_t *parser, segment_t *segment){
+static void plb835Handler(parser835_t *parser, segment_t *segment){
   addChildSegment(parser->header, segment);
   parser->claim = segment;
   parser->loop = segment;
 }
 
-void se835Handler(parser835_t *parser, segment_t *segment){
+static void se835Handler(parser835_t *parser, segment_t *segment){
   addChildSegment(parser->transaction, segment);
   parser->loop = parser->transaction;
   parser->trailer = segment;
 }
 
-void ge835Handler(parser835_t *parser, segment_t *segment){
+static void ge835Handler(parser835_t *parser, segment_t *segment){
   if(parser->loop == parser->transaction && isSE(parser->transaction->lastSegment->name)){
     addChildSegment(parser->functional, segment);
     parser->loop = parser->functional;
@@ -174,7 +202,7 @@ void ge835Handler(parser835_t *parser, segment_t *segment){
   }
 }
 
-void iea835Handler(parser835_t *parser, segment_t *segment){
+static void iea835Handler(parser835_t *parser, segment_t *segment){
   if(parser->loop == parser->functional && isGE(parser->functional->lastSegment->name)){
     addChildSegment(parser->interchange, segment);
     parser->loop = parser->interchange;
@@ -184,7 +212,7 @@ void iea835Handler(parser835_t *parser, segment_t *segment){
   }
 }
 
-void validate835Parser(parser835_t *parser){
+static void validate835Parser(parser835_t *parser){
   if(!parser->super->finished && !parser->super->failure){
     if(!isSE(parser->transaction->lastSegment->name)){
       parserFail(parser->super, MISSING_SE_SEGMENT);
@@ -211,12 +239,12 @@ void validate835Parser(parser835_t *parser){
   parser->super->finished = true;
 }
 
-void build835Indexes(parser835_t *parser){
+static void build835Indexes(parser835_t *parser){
   rewind835Parser(parser);
   buildIndexes(parser->super, parser->interchange);
 }
 
-void parser835Initialization(parser835_t *parser){
+static void parser835Initialization(parser835_t *parser){
   parser->interchange = NULL;
   parser->loop = NULL;
   parser->functional = NULL;
@@ -225,10 +253,9 @@ void parser835Initialization(parser835_t *parser){
   parser->payee = NULL;
   parser->header = NULL;
   parser->claim = NULL;
-  parserInitialization(parser->super);
 }
 
-void rewind835Parser(parser835_t *parser){
+static void rewind835Parser(parser835_t *parser){
   parser->interchange = rewindLoop(parser->interchange);
   parser->functional = rewindLoop(parser->functional);
   parser->transaction = rewindLoop(parser->transaction);
@@ -239,21 +266,12 @@ void rewind835Parser(parser835_t *parser){
   parser->loop = parser->interchange;
 }
 
-void parser835Cleanup(parser835_t *parser){
+static void parser835Cleanup(parser835_t *parser){
 
 }
 
-void parser835Free(parser835_t *parser){
+static void parser835Free(parser835_t *parser){
   if(NULL != parser){
-    rewind835Parser(parser);
-    loopFree(parser->claim);
-    loopFree(parser->header);
-    loopFree(parser->payee);
-    loopFree(parser->payer);
-    loopFree(parser->transaction);
-    loopFree(parser->functional);
-    loopFree(parser->interchange);
-    parserFree(parser->super);
     free(parser);
   }
 }

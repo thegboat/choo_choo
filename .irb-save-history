@@ -1,7 +1,3 @@
-ActiveRecord::Base.transaction {td.destroy; raise ActiveRecord::Rollback }
-td.posting_date
-td.credit_transaction
-exit
 TransactionDetail.where(business_entity_id: 911).first
 td = _
 ActiveRecord::Base.transaction {td.destroy; raise ActiveRecord::Rollback }
@@ -96,5 +92,9 @@ ChooChoo.descendants
 ChooChoo.descendants(:GS, :GE, :ST)
 _.length
 ChooChoo.descendants(:GS, :GE, :ST)
+ChooChoo.descendants(:GS, :GE, :ST)
+exit
+ChooChoo.descendants(:GS, :GE, :ST)
+exit
 ChooChoo.descendants(:GS, :GE, :ST)
 exit

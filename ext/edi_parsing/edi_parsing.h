@@ -21,6 +21,7 @@ typedef struct property_struct property_t;
 typedef struct parser_struct parser_t;
 typedef struct index_stat_struct index_stat_t;
 typedef struct parser835_struct parser835_t;
+typedef struct anchor_struct anchor_t;
 
 struct index_stat_struct
 {
@@ -32,6 +33,8 @@ struct parser_struct
 {
   short errors[MAX_ERROR_SIZE];
   short errorCount;
+  char documentType[10];
+  segment_t *root;
   segment_t **nameIndex;
   segment_t **primaryIndex;
   char *str;
@@ -40,6 +43,12 @@ struct parser_struct
   int propertyCount;
   bool failure;
   bool finished;
+};
+
+struct anchor_struct
+{
+  parser_t *parser;
+  segment_t *segment;
 };
 
 struct parser835_struct
@@ -142,45 +151,18 @@ void parserFail(parser_t *parser, short error);
 // traversal
 
 void buildIndexes(parser_t *parser, segment_t *root);
-VALUE segmentFind(parser_t *parser, VALUE segment_rb, VALUE names);
+VALUE segmentFind(parser_t *parser, segment_t *segment, VALUE names);
 VALUE segmentToHash(segment_t *segment);
-VALUE segmentParent(parser_t *parser, VALUE segment_rb);
-VALUE segmentChildren(parser_t *parser, VALUE segment_rb, VALUE names);
+VALUE segmentChildren(parser_t *parser, segment_t *segment, VALUE names);
 VALUE propertiesToHash(property_t *property);
 void traversalLibInit();
 
 // 835
 
-void parse835(parser835_t *parser, char *ediFile);
-void attach835Segment(parser835_t *parser, segment_t *segment);
-void rewind835Parser(parser835_t *parser);
-void default835Handler(parser835_t *parser, segment_t *segment);
-void validate835Parser(parser835_t *parser);
-void parser835Free(parser835_t *parser);
-void parser835Initialization(parser835_t *parser);
-void isa835Handler(parser835_t *parser, segment_t *segment);
-void gs835Handler(parser835_t *parser, segment_t *segment);
-void st835Handler(parser835_t *parser, segment_t *segment);
-void n1835Handler(parser835_t *parser, segment_t *segment);
-void lx835Handler(parser835_t *parser, segment_t *segment);
-void clp835Handler(parser835_t *parser, segment_t *segment);
-void svc835Handler(parser835_t *parser, segment_t *segment);
-void plb835Handler(parser835_t *parser, segment_t *segment);
-void se835Handler(parser835_t *parser, segment_t *segment);
-void ge835Handler(parser835_t *parser, segment_t *segment);
-void iea835Handler(parser835_t *parser, segment_t *segment);
-void parser835Cleanup(parser835_t *parser);
-void build835Indexes(parser835_t *parser);
+void parse835(anchor_t *anchor, char *ediFile);
 
-// interface 
+// interface
 
-void interchange_loop_835_free(VALUE self);
-VALUE interchange_loop_835_alloc(VALUE self);
-VALUE choo_choo_parse_835(VALUE segment, VALUE isa_str);
-VALUE interchange_loop_835_to_hash(VALUE self);
-VALUE interchange_loop_835_errors(VALUE self);
 void Init_edi_parsing(void);
-VALUE segment835Find(VALUE self, VALUE names);
-VALUE segment835children(VALUE self, VALUE names);
-VALUE buildSegmentNode(VALUE isa, segment_t *segment);
+VALUE buildSegmentNode(parser_t *parser, segment_t *segment);
 

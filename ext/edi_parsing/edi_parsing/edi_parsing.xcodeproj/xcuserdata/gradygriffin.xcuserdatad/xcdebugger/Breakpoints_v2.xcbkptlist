@@ -530,16 +530,16 @@
                   shouldBeEnabled = "No"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
-                  symbolName = "interchange_loop_835_free"
+                  symbolName = "buildSegmentNode"
                   moduleName = "edi_parsing.bundle"
                   usesParentBreakpointCondition = "Yes"
                   urlString = "file:///Users/gradygriffin/.rbenv/versions/2.2.1/include/ruby-2.2.0/ruby/ruby.h"
-                  timestampString = "461206237.111923"
+                  timestampString = "461492468.827933"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
                   startingLineNumber = "1191"
                   endingLineNumber = "1191"
-                  offsetFromSymbolStart = "14">
+                  offsetFromSymbolStart = "73">
                </Location>
                <Location
                   shouldBeEnabled = "No"
@@ -549,22 +549,97 @@
                   moduleName = "edi_parsing.bundle"
                   usesParentBreakpointCondition = "Yes"
                   urlString = "file:///Users/gradygriffin/.rbenv/versions/2.2.1/include/ruby-2.2.0/ruby/ruby.h"
-                  timestampString = "461206237.112101"
+                  timestampString = "461492468.828107"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
                   startingLineNumber = "1191"
                   endingLineNumber = "1191"
-                  offsetFromSymbolStart = "50">
+                  offsetFromSymbolStart = "104">
                </Location>
                <Location
                   shouldBeEnabled = "No"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
-                  symbolName = "interchange_loop_835_to_hash"
+                  symbolName = "choo_choo_parse_835"
                   moduleName = "edi_parsing.bundle"
                   usesParentBreakpointCondition = "Yes"
                   urlString = "file:///Users/gradygriffin/.rbenv/versions/2.2.1/include/ruby-2.2.0/ruby/ruby.h"
-                  timestampString = "461206237.112196"
+                  timestampString = "461492468.828228"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "1191"
+                  endingLineNumber = "1191"
+                  offsetFromSymbolStart = "190">
+               </Location>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "segment_find"
+                  moduleName = "edi_parsing.bundle"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/gradygriffin/.rbenv/versions/2.2.1/include/ruby-2.2.0/ruby/ruby.h"
+                  timestampString = "461492468.828351"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "1191"
+                  endingLineNumber = "1191"
+                  offsetFromSymbolStart = "18">
+               </Location>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "segment_children"
+                  moduleName = "edi_parsing.bundle"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/gradygriffin/.rbenv/versions/2.2.1/include/ruby-2.2.0/ruby/ruby.h"
+                  timestampString = "461492468.828466"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "1191"
+                  endingLineNumber = "1191"
+                  offsetFromSymbolStart = "18">
+               </Location>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "segment_parent"
+                  moduleName = "edi_parsing.bundle"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/gradygriffin/.rbenv/versions/2.2.1/include/ruby-2.2.0/ruby/ruby.h"
+                  timestampString = "461492468.828578"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "1191"
+                  endingLineNumber = "1191"
+                  offsetFromSymbolStart = "18">
+               </Location>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "segment_parent"
+                  moduleName = "edi_parsing.bundle"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/gradygriffin/.rbenv/versions/2.2.1/include/ruby-2.2.0/ruby/ruby.h"
+                  timestampString = "461492468.828696"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "1191"
+                  endingLineNumber = "1191"
+                  offsetFromSymbolStart = "91">
+               </Location>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "documentType"
+                  moduleName = "edi_parsing.bundle"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/gradygriffin/.rbenv/versions/2.2.1/include/ruby-2.2.0/ruby/ruby.h"
+                  timestampString = "461492468.828812"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
                   startingLineNumber = "1191"
@@ -575,16 +650,61 @@
                   shouldBeEnabled = "No"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
-                  symbolName = "interchange_loop_835_errors"
+                  symbolName = "interchange_loop_to_hash"
                   moduleName = "edi_parsing.bundle"
                   usesParentBreakpointCondition = "Yes"
                   urlString = "file:///Users/gradygriffin/.rbenv/versions/2.2.1/include/ruby-2.2.0/ruby/ruby.h"
-                  timestampString = "461206237.112291"
+                  timestampString = "461492468.828923"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
                   startingLineNumber = "1191"
                   endingLineNumber = "1191"
-                  offsetFromSymbolStart = "23">
+                  offsetFromSymbolStart = "14">
+               </Location>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "interchange_loop_errors"
+                  moduleName = "edi_parsing.bundle"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/gradygriffin/.rbenv/versions/2.2.1/include/ruby-2.2.0/ruby/ruby.h"
+                  timestampString = "461492468.829033"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "1191"
+                  endingLineNumber = "1191"
+                  offsetFromSymbolStart = "9">
+               </Location>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "interchange_loop_free"
+                  moduleName = "edi_parsing.bundle"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/gradygriffin/.rbenv/versions/2.2.1/include/ruby-2.2.0/ruby/ruby.h"
+                  timestampString = "461492468.829142"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "1191"
+                  endingLineNumber = "1191"
+                  offsetFromSymbolStart = "14">
+               </Location>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "segment_free"
+                  moduleName = "edi_parsing.bundle"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/gradygriffin/.rbenv/versions/2.2.1/include/ruby-2.2.0/ruby/ruby.h"
+                  timestampString = "461492468.829256"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "1191"
+                  endingLineNumber = "1191"
+                  offsetFromSymbolStart = "14">
                </Location>
             </Locations>
          </BreakpointContent>
@@ -1061,7 +1181,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "27"
             endingLineNumber = "27"
-            landmarkName = "choo_choo_parse_835()"
+            landmarkName = "interchange_loop_free()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -1077,7 +1197,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "35"
             endingLineNumber = "35"
-            landmarkName = "choo_choo_parse_835()"
+            landmarkName = "interchange_loop_alloc()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -1093,7 +1213,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "41"
             endingLineNumber = "41"
-            landmarkName = "choo_choo_parse_835()"
+            landmarkName = "segment_free()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -1104,12 +1224,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../edi_parsing_traversal.c"
-            timestampString = "461466066.202253"
+            timestampString = "461491418.006473"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "172"
-            endingLineNumber = "172"
-            landmarkName = "nameIndexFunc()"
+            startingLineNumber = "170"
+            endingLineNumber = "170"
+            landmarkName = "indexSegment()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -1120,12 +1240,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../edi_parsing_traversal.c"
-            timestampString = "461466066.202253"
+            timestampString = "461491418.006473"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "169"
-            endingLineNumber = "169"
-            landmarkName = "nameIndexFunc()"
+            startingLineNumber = "167"
+            endingLineNumber = "167"
+            landmarkName = "indexSegment()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -1136,11 +1256,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../edi_parsing_traversal.c"
-            timestampString = "461466066.202253"
+            timestampString = "461491418.006473"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "51"
-            endingLineNumber = "51"
+            startingLineNumber = "50"
+            endingLineNumber = "50"
             landmarkName = "segmentChildren()"
             landmarkType = "7">
          </BreakpointContent>
@@ -1148,7 +1268,7 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../edi_parsing_interface.c"
@@ -1157,7 +1277,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "40"
             endingLineNumber = "40"
-            landmarkName = "choo_choo_parse_835()"
+            landmarkName = "segment_free()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -1168,12 +1288,92 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../edi_parsing_traversal.c"
-            timestampString = "461466066.202253"
+            timestampString = "461491418.006473"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "115"
-            endingLineNumber = "115"
-            landmarkName = "segmentFind()"
+            startingLineNumber = "113"
+            endingLineNumber = "113"
+            landmarkName = "nameIndexSearch()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../edi_parsing_interface.c"
+            timestampString = "461491841.398563"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "65"
+            endingLineNumber = "65"
+            landmarkName = "choo_choo_parse_835()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../edi_parsing_interface.c"
+            timestampString = "461492182.924647"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "113"
+            endingLineNumber = "113"
+            landmarkName = "buildSegmentNode()"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "buildSegmentNode"
+                  moduleName = "edi_parsing.bundle"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/gradygriffin/dev/choo_choo/ext/edi_parsing/edi_parsing_interface.c"
+                  timestampString = "461492190.69225"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "114"
+                  endingLineNumber = "114"
+                  offsetFromSymbolStart = "85">
+               </Location>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "segment_parent"
+                  moduleName = "edi_parsing.bundle"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/gradygriffin/dev/choo_choo/ext/edi_parsing/edi_parsing_interface.c"
+                  timestampString = "461492190.692385"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "114"
+                  endingLineNumber = "114"
+                  offsetFromSymbolStart = "103">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../edi_parsing_interface.c"
+            timestampString = "461492224.39535"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "56"
+            endingLineNumber = "56"
+            landmarkName = "choo_choo_parse_835()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
