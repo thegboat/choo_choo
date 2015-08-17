@@ -1,6 +1,8 @@
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 require 'choo_choo'
 require 'benchmark'
+require 'pry'
+require 'pry-byebug'
 
 
 module ChooChoo
@@ -24,6 +26,18 @@ module ChooChoo
     edi = ChooChoo::Parser.parse_835(test_string)
     isa = edi.isa_segments.first
     isa.to_hash
+  end
+
+  def self.children(*names)
+    edi = ChooChoo::Parser.parse_835(ChooChoo.test_string)
+    isa = edi.isa_segments.first
+    isa.children(*names)
+  end
+
+  def self.descendants(*names)
+    edi = ChooChoo::Parser.parse_835(ChooChoo.test_string)
+    isa = edi.isa_segments.first
+    isa.descendants(*names)
   end
 end
 

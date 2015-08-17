@@ -42,7 +42,7 @@
       allowLocationSimulation = "YES">
       <PathRunnable
          runnableDebuggingMode = "0"
-         FilePath = "/usr/bin/ruby">
+         FilePath = "/Users/gradygriffin/.rbenv/versions/2.2.1/bin/ruby">
       </PathRunnable>
       <MacroExpansion>
          <BuildableReference

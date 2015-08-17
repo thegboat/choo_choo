@@ -1,100 +1,100 @@
-ChooChoo.test_string2.split('~').length
-ChooChoo.test_string.split('~').length
+ActiveRecord::Base.transaction {td.destroy; raise ActiveRecord::Rollback }
+td.posting_date
+td.credit_transaction
 exit
-result = ChooChoo::Parser.parse_835(ChooChoo.test_string2)
+TransactionDetail.where(business_entity_id: 911).first
+td = _
+ActiveRecord::Base.transaction {td.destroy; raise ActiveRecord::Rollback }
+td.posting_date
+td.financial_period
+td.financial_period = nil
+td.reload
+td.posting_date = nil
+td.financial_period = nil
+ActiveRecord::Base.transaction {td.destroy; raise ActiveRecord::Rollback }
+td.financial_period
+td.posting_date
+td.stamp_financial_period
+td
+td.financial_period
+CentralFramework::ClientFinancialPeriodCalculator.calculate(td)
+CentralFramework::ClientFinancialPeriodCalculator.new(td)
+cc = _
+cc.calculatable?
+cc.fetch_period
+cc.skip?
+cc.send :skip?
+cc.send :read_cache_for_period
+td.id
 exit
-result = ChooChoo::Parser.parse_835(ChooChoo.test_string2)
+td
+td = TransactionDetail.find 59517686
+CentralFramework::ClientFinancialPeriodCalculator.calculate(td)
+td.reload
+ActiveRecord::Base.transaction {td.destroy; raise ActiveRecord::Rollback }
+td.posting_date
+td.financial_period
+td.reload
+td.financial_period = nil
+td.posting_date = nil
+ActiveRecord::Base.transaction {td.destroy; raise ActiveRecord::Rollback }
+td.posting_date
+td.financial_period
+td.id
+CreditTransaction.first
+CreditTransaction.where(credit_transaction_type_id: 1).first
+cc = _
+cc.posting_date
+cc.posting_date = nil
+cc.save!
+cc.reload
 exit
-result = ChooChoo::Parser.parse_835(ChooChoo.test_string2)
+list
+step
+list
+step
+list
+ty = 'gg'
+ty
+ty.upcase!
+ty
+quit
+ChooChoo.children("GS")
+names
+segments
+segments.map(&:name)
+quit
 exit
-result = ChooChoo::Parser.parse_835(ChooChoo.test_string2)
+ChooChoo.children("GS")
+_.length
+ChooChoo.children("ISA")
+ChooChoo.children("IEA")
+exit
+ChooChoo.descendants("IEA")
+ChooChoo.descendants("Gs")
+ChooChoo.descendants("SVC")
+ChooChoo.descendants("CAS")
+ChooChoo.descendants("ST")
+ChooChoo.descendants
+exit
+ChooChoo.descendants
+exit
+ChooChoo.descendants
+_.first
+ChooChoo.parse_835
+ChooChoo::Parser.parse_835
+ChooChoo::Parser.parse_835(ChooChoo.test_string)
 edi = _
-edi.isa_segments
-edi.isa_segments.first
-isa = _
-isa.to_hash
-exit
-result = ChooChoo::Parser.parse_835(ChooChoo.test_string2)
-_.isa_segments
-_.first
-rr = _
-rr.to_hash
-exit
-result = ChooChoo::Parser.parse_835(ChooChoo.test_string2)
-_.first
-result = ChooChoo::Parser.parse_835(ChooChoo.test_string2)
-_.isa_segments
-_.first
-rr = _
-rr.to_hash
-exit
-ChooChoo.to_hash
-_.to_json
-exit
-ChooChoo.to_hash
-_.to_json
-Ox
-require 'ox'
-Ox.dump
-Ox.dump()
-Ox.dump("")
-Ox.dump({grady: 5})
-ChooChoo.to_hash
-exit
-ChooChoo.to_hash
-exit
-ChooChoo.to_hash
-x = _
-x[:IEA]
-x[:ISA]
-x[:ISA01]
-x[:IEA01]
-exit
-ChooChoo.to_hash
-ChooChoo.to_hash.merge(IEA01: 1)
-ChooChoo.to_hash
-rr = _
-rr[:GE01]
-rr[:children]
-rr[:children].first
-rr[:children].first[:GS]
-rr[:children].first.
-rr.keys
-rr
-rr[:children].first[:GS]
-rr[:children]
-rr[:children].first
-rr[:children].first
-rr[:children].first
-rr[:children].first
-rr[:children][1]
-exit
-ChooChoo.to_hash
-exit
-ChooChoo.to_hash
-exit
-ChooChoo.to_hash
-exit
-ChooChoo.to_hash
-exit
-ChooChoo.to_hash
-ChooChoo.to_hash
-ChooChoo.to_hash
-ChooChoo::Parser
-ChooChoo::Parser.max_threads
-ChooChoo::Parser.new('i'),max_threads
-ChooChoo::Parser.new('i').max_threads
-exit
-ChooChoo.to_hash
-ChooChoo.to_hash
-exit
-ChooChoo.to_hash
-exit
-ChooChoo.to_hash
+isa = edi.isa_segments.first
+isa.descendants
+isa.descendants("GS")
 exit
 exit
-ChooChoo.to_hash
+ChooChoo.descendants
 exit
-ChooChoo.to_hash
-_.class
+ChooChoo.descendants
+ChooChoo.descendants(:GS, :GE, :ST)
+_.length
+ChooChoo.descendants(:GS, :GE, :ST)
+ChooChoo.descendants(:GS, :GE, :ST)
 exit

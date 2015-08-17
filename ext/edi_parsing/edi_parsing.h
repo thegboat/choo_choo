@@ -1,12 +1,10 @@
 //
-//  edi_835_parser.h
+//  edi_parsing.h
 //  choo_choo_parser
 //
 //  Created by Grady Griffin on 8/11/15.
 //  Copyright (c) 2015 Grady Griffin. All rights reserved.
 //
-#ifndef edi_parsing_h
-#define edi_parsing_h
 
 #include <stdbool.h>
 #include <stdlib.h>
@@ -16,24 +14,28 @@
 #include <ruby.h>
 #include "edi_parsing_constants.h"
 
+// data types
+
 typedef struct segment_struct segment_t;
 typedef struct property_struct property_t;
 typedef struct parser_struct parser_t;
+typedef struct index_stat_struct index_stat_t;
 typedef struct parser835_struct parser835_t;
+
+struct index_stat_struct
+{
+  int lower;
+  int upper;
+};
 
 struct parser_struct
 {
   short errors[MAX_ERROR_SIZE];
   short errorCount;
-  property_t **pnIdx;
-  property_t **pdIdx;
-  property_t **pPkey;
-  segment_t **snIdx;
-  segment_t **sdIdx;
-  segment_t **sPkey;
+  segment_t **nameIndex;
+  segment_t **primaryIndex;
   char *str;
   char componentSeparator[2];
-  int depth;
   int segmentCount;
   int propertyCount;
   bool failure;
@@ -42,7 +44,7 @@ struct parser_struct
 
 struct parser835_struct
 {
-  parser_t super;
+  parser_t *super;
   segment_t *loop;
   segment_t *interchange;
   segment_t *functional;
@@ -68,6 +70,7 @@ struct segment_struct
   int elements;
   int depth;
   int pkey;
+  int boundary;
 };
 
 struct property_struct
@@ -80,7 +83,8 @@ struct property_struct
   int pkey;
 };
 
-/* inspection */
+// inspection
+
 bool identify(char *src, const char* seg);
 bool isISA(char *src);
 bool isIEA(char *src);
@@ -114,40 +118,41 @@ bool isLQ(char *src);
 bool isPR(char *src);
 bool isPE(char *src);
 
+// segment
 
-void buildProperty(segment_t *segment, char *data, short seg_cnt, short elem_cnt);
 void segmentInitializer(segment_t *segment, char *src);
 void addProperty(segment_t *segment, property_t *property);
+void buildProperty(segment_t *segment, char *data, short seg_cnt, short elem_cnt);
 void buildKey(char *key, char *seg_name, short seg_cnt, short elem_cnt);
 void addChildSegment(segment_t *parent, segment_t *child);
+void loopFree(segment_t *loop);
 void segmentFree(segment_t *segment);
 void propertyFree(property_t *property);
 segment_t *rewindLoop(segment_t *loop);
-void loopFree(segment_t *segment_t);
+
+// parser
+
 void *ediParsingMalloc(size_t size);
-void parseElement(segment_t *segment, char *str, const char componentSeparator[2], short seg_cnt);
 segment_t *parseSegment(parser_t *parser);
-VALUE segment_to_hash(segment_t *segment);
-void allocIndexes(parser_t *parser);
-
-
-VALUE interchange_loop_alloc(VALUE self);
-void interchange_loop_free(VALUE self);
-VALUE choo_choo_parse_835(VALUE segment, VALUE isa_str);
-VALUE choo_choo_parse_835(VALUE segment, VALUE isa_str);
-VALUE interchange_loop_to_hash(VALUE self);
-VALUE segment_to_hash(segment_t *segment);
-void Init_edi_parsing(void);
-
+int parseElement(segment_t *segment, char *str, const char componentSeparator[2], short seg_cnt);
+void parserInitialization(parser_t *parser);
+void parserFree(parser_t *parser);
 void parserFail(parser_t *parser, short error);
 
-/* 835 */
+// traversal
+
+void buildIndexes(parser_t *parser, segment_t *root);
+VALUE segmentFind(parser_t *parser, VALUE segment_rb, VALUE names);
+VALUE segmentToHash(segment_t *segment);
+VALUE segmentParent(parser_t *parser, VALUE segment_rb);
+VALUE segmentChildren(parser_t *parser, VALUE segment_rb, VALUE names);
+VALUE propertiesToHash(property_t *property);
+void traversalLibInit();
+
+// 835
 
 void parse835(parser835_t *parser, char *ediFile);
-void parse835Segment(parser835_t *parser);
-void parse835Element(parser835_t *parser, char *str, segment_t *segment, short seg_cnt);
 void attach835Segment(parser835_t *parser, segment_t *segment);
-
 void rewind835Parser(parser835_t *parser);
 void default835Handler(parser835_t *parser, segment_t *segment);
 void validate835Parser(parser835_t *parser);
@@ -167,13 +172,15 @@ void iea835Handler(parser835_t *parser, segment_t *segment);
 void parser835Cleanup(parser835_t *parser);
 void build835Indexes(parser835_t *parser);
 
-int cmpSegmentName(const void *p1, const void*p2);
-int cmpSegmentDepth(const void *p1, const void*p2);
-int cmpPropertyName(const void *p1, const void*p2);
-int cmpPropertyDepth(const void *p1, const void*p2);
-void buildIndexes(parser_t *parser, segment_t *segment);
-void indexSegment(parser_t *parser, segment_t *segment, int segmentCount, int propertyCount);
-void allocIndexes(parser_t *parser);
+// interface 
 
+void interchange_loop_835_free(VALUE self);
+VALUE interchange_loop_835_alloc(VALUE self);
+VALUE choo_choo_parse_835(VALUE segment, VALUE isa_str);
+VALUE interchange_loop_835_to_hash(VALUE self);
+VALUE interchange_loop_835_errors(VALUE self);
+void Init_edi_parsing(void);
+VALUE segment835Find(VALUE self, VALUE names);
+VALUE segment835children(VALUE self, VALUE names);
+VALUE buildSegmentNode(VALUE isa, segment_t *segment);
 
-#endif

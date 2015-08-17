@@ -5,8 +5,6 @@
 //  Created by Grady Griffin on 8/3/15.
 //  Copyright (c) 2015 Grady Griffin. All rights reserved.
 //
-#ifndef edi_parsing_constants_h
-#define edi_parsing_constants_h
 
 #define ISA_SEGMENT "ISA"
 #define IEA_SEGMENT "IEA"
@@ -52,6 +50,13 @@
 #define SEGMENT_INDEX_RESIZE 500
 #define PROPERTY_INDEX_RESIZE 5000
 
+#define DOCUMENT_TYPE_KEY "@document_type"
+
+#define NODE_KEY "@_id"
+#define ISA_LINK "@_isa_link"
+#define PROPERTIES "@_properties"
+#define SEGMENT_NAME "@_name"
+
 #define ISA_SEGMENT_NOT_DETECTED_FIRST    1
 #define MORE_THAN_ONE_ISA_SEGMENT_FOUND   2
 #define WRONG_NUMBER_OF_ELEMENTS_FOR_ISA  3
@@ -78,6 +83,4 @@
 #define MISSING_IEA_SEGMENT               24
 #define INVALID_COMPONENT_SEPARATOR       25
 
-
-#endif
 

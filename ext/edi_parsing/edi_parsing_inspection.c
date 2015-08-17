@@ -1,10 +1,11 @@
 //
-//  edi_835_inspection.c
+//  edi_parsing_inspection.c
 //  choo_choo_parser
 //
 //  Created by Grady Griffin on 8/3/15.
 //  Copyright (c) 2015 Grady Griffin. All rights reserved.
 //
+
 #include "edi_parsing.h"
 
 bool identify(char *src, const char *seg){

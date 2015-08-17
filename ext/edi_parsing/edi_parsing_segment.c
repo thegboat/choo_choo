@@ -96,27 +96,3 @@ segment_t *rewindLoop(segment_t *loop){
   }
   return loop;
 }
-
-VALUE segment_to_hash(segment_t *segment){
-  property_t *property = segment->firstProperty;
-  segment_t *child = segment->firstSegment;
-  VALUE proxy = rb_hash_new();
-  VALUE children = rb_ary_new();
-
-  while(NULL != property){
-    VALUE key = ID2SYM(rb_intern(property->key));
-    rb_hash_aset(proxy, key, rb_str_new_cstr(property->value));
-    property = property->tail;
-  }
-
-  if(NULL != child){
-    while(NULL != child){
-      rb_ary_push(children, segment_to_hash(child));
-      child = child->tail;
-    }
-    rb_hash_aset(proxy, ID2SYM(rb_intern("children")), children);
-  }
-
-  rb_hash_aset(proxy, ID2SYM(rb_intern("name")), rb_str_new_cstr(segment->name));
-  return proxy;
-}

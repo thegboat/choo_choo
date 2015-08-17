@@ -1,5 +1,6 @@
 module ChooChoo
-  class InterchangeLoop < Segment
+  class InterchangeLoop
+    include ChooChoo::DocumentNode
 
     def errors
       _errors
