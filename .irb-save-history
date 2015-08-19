@@ -1,7 +1,3 @@
-TransactionDetail.where(business_entity_id: 911).first
-td = _
-ActiveRecord::Base.transaction {td.destroy; raise ActiveRecord::Rollback }
-td.posting_date
 td.financial_period
 td.financial_period = nil
 td.reload
@@ -97,4 +93,8 @@ exit
 ChooChoo.descendants(:GS, :GE, :ST)
 exit
 ChooChoo.descendants(:GS, :GE, :ST)
+exit
+'BPR*I*479.26*C*ACH*CCP*01*082000073*DA*004163086776*1710226428*USWM     *01*082900872*DA*28452504*20150102'.split('*')
+p = _
+p.length
 exit

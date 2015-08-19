@@ -9,18 +9,17 @@
 
 static int littleUSearch(parser_t *parser, const char *name, int idx);
 static int littleLSearch(parser_t *parser, const char *name, int idx);
-static index_stat_t nameIndexSearch(parser_t *parser, const char *name);
 static int nameIndexFunc(const void *p1, const void*p2);
 static void indexSegment(parser_t *parser, segment_t *segment, int *segmentCount, int depth);
 static void allocIndexes(parser_t *parser);
 static const int getNodeKey(VALUE segment_rb);
 static segment_t *getNode(parser_t *parser, VALUE segment_rb);
 
-void buildIndexes(parser_t *parser, segment_t *root){
+void buildIndexes(parser_t *parser){
   int segmentCount = 0;
   int propertyCount = 0;
   allocIndexes(parser);
-  indexSegment(parser, root, &segmentCount, 0);
+  indexSegment(parser, parser->root, &segmentCount, 0);
   qsort(parser->nameIndex, parser->segmentCount, sizeof(segment_t*), nameIndexFunc);
 }
 
@@ -86,7 +85,7 @@ VALUE segmentFind(parser_t *parser, segment_t *segment, VALUE names){
       c_name = StringValueCStr(name);
       stat = nameIndexSearch(parser, c_name);
       int max = (stat.upper - stat.lower) + 1;
-      if(stat.upper > -1){
+      if(!missingSegment(stat)){
         for(int i=0;i<max;i++){
           descendant = parser->nameIndex[i+stat.upper];
           if(descendant->pkey > segment->pkey && descendant->pkey <= segment->boundary){
@@ -101,7 +100,7 @@ VALUE segmentFind(parser_t *parser, segment_t *segment, VALUE names){
   return result;
 }
 
-static index_stat_t nameIndexSearch(parser_t *parser, const char *name){
+index_stat_t nameIndexSearch(parser_t *parser, const char *name){
   index_stat_t stat = {-1,-1};
   int first = 0;
   int last = parser->segmentCount;
@@ -195,6 +194,18 @@ static segment_t *getNode(parser_t *parser, VALUE segment_rb){
   }else{
     return parser->primaryIndex[nodeKey];
   }
+}
+
+bool missingSegment(index_stat_t stat){
+  return stat.lower < 0 || stat.upper < 0;
+}
+
+int segmentsWithName(index_stat_t stat){
+  return missingSegment(stat) ? 0 : ((stat.upper - stat.lower) + 1);
+}
+
+bool multipleWithName(index_stat_t stat){
+  return segmentsWithName(stat) > 1; 
 }
 
 

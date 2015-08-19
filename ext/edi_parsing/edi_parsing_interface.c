@@ -49,20 +49,16 @@ static VALUE segment_alloc(VALUE self){
 
 static VALUE choo_choo_parse_835(VALUE segment, VALUE isa_str){
   char *c_isa_str = StringValueCStr(isa_str);
+  anchor_t *anchor;
   VALUE mChooChoo = rb_define_module("ChooChoo");
   VALUE cSegment = rb_define_class_under(mChooChoo, "Segment", rb_cObject);
   VALUE cInterchangeLoop = rb_define_class_under(mChooChoo, "InterchangeLoop", rb_cObject);
-
   VALUE isa = rb_class_new_instance(0, NULL, cInterchangeLoop);
-  anchor_t *anchor;
-  Data_Get_Struct(isa, anchor_t, anchor);
 
+  rb_iv_set(segment_rb, SEGMENT_NAME, "ISA");
+  Data_Get_Struct(isa, anchor_t, anchor);
   parse835(anchor, c_isa_str);
-  rb_iv_set(isa, PROPERTIES, propertiesToHash(anchor->segment->firstProperty));
-  VALUE isas = rb_ary_new();
-  rb_ary_push(isas, isa);
-  segment_children(isa, rb_ary_new());
-  return isas;
+  return isa;
 }
 
 static VALUE interchange_loop_to_hash(VALUE self){  
@@ -113,7 +109,7 @@ VALUE buildSegmentNode(parser_t *parser, segment_t *segment){
   Data_Get_Struct(segment_rb, anchor_t, anchor);
   anchor->parser = parser;
   anchor->segment = segment;
-  rb_iv_set(segment_rb, PROPERTIES, propertiesToHash(segment->firstProperty));
+  rb_iv_set(segment_rb, SEGMENT_NAME, rb_str_new_cstr(segment->name));
   return segment_rb;
 }
 

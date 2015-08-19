@@ -138,6 +138,7 @@ void loopFree(segment_t *loop);
 void segmentFree(segment_t *segment);
 void propertyFree(property_t *property);
 segment_t *rewindLoop(segment_t *loop);
+bool elementCountIn(segment_t *segment, int start, int end);
 
 // parser
 
@@ -150,12 +151,16 @@ void parserFail(parser_t *parser, short error);
 
 // traversal
 
-void buildIndexes(parser_t *parser, segment_t *root);
+void buildIndexes(parser_t *parser);
 VALUE segmentFind(parser_t *parser, segment_t *segment, VALUE names);
 VALUE segmentToHash(segment_t *segment);
 VALUE segmentChildren(parser_t *parser, segment_t *segment, VALUE names);
 VALUE propertiesToHash(property_t *property);
 void traversalLibInit();
+index_stat_t nameIndexSearch(parser_t *parser, const char *name);
+bool missingSegment(index_stat_t stat);
+int segmentsWithName(index_stat_t stat);
+bool multipleWithName(index_stat_t stat);
 
 // 835
 

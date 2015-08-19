@@ -46,15 +46,7 @@
 #define MAX_NAME_SIZE 5
 #define MAX_KEY_SIZE 10
 #define MAX_ERROR_SIZE 10
-#define MAX_THREADS 2
-#define SEGMENT_INDEX_RESIZE 500
-#define PROPERTY_INDEX_RESIZE 5000
 
-#define DOCUMENT_TYPE_KEY "@document_type"
-
-#define NODE_KEY "@_id"
-#define ISA_LINK "@_isa_link"
-#define PROPERTIES "@_properties"
 #define SEGMENT_NAME "@_name"
 
 #define ISA_SEGMENT_NOT_DETECTED_FIRST    1
