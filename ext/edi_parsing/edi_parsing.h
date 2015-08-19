@@ -171,3 +171,7 @@ void parse835(anchor_t *anchor, char *ediFile);
 void Init_edi_parsing(void);
 VALUE buildSegmentNode(parser_t *parser, segment_t *segment);
 
+// errors
+
+VALUE getErrors(parser_t *parser);
+

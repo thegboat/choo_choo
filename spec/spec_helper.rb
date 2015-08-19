@@ -42,3 +42,16 @@ module ChooChoo
 end
 
 
+
+
+def str(segname, funcname)
+%{
+    def #{funcname}
+      raise ChooChoo::MethodNotImplemented, "no method #{funcname} for Document type } +'#{document_type}' + %{" if !["835"].include?(document_type)
+      raise ChooChoo::MethodNotImplemented, "no method #{funcname} for Segment #{segname}"  if name != :#{segname}
+      get_property('#{funcname}'')
+    end
+}
+end
+
+

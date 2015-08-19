@@ -1,22 +1,3 @@
-td.financial_period
-td.financial_period = nil
-td.reload
-td.posting_date = nil
-td.financial_period = nil
-ActiveRecord::Base.transaction {td.destroy; raise ActiveRecord::Rollback }
-td.financial_period
-td.posting_date
-td.stamp_financial_period
-td
-td.financial_period
-CentralFramework::ClientFinancialPeriodCalculator.calculate(td)
-CentralFramework::ClientFinancialPeriodCalculator.new(td)
-cc = _
-cc.calculatable?
-cc.fetch_period
-cc.skip?
-cc.send :skip?
-cc.send :read_cache_for_period
 td.id
 exit
 td
@@ -97,4 +78,23 @@ exit
 'BPR*I*479.26*C*ACH*CCP*01*082000073*DA*004163086776*1710226428*USWM     *01*082900872*DA*28452504*20150102'.split('*')
 p = _
 p.length
+exit
+EDI835
+ChooChoo::EDI835
+print_meths
+print_meths(ChooChoo::EDI835)
+print_meths([ChooChoo::EDI835])
+ChooChoo::EDI835.valid_document_nodes
+exit
+print_meths([ChooChoo::EDI835])
+exit
+print_meths([ChooChoo::EDI835])
+exit
+print_meths([ChooChoo::EDI835])
+exit
+print_meths([ChooChoo::EDI835])
+exit
+print_meths([ChooChoo::EDI835])
+exit
+print_meths([ChooChoo::EDI835])
 exit

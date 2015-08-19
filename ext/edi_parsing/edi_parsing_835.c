@@ -88,112 +88,138 @@ static void default835Handler(parser835_t *parser, segment_t *segment){
 }
 
 static bool isa835Handler(parser835_t *parser, segment_t *segment){
-  if(NULL == parser->interchange){
+  if(NULL != parser->interchange){
+    parserFail(parser->super, MORE_THAN_ONE_ISA_SEGMENT_FOUND);
+  }else if(!elementCountIn(segment, 16,16)){
+    parserFail(parser->super, WRONG_NUMBER_OF_ELEMENTS_FOR_ISA);
+  }else if(strlen(segment->lastProperty->value) != 1){
+    parserFail(parser->super, INVALID_COMPONENT_SEPARATOR);
+  }else{
     parser->interchange = segment;
     parser->loop = segment;
-  }else{
-    parserFail(parser->super, MORE_THAN_ONE_ISA_SEGMENT_FOUND);
-  }
-
-  if(parser->interchange->elements != 16){
-    parserFail(parser->super, WRONG_NUMBER_OF_ELEMENTS_FOR_ISA);
-  }else{
-    if(strlen(parser->interchange->lastProperty->value) != 1){
-      parserFail(parser->super, INVALID_COMPONENT_SEPARATOR);
-    }else{
-      parser->super->componentSeparator[0] = parser->interchange->lastProperty->value[0];
-      parser->super->componentSeparator[1] = '\0';
-    }
+    parser->super->componentSeparator[0] = parser->interchange->lastProperty->value[0];
+    parser->super->componentSeparator[1] = '\0';
   }
 }
 
 static bool gs835Handler(parser835_t *parser, segment_t *segment){
-  if(parser->loop == parser->interchange || (parser->loop == parser->functional && NULL != parser->trailer && isGE(parser->trailer->name))){
-    addChildSegment(parser->interchange, segment);
-    parser->functional = segment;
-    parser->loop = segment;
+  if(!elementCountIn(segment, 8,8)){
+    if(parser->loop == parser->interchange || (parser->loop == parser->functional && NULL != parser->trailer && isGE(parser->trailer->name))){
+      addChildSegment(parser->interchange, segment);
+      parser->functional = segment;
+      parser->loop = segment;
+    }else{
+     parserFail(parser->super, INVALID_GS_SEGMENT);
+    }
   }else{
-   parserFail(parser->super, INVALID_GS_SEGMENT);
-  }
-
-  if(segment->elements != 8){
     parserFail(parser->super, WRONG_NUMBER_OF_ELEMENTS_FOR_GS);
   }
 }
 
 static bool st835Handler(parser835_t *parser, segment_t *segment){
-  if(parser->loop == parser->functional || (parser->loop == parser->transaction && NULL != parser->trailer && isSE(parser->trailer->name))){
-    addChildSegment(parser->functional, segment);
-    parser->transaction = segment;
-    parser->loop = segment;
-  }else{
-   parserFail(parser->super, INVALID_ST_SEGMENT);
-  }
-
   if(!elementCountIn(segment,2,3)){
+    if(parser->loop == parser->functional || (parser->loop == parser->transaction && NULL != parser->trailer && isSE(parser->trailer->name))){
+      addChildSegment(parser->functional, segment);
+      parser->transaction = segment;
+      parser->loop = segment;
+    }else{
+     parserFail(parser->super, INVALID_ST_SEGMENT);
+    }
+  }else{
     parserFail(parser->super, WRONG_NUMBER_OF_ELEMENTS_FOR_ST);
   }
 }
 
 static bool bpr835Handler(parser835_t *parser, segment_t *segment){
-  if(isST(parser->loop)){
-    addChildSegment(parser->loop, segment);
-  }else{
-    parserFail(parser->super, INVALID_BPR_SEGMENT);
-  }
-
   if(!elementCountIn(segment,16,21)){
     parserFail(parser->super, WRONG_NUMBER_OF_ELEMENTS_FOR_BPR);
+  }else if(!isST(parser->loop)){
+    parserFail(parser->super, INVALID_BPR_SEGMENT);
+  }else{
+    addChildSegment(parser->loop, segment);
   }
 }
 
 static bool trn835Handler(parser835_t *parser, segment_t *segment){
-  if(isST(parser->loop)){
-    addChildSegment(parser->loop, segment);
-  }else{
-    parserFail(parser->super, INVALID_TRN_SEGMENT);
-  }
-
   if(!elementCountIn(segment,3,4)){
     parserFail(parser->super, WRONG_NUMBER_OF_ELEMENTS_FOR_TRN);
+  }else if(!isST(parser->loop)){
+    parserFail(parser->super, INVALID_TRN_SEGMENT);
+  }else{
+    addChildSegment(parser->loop, segment);
   }
 }
 
 static bool cur835Handler(parser835_t *parser, segment_t *segment){
-  if(isST(parser->loop)){
-    addChildSegment(parser->loop, segment);
-  }else{
-    parserFail(parser->super, INVALID_CUR_SEGMENT);
-  }
-
   if(!elementCountIn(segment,2,21)){
     parserFail(parser->super, WRONG_NUMBER_OF_ELEMENTS_FOR_CUR);
+  }else if(!isST(parser->loop)){
+    parserFail(parser->super, INVALID_CUR_SEGMENT);
+  }else{
+    addChildSegment(parser->loop, segment);
   }
 }
 
 static bool n1835Handler(parser835_t *parser, segment_t *segment){
-  if(isST(parser->loop)){
-    addChildSegment(parser->loop, segment);
-    parser->payer = segment;
-    parser->loop = segment;
-  }else if(parser->loop == parser->payer){
-    addChildSegment(parser->loop, segment);
-    parser->payee = segment;
-    parser->loop = segment;
+  if(elementCountIn(segment,2,6)){
+    if(isST(parser->loop)){
+      addChildSegment(parser->loop, segment);
+      parser->payer = segment;
+      parser->loop = segment;
+    }else if(parser->loop == parser->payer){
+      addChildSegment(parser->loop, segment);
+      parser->payee = segment;
+      parser->loop = segment;
+    }else{
+      parserFail(parser->super, INVALID_N1_SEGMENT);
+    }
   }else{
-    parserFail(parser->super, INVALID_N1_SEGMENT);
+    parserFail(parser->super, WRONG_NUMBER_OF_ELEMENTS_FOR_N1);
   }
 }
+
+static bool n3835Handler(parser835_t *parser, segment_t *segment){
+  if(!elementCountIn(segment,1,2)){
+    parserFail(parser->super, WRONG_NUMBER_OF_ELEMENTS_FOR_N3);
+  }else if(!isN1(parser->loop)){
+    parserFail(parser->super, INVALID_N3_SEGMENT);
+  }else{
+    addChildSegment(parser->loop, segment);
+  }
+}
+
+static bool n4835Handler(parser835_t *parser, segment_t *segment){
+  if(!elementCountIn(segment,1,3)){
+    parserFail(parser->super, WRONG_NUMBER_OF_ELEMENTS_FOR_N4);
+  }else if(!isN1(parser->loop)){
+    parserFail(parser->super, INVALID_N4_SEGMENT);
+  }else{
+    addChildSegment(parser->loop, segment);
+  }
+}
+
+static bool per835Handler(parser835_t *parser, segment_t *segment){
+  if(!elementCountIn(segment,1,9)){
+    parserFail(parser->super, WRONG_NUMBER_OF_ELEMENTS_FOR_PER);
+  }else if(parser->loop != parser->payer){
+    parserFail(parser->super, INVALID_PER_SEGMENT);
+  }else{
+    addChildSegment(parser->loop, segment);
+  }
+}
+
 
 static bool lx835Handler(parser835_t *parser, segment_t *segment){
   if(NULL == parser->payer || NULL == parser->payee){
     parserFail(parser->super, MISSING_PAYER_LOOP);
-  }else if(parser->loop == parser->payee){
+  }else if(!elementCountIn(segment,1,1)){
+    parserFail(parser->super, WRONG_NUMBER_OF_ELEMENTS_FOR_LX);
+  }else if(parser->loop != parser->payee){
+    parserFail(parser->super, INVALID_LX_SEGMENT);
+  }else{
     addChildSegment(parser->loop, segment);
     parser->header = segment;
     parser->loop = segment;
-  }else{
-   parserFail(parser->super, INVALID_LX_SEGMENT);
   }
 }
 
@@ -219,34 +245,46 @@ static bool svc835Handler(parser835_t *parser, segment_t *segment){
 }
 
 static bool plb835Handler(parser835_t *parser, segment_t *segment){
-  addChildSegment(parser->header, segment);
+  addChildSegment(parser->t, segment);
   parser->claim = segment;
   parser->loop = segment;
 }
 
 static bool se835Handler(parser835_t *parser, segment_t *segment){
-  addChildSegment(parser->transaction, segment);
-  parser->loop = parser->transaction;
-  parser->trailer = segment;
+  if(!elementCountIn(segment,2,2)){
+    addChildSegment(parser->transaction, segment);
+    parser->loop = parser->transaction;
+    parser->trailer = segment;
+  }else{
+    parserFail(parser->super, WRONG_NUMBER_OF_ELEMENTS_FOR_SE);
+  }
 }
 
 static bool ge835Handler(parser835_t *parser, segment_t *segment){
-  if(parser->loop == parser->transaction && isSE(parser->transaction->lastSegment->name)){
-    addChildSegment(parser->functional, segment);
-    parser->loop = parser->functional;
-    parser->trailer = segment;
+  if(!elementCountIn(segment,2,2))
+    if(parser->loop == parser->transaction && isSE(parser->transaction->lastSegment->name)){
+      addChildSegment(parser->functional, segment);
+      parser->loop = parser->functional;
+      parser->trailer = segment;
+    }else{
+      parserFail(parser->super, INVALID_GE_SEGMENT);
+    }
   }else{
-    parserFail(parser->super, INVALID_GE_SEGMENT);
+    parserFail(parser->super, WRONG_NUMBER_OF_ELEMENTS_FOR_GE);
   }
 }
 
 static bool iea835Handler(parser835_t *parser, segment_t *segment){
-  if(parser->loop == parser->functional && isGE(parser->functional->lastSegment->name)){
-    addChildSegment(parser->interchange, segment);
-    parser->loop = parser->interchange;
-    parser->trailer = segment;
+  if(!elementCountIn(segment,2,2)){
+    if(parser->loop == parser->functional && isGE(parser->functional->lastSegment->name)){
+      addChildSegment(parser->interchange, segment);
+      parser->loop = parser->interchange;
+      parser->trailer = segment;
+    }else{
+      parserFail(parser->super, INVALID_IEA_SEGMENT);
+    }
   }else{
-    parserFail(parser->super, INVALID_IEA_SEGMENT);
+    parserFail(parser->super, WRONG_NUMBER_OF_ELEMENTS_FOR_IEA);
   }
 }
 

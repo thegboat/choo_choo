@@ -19,6 +19,8 @@ static VALUE segment_children(VALUE self, VALUE names);
 static anchor_t *getAnchor(VALUE segment_rb);
 static VALUE segment_find(VALUE self, VALUE names);
 static VALUE documentType(VALUE self);
+static VALUE getProperty(VALUE self, VALUE key_rb);
+static VALUE segmentName(VALUE self);
 
 static void interchange_loop_free(VALUE self){
   anchor_t *anchor;
@@ -54,8 +56,6 @@ static VALUE choo_choo_parse_835(VALUE segment, VALUE isa_str){
   VALUE cSegment = rb_define_class_under(mChooChoo, "Segment", rb_cObject);
   VALUE cInterchangeLoop = rb_define_class_under(mChooChoo, "InterchangeLoop", rb_cObject);
   VALUE isa = rb_class_new_instance(0, NULL, cInterchangeLoop);
-
-  rb_iv_set(segment_rb, SEGMENT_NAME, "ISA");
   Data_Get_Struct(isa, anchor_t, anchor);
   parse835(anchor, c_isa_str);
   return isa;
@@ -109,13 +109,34 @@ VALUE buildSegmentNode(parser_t *parser, segment_t *segment){
   Data_Get_Struct(segment_rb, anchor_t, anchor);
   anchor->parser = parser;
   anchor->segment = segment;
-  rb_iv_set(segment_rb, SEGMENT_NAME, rb_str_new_cstr(segment->name));
   return segment_rb;
 }
 
 static VALUE documentType(VALUE self){
   anchor_t *anchor = getAnchor(self);
   return rb_str_new_cstr(anchor->parser->documentType);
+}
+
+static VALUE segmentName(VALUE self){
+  anchor_t *anchor = getAnchor(self);
+  ID id_name = rb_intern(anchor->segment->name);
+  return ID2SYM(id_name);
+}
+
+static VALUE getProperty(VALUE self, VALUE key_rb){
+  char *key = StringValueCStr(key_rb);
+  anchor_t *anchor = getAnchor(self);
+  property_t *property = anchor->segment->firstProperty;
+  while(NULL != property){
+    if(strcmp(property->key, key) == 0) return rb_str_new_cstr(property->value);
+  }
+
+  return Qnil;
+}
+
+static VALUE _errors(VALUE self){
+  anchor_t *anchor = getAnchor(self);
+  return getErrors(anchor->parser);
 }
 
 void Init_edi_parsing(void) {
@@ -131,12 +152,16 @@ void Init_edi_parsing(void) {
   rb_define_private_method(cSegment, "_c_children", segment_children, 1);
   rb_define_private_method(cSegment, "_c_parent", segment_parent, 0);
   rb_define_method(cSegment, "document_type", documentType, 0);
-  
-  rb_define_private_method(cInterchangeLoop, "_c_descendants", segment_find, 1);
-  rb_define_private_method(cInterchangeLoop, "_c_children", segment_children, 1);
-  rb_define_method(cInterchangeLoop, "document_type", documentType, 0);
+  rb_define_method(cSegment, "name", segmentName, 0);
+  rb_define_method(cSegment, "get_property", getProperty, 1);
 
   rb_define_alloc_func(cInterchangeLoop, interchange_loop_alloc);
+  rb_define_method(cInterchangeLoop, "document_type", documentType, 0);
+  rb_define_method(cInterchangeLoop, "name", segmentName, 0);
+  rb_define_method(cInterchangeLoop, "get_property", getProperty, 1);
+  rb_define_method(cInterchangeLoop, "errors", _errors, 0);
   rb_define_method(cInterchangeLoop, "to_hash", interchange_loop_to_hash, 0);
-  rb_define_method(cInterchangeLoop, "_errors", interchange_loop_errors, 0);
+  rb_define_private_method(cInterchangeLoop, "_errors", interchange_loop_errors, 0);
+  rb_define_private_method(cInterchangeLoop, "_c_descendants", segment_find, 1);
+  rb_define_private_method(cInterchangeLoop, "_c_children", segment_children, 1);
 }

@@ -5,6 +5,10 @@ module ChooChoo
       @isa_segments = isas
     end
 
+    def self.document_type
+      "835"
+    end
+
     def self.valid_segments
       @valid_segments ||= Set.new(valid_document_nodes.keys)
     end
@@ -22,7 +26,7 @@ module ChooChoo
         CAS: 19,
         IEA: 2,
         QTY: 4,
-        SVC: [{1 => 7}, (2..5), {6 => 8}, 7]
+        SVC: [{1 => 7}, (2..5), {6 => 8}, 7],
         CLP: 14, 
         PLB: [(1..2), {3 => 2}, 4, {5 => 2}, 6, {7 => 2}, 8, {9 => 2}, 10, {11 => 2}, 12, {13 => 2}, 14],
         TS3: 19,
@@ -51,5 +55,8 @@ module ChooChoo
       isa_segments.length
     end
 
+
+
   end
 end
+
