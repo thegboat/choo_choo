@@ -6,10 +6,31 @@
 	objectVersion = 46;
 	objects = {
 
+/* Begin PBXFileReference section */
+		5218BBE61B86375D00F0B73D /* edi_parsing_835.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = edi_parsing_835.c; path = ../edi_parsing_835.c; sourceTree = "<group>"; };
+		5218BBE71B86375D00F0B73D /* edi_parsing_constants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = edi_parsing_constants.h; path = ../edi_parsing_constants.h; sourceTree = "<group>"; };
+		5218BBE81B86375D00F0B73D /* edi_parsing_errors.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = edi_parsing_errors.c; path = ../edi_parsing_errors.c; sourceTree = "<group>"; };
+		5218BBE91B86375D00F0B73D /* edi_parsing_inspection.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = edi_parsing_inspection.c; path = ../edi_parsing_inspection.c; sourceTree = "<group>"; };
+		5218BBEA1B86375D00F0B73D /* edi_parsing_interface.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = edi_parsing_interface.c; path = ../edi_parsing_interface.c; sourceTree = "<group>"; };
+		5218BBEB1B86375D00F0B73D /* edi_parsing_parser.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = edi_parsing_parser.c; path = ../edi_parsing_parser.c; sourceTree = "<group>"; };
+		5218BBEC1B86375D00F0B73D /* edi_parsing_segment.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = edi_parsing_segment.c; path = ../edi_parsing_segment.c; sourceTree = "<group>"; };
+		5218BBED1B86375D00F0B73D /* edi_parsing_traversal.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = edi_parsing_traversal.c; path = ../edi_parsing_traversal.c; sourceTree = "<group>"; };
+		5218BBEE1B86375D00F0B73D /* edi_parsing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = edi_parsing.h; path = ../edi_parsing.h; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
 /* Begin PBXGroup section */
 		5218BBDB1B8635F400F0B73D = {
 			isa = PBXGroup;
 			children = (
+				5218BBE61B86375D00F0B73D /* edi_parsing_835.c */,
+				5218BBE71B86375D00F0B73D /* edi_parsing_constants.h */,
+				5218BBE81B86375D00F0B73D /* edi_parsing_errors.c */,
+				5218BBE91B86375D00F0B73D /* edi_parsing_inspection.c */,
+				5218BBEA1B86375D00F0B73D /* edi_parsing_interface.c */,
+				5218BBEB1B86375D00F0B73D /* edi_parsing_parser.c */,
+				5218BBEC1B86375D00F0B73D /* edi_parsing_segment.c */,
+				5218BBED1B86375D00F0B73D /* edi_parsing_traversal.c */,
+				5218BBEE1B86375D00F0B73D /* edi_parsing.h */,
 			);
 			sourceTree = "<group>";
 		};
@@ -23,6 +44,7 @@
 			buildPhases = (
 			);
 			buildToolPath = /usr/bin/make;
+			buildWorkingDirectory = /Users/carecloud/dev/choo_choo/ext/edi_parsing;
 			dependencies = (
 			);
 			name = edi_parsing;

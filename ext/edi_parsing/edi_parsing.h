@@ -94,38 +94,38 @@ struct property_struct
 
 // inspection
 
-bool identify(char *src, const char* seg);
-bool isISA(char *src);
-bool isIEA(char *src);
-bool isTS3(char *src);
-bool isTS2(char *src);
-bool isCLP(char *src);
-bool isCAS(char *src);
-bool isNM1(char *src);
-bool isMIA(char *src);
-bool isMOA(char *src);
-bool isAMT(char *src);
-bool isQTY(char *src);
-bool isSVC(char *src);
-bool isPLB(char *src);
-bool isRDM(char *src);
-bool isBPR(char *src);
-bool isTRN(char *src);
-bool isCUR(char *src);
-bool isREF(char *src);
-bool isDTM(char *src);
-bool isPER(char *src);
-bool isGS(char *src); 
-bool isGE(char *src); 
-bool isST(char *src); 
-bool isSE(char *src); 
-bool isN1(char *src);
-bool isN4(char *src);
-bool isN3(char *src);
-bool isLX(char *src);
-bool isLQ(char *src);
-bool isPR(char *src);
-bool isPE(char *src);
+bool identify(segment_t *segment, const char *seg);
+bool isISA(segment_t *segment);
+bool isIEA(segment_t *segment);
+bool isTS3(segment_t *segment);
+bool isTS2(segment_t *segment);
+bool isCLP(segment_t *segment);
+bool isCAS(segment_t *segment);
+bool isNM1(segment_t *segment);
+bool isMIA(segment_t *segment);
+bool isMOA(segment_t *segment);
+bool isAMT(segment_t *segment);
+bool isQTY(segment_t *segment);
+bool isSVC(segment_t *segment);
+bool isPLB(segment_t *segment);
+bool isRDM(segment_t *segment);
+bool isBPR(segment_t *segment);
+bool isTRN(segment_t *segment);
+bool isCUR(segment_t *segment);
+bool isREF(segment_t *segment);
+bool isDTM(segment_t *segment);
+bool isPER(segment_t *segment);
+bool isGS(segment_t *segment); 
+bool isGE(segment_t *segment); 
+bool isST(segment_t *segment); 
+bool isSE(segment_t *segment); 
+bool isN1(segment_t *segment);
+bool isN4(segment_t *segment);
+bool isN3(segment_t *segment);
+bool isLX(segment_t *segment);
+bool isLQ(segment_t *segment);
+bool isPR(segment_t *segment);
+bool isPE(segment_t *segment);
 
 // segment
 
