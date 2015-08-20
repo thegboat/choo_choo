@@ -158,9 +158,9 @@ VALUE segmentChildren(parser_t *parser, segment_t *segment, VALUE names);
 VALUE propertiesToHash(property_t *property);
 void traversalLibInit();
 index_stat_t nameIndexSearch(parser_t *parser, const char *name);
-bool missingSegment(index_stat_t stat);
-int segmentsWithName(index_stat_t stat);
-bool multipleWithName(index_stat_t stat);
+bool missingSegment(parser_t *parser, char *src);
+int segmentsWithName(parser_t *parser, char *src);
+bool multipleWithName(parser_t *parser, char *src);
 
 // 835
 

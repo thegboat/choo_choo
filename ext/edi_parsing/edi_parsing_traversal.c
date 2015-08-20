@@ -12,8 +12,6 @@ static int littleLSearch(parser_t *parser, const char *name, int idx);
 static int nameIndexFunc(const void *p1, const void*p2);
 static void indexSegment(parser_t *parser, segment_t *segment, int *segmentCount, int depth);
 static void allocIndexes(parser_t *parser);
-static const int getNodeKey(VALUE segment_rb);
-static segment_t *getNode(parser_t *parser, VALUE segment_rb);
 
 void buildIndexes(parser_t *parser){
   int segmentCount = 0;
@@ -85,7 +83,7 @@ VALUE segmentFind(parser_t *parser, segment_t *segment, VALUE names){
       c_name = StringValueCStr(name);
       stat = nameIndexSearch(parser, c_name);
       int max = (stat.upper - stat.lower) + 1;
-      if(!missingSegment(stat)){
+      if(stat.lower >= 0 && stat.upper >= 0){
         for(int i=0;i<max;i++){
           descendant = parser->nameIndex[i+stat.upper];
           if(descendant->pkey > segment->pkey && descendant->pkey <= segment->boundary){
@@ -181,31 +179,18 @@ static void allocIndexes(parser_t *parser){
   parser->primaryIndex = ediParsingMalloc(sizeof(segment_t*) * parser->segmentCount);
 }
 
-static const int getNodeKey(VALUE segment_rb){
-  VALUE segment_id_rb = rb_iv_get(segment_rb, NODE_KEY);
-  return segment_id_rb == Qnil ? 0 : NUM2INT(segment_id_rb);
-}
-
-static segment_t *getNode(parser_t *parser, VALUE segment_rb){
-  const int nodeKey = getNodeKey(segment_rb);
-  if(nodeKey+1 > parser->segmentCount){
-    // error
-    return NULL;
-  }else{
-    return parser->primaryIndex[nodeKey];
-  }
-}
-
-bool missingSegment(index_stat_t stat){
+bool missingSegment(parser_t *parser, char *src){
+  index_stat_t stat = nameIndexSearch(parser, src);
   return stat.lower < 0 || stat.upper < 0;
 }
 
-int segmentsWithName(index_stat_t stat){
-  return missingSegment(stat) ? 0 : ((stat.upper - stat.lower) + 1);
+int segmentsWithName(parser_t *parser, char *src){
+  index_stat_t stat = nameIndexSearch(parser, src);
+  return (stat.lower < 0 || stat.upper < 0) ? 0 : ((stat.upper - stat.lower) + 1);
 }
 
-bool multipleWithName(index_stat_t stat){
-  return segmentsWithName(stat) > 1; 
+bool multipleWithName(parser_t *parser, char *src){
+  return segmentsWithName(parser, src) > 1;
 }
 
 

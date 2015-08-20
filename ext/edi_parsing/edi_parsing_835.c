@@ -151,7 +151,7 @@ static void isa835Handler(parser835_t *parser, segment_t *segment){
 
 static void iea835Handler(parser835_t *parser, segment_t *segment){
   if(!elementCountIn(segment,2,2)){
-    if(parser->loop == parser->functional && isGE(parser->functional->lastSegment->name)){
+    if(parser->loop == parser->functional && isGE(parser->trailer)){
       addChildSegment(parser->interchange, segment);
       parser->loop = parser->interchange;
       parser->trailer = segment;
@@ -407,7 +407,7 @@ static void n1835Handler(parser835_t *parser, segment_t *segment){
       parserFail(parser->super, INVALID_N1_SEGMENT);
     }
   }else{
-    parserFail(parser->super, WRONG_NUMBER_OF_ELEMENTS_FOR_N1);
+    parserFail(parser->super, WRONG_NUMBER_OF_ELEMENTS_FOR_N1_SEGMENT);
   }
 }
 
@@ -465,19 +465,19 @@ static void parser835Initialization(parser835_t *parser){
 }
 
 static void validate835Parser(parser835_t *parser){
-  if(missingSegment(ISA_SEGMENT)){
+  if(missingSegment(parser, ISA_SEGMENT)){
     parserFail(parser->super, MISSING_ISA_SEGMENT);
-  }else if(missingSegment(GS_SEGMENT)){
+  }else if(missingSegment(parser, GS_SEGMENT)){
     parserFail(parser->super, MISSING_GS_SEGMENT);
-  }else if(missingSegment(ST_SEGMENT)){
+  }else if(missingSegment(parser, ST_SEGMENT)){
     parserFail(parser->super, MISSING_ST_SEGMENT);
-  }else if(missingSegment(N1_SEGMENT)){
+  }else if(missingSegment(parser, N1_SEGMENT)){
     parserFail(parser->super, MISSING_N1_SEGMENT);
-  }else if(missingSegment(SE_SEGMENT)){
+  }else if(missingSegment(parser, SE_SEGMENT)){
     parserFail(parser->super, MISSING_SE_SEGMENT);
-  }else if(missingSegment(GE_SEGMENT)){
+  }else if(missingSegment(parser, GE_SEGMENT)){
     parserFail(parser->super, MISSING_GE_SEGMENT);
-  }else if(missingSegment(IEA_SEGMENT)){
+  }else if(missingSegment(parser, IEA_SEGMENT)){
     parserFail(parser->super, MISSING_IEA_SEGMENT);
   }
 }
