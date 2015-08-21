@@ -9,7 +9,7 @@
 #include "edi_parsing.h"
 
 bool identify(segment_t *segment, const char *seg){
-  if(NULL == segment || NULL == segment->name || strlen(segment->name) < strlen(seg)){
+  if(NULL == segment || strlen(segment->name) < strlen(seg)){
     return false;
   }else{
     return 0 == strcmp(segment->name, seg);

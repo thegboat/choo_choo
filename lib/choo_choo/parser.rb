@@ -28,7 +28,7 @@ module ChooChoo
         str_buffer << (trailer =~ /ISA\*$/ ? trailer[0..-5] : trailer)
         str_buffer.delete!("\000")
         isa = yield(str_buffer)
-        obj_buffer += isa
+        obj_buffer << isa
         str_buffer = trailer[-4..-1]
       end
       obj_buffer

@@ -44,7 +44,6 @@ static void validate835Parser(parser835_t *parser);
 static void parser835Free(parser835_t *parser);
 static void parser835Initialization(parser835_t *parser);
 static void parser835Cleanup(parser835_t *parser);
-static void build835Indexes(parser835_t *parser);
 
 void parse835(anchor_t *anchor, char *ediFile){
   parser_t *super = anchor->parser;
@@ -150,7 +149,7 @@ static void isa835Handler(parser835_t *parser, segment_t *segment){
 }
 
 static void iea835Handler(parser835_t *parser, segment_t *segment){
-  if(!elementCountIn(segment,2,2)){
+  if(elementCountIn(segment,2,2)){
     if(parser->loop == parser->functional && isGE(parser->trailer)){
       addChildSegment(parser->interchange, segment);
       parser->loop = parser->interchange;
@@ -199,7 +198,7 @@ static void clp835Handler(parser835_t *parser, segment_t *segment){
 static void nm1835Handler(parser835_t *parser, segment_t *segment){
   if(!isCLP(parser->loop)){
     parserFail(parser->super, INVALID_NM1_SEGMENT);
-  }else if(!elementCountIn(segment,5,11)){
+  }else if(!elementCountIn(segment,2,11)){
     parserFail(parser->super, WRONG_NUMBER_OF_ELEMENTS_FOR_NM1_SEGMENT);
   }else{
     addChildSegment(parser->loop, segment);
@@ -382,7 +381,7 @@ static void st835Handler(parser835_t *parser, segment_t *segment){
 }
 
 static void se835Handler(parser835_t *parser, segment_t *segment){
-  if(NULL != parser->trailer || !isSE(parser->trailer)){
+  if(NULL != parser->trailer && !isSE(parser->trailer)){
     parserFail(parser->super, INVALID_SE_SEGMENT);
   }else if(!elementCountIn(segment,2,2)){
     parserFail(parser->super, WRONG_NUMBER_OF_ELEMENTS_FOR_SE_SEGMENT);
@@ -465,19 +464,19 @@ static void parser835Initialization(parser835_t *parser){
 }
 
 static void validate835Parser(parser835_t *parser){
-  if(missingSegment(parser, ISA_SEGMENT)){
+  if(missingSegment(parser->super, ISA_SEGMENT)){
     parserFail(parser->super, MISSING_ISA_SEGMENT);
-  }else if(missingSegment(parser, GS_SEGMENT)){
+  }else if(missingSegment(parser->super, GS_SEGMENT)){
     parserFail(parser->super, MISSING_GS_SEGMENT);
-  }else if(missingSegment(parser, ST_SEGMENT)){
+  }else if(missingSegment(parser->super, ST_SEGMENT)){
     parserFail(parser->super, MISSING_ST_SEGMENT);
-  }else if(missingSegment(parser, N1_SEGMENT)){
+  }else if(missingSegment(parser->super, N1_SEGMENT)){
     parserFail(parser->super, MISSING_N1_SEGMENT);
-  }else if(missingSegment(parser, SE_SEGMENT)){
+  }else if(missingSegment(parser->super, SE_SEGMENT)){
     parserFail(parser->super, MISSING_SE_SEGMENT);
-  }else if(missingSegment(parser, GE_SEGMENT)){
+  }else if(missingSegment(parser->super, GE_SEGMENT)){
     parserFail(parser->super, MISSING_GE_SEGMENT);
-  }else if(missingSegment(parser, IEA_SEGMENT)){
+  }else if(missingSegment(parser->super, IEA_SEGMENT)){
     parserFail(parser->super, MISSING_IEA_SEGMENT);
   }
 }
@@ -486,9 +485,9 @@ static void parser835Cleanup(parser835_t *parser){
   parser->interchange = rewindLoop(parser->interchange);
   parser->super->root = parser->interchange;
   if(!parser->super->failure){
-    build835Indexes(parser);
+    buildIndexes(parser->super);
+    validate835Parser(parser);
   }
-  validate835Parser(parser);
   parser->super->finished = true;
 }
 

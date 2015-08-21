@@ -13,6 +13,7 @@ void segmentInitializer(segment_t *segment, char *src){
   memcpy(segment->name,src,idx);
   segment->name[idx+1] = '\0';
   segment->elements = 0;
+  segment->depth = 0;
 }
 
 void addProperty(segment_t *segment, property_t *property){
@@ -53,6 +54,7 @@ void addChildSegment(segment_t *parent, segment_t *child){
   }
   parent->lastSegment = child;
   child->parent = parent;
+  child->depth = parent->depth + 1;
 }
 
 void segmentFree(segment_t *segment){

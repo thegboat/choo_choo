@@ -89,7 +89,6 @@ struct property_struct
   char *value;
   property_t *head;
   property_t *tail;
-  int pkey;
 };
 
 // inspection

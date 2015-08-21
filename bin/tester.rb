@@ -3,5 +3,5 @@ FileUtils.cp('./edi_parsing.bundle', '../../lib/edi_parsing.bundle')
 
 require_relative "../spec/spec_helper"
 
-ChooChoo.benchmark(1)
+ChooChoo.descendants(:SVC)
 #ChooChoo.to_hash

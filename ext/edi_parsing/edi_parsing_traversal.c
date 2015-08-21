@@ -32,18 +32,39 @@ VALUE propertiesToHash(property_t *property){
 }
 
 VALUE segmentChildren(parser_t *parser, segment_t *segment, VALUE names){
-  segment_t *child = segment->firstSegment;
-  VALUE children = rb_ary_new();
+  VALUE result = rb_ary_new();
+  const int length = NUM2INT(rb_funcall(names, rb_intern("length"), 0));
+  segment_t *descendant;
 
-  if(NULL != child){
-    while(NULL != child){
-      VALUE child_rb = buildSegmentNode(parser, child);
-      rb_ary_push(children, child_rb);
-      child = child->tail;
+  if(length == 0){
+    descendant = segment->firstSegment;
+
+    while(NULL != descendant){
+      VALUE child_rb = buildSegmentNode(parser, descendant);
+      rb_ary_push(result, child_rb);
+      descendant = descendant->tail;
+    }
+  }else{
+    VALUE name = rb_ary_pop(names);
+    char *c_name;
+    index_stat_t stat;
+    while(name != Qnil){
+      c_name = StringValueCStr(name);
+      stat = nameIndexSearch(parser, c_name);
+      int max = (stat.upper - stat.lower) + 1;
+      if(stat.lower >= 0 && stat.upper >= 0){
+        for(int i=0;i<max;i++){
+          descendant = parser->nameIndex[i+stat.lower];
+          if(segment->depth + 1 == descendant->depth && descendant->pkey > segment->pkey && descendant->pkey <= segment->boundary){
+            VALUE child_rb = buildSegmentNode(parser, descendant);
+            rb_ary_push(result, child_rb);
+          }
+        }
+      }
+      name = rb_ary_pop(names);
     }
   }
-
-  return children;
+  return result;
 }
 
 VALUE segmentToHash(segment_t *segment){
@@ -72,8 +93,10 @@ VALUE segmentFind(parser_t *parser, segment_t *segment, VALUE names){
     int max = (segment->boundary - segment->pkey) + 1;
     for(int i=1;i<max;i++){
       descendant = parser->primaryIndex[i+segment->pkey];
-      VALUE child_rb = buildSegmentNode(parser, descendant);
-      rb_ary_push(result, child_rb);
+      if(descendant->pkey > segment->pkey && descendant->pkey <= segment->boundary){
+        VALUE child_rb = buildSegmentNode(parser, descendant);
+        rb_ary_push(result, child_rb);
+      }
     }
   }else{
     VALUE name = rb_ary_pop(names);
@@ -85,7 +108,7 @@ VALUE segmentFind(parser_t *parser, segment_t *segment, VALUE names){
       int max = (stat.upper - stat.lower) + 1;
       if(stat.lower >= 0 && stat.upper >= 0){
         for(int i=0;i<max;i++){
-          descendant = parser->nameIndex[i+stat.upper];
+          descendant = parser->nameIndex[i+stat.lower];
           if(descendant->pkey > segment->pkey && descendant->pkey <= segment->boundary){
             VALUE child_rb = buildSegmentNode(parser, descendant);
             rb_ary_push(result, child_rb);
@@ -103,12 +126,11 @@ index_stat_t nameIndexSearch(parser_t *parser, const char *name){
   int first = 0;
   int last = parser->segmentCount;
   int cmp = -1;
-  int middle;
+  int middle = (first+last)/2;
   segment_t* segment;
 
   while(first <= last) {
-    middle = (first+last)/2;
-    segment_t* segment = parser->nameIndex[middle];
+    segment = parser->nameIndex[middle];
     cmp = strcmp(segment->name, name);
     if(cmp < 0){
       first = middle + 1;
@@ -117,11 +139,12 @@ index_stat_t nameIndexSearch(parser_t *parser, const char *name){
     }else{
       break;
     }
+    middle = (first+last)/2;
   }
 
   if(cmp == 0){
     stat.lower = littleLSearch(parser, name, middle);
-    stat.upper = littleLSearch(parser, name, middle);
+    stat.upper = littleUSearch(parser, name, middle);
   }
   return stat;
 }

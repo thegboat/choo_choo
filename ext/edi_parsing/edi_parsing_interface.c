@@ -17,6 +17,7 @@ static VALUE interchange_loop_errors(VALUE self);
 static VALUE segment_parent(VALUE self);
 static VALUE segment_children(VALUE self, VALUE names);
 static anchor_t *getAnchor(VALUE segment_rb);
+static anchor_t *getAnchorUnsafe(VALUE segment_rb);
 static VALUE segment_find(VALUE self, VALUE names);
 static VALUE documentType(VALUE self);
 static VALUE getProperty(VALUE self, VALUE key_rb);
@@ -93,6 +94,15 @@ static VALUE segment_children(VALUE self, VALUE names){
 static anchor_t *getAnchor(VALUE segment_rb){
   anchor_t *anchor;
   Data_Get_Struct(segment_rb, anchor_t, anchor);
+  if(NULL == anchor || anchor->parser->failure){
+    rb_raise(rb_eRuntimeError, "Can not perform all operations when parsing fails.");
+  }
+  return anchor;
+}
+
+static anchor_t *getAnchorUnsafe(VALUE segment_rb){
+  anchor_t *anchor;
+  Data_Get_Struct(segment_rb, anchor_t, anchor);
   return anchor;
 }
 
@@ -113,12 +123,12 @@ VALUE buildSegmentNode(parser_t *parser, segment_t *segment){
 }
 
 static VALUE documentType(VALUE self){
-  anchor_t *anchor = getAnchor(self);
+  anchor_t *anchor = getAnchorUnsafe(self);
   return rb_str_new_cstr(anchor->parser->documentType);
 }
 
 static VALUE segmentName(VALUE self){
-  anchor_t *anchor = getAnchor(self);
+  anchor_t *anchor = getAnchorUnsafe(self);
   ID id_name = rb_intern(anchor->segment->name);
   return ID2SYM(id_name);
 }
@@ -127,15 +137,18 @@ static VALUE getProperty(VALUE self, VALUE key_rb){
   char *key = StringValueCStr(key_rb);
   anchor_t *anchor = getAnchor(self);
   property_t *property = anchor->segment->firstProperty;
-  while(NULL != property){
+  short cnt = 0;
+  while(NULL != property && cnt < 1000){
     if(strcmp(property->key, key) == 0) return rb_str_new_cstr(property->value);
+    property = property->tail;
+    cnt++;
   }
 
   return Qnil;
 }
 
 static VALUE _errors(VALUE self){
-  anchor_t *anchor = getAnchor(self);
+  anchor_t *anchor = getAnchorUnsafe(self);
   return getErrors(anchor->parser);
 }
 
@@ -148,19 +161,19 @@ void Init_edi_parsing(void) {
   rb_define_method(cParser, "_c_parse_835", choo_choo_parse_835, 1);
 
   rb_define_alloc_func(cSegment, segment_alloc);
+  rb_define_method(cSegment, "document_type", documentType, 0);
+  rb_define_method(cSegment, "name", segmentName, 0);
   rb_define_private_method(cSegment, "_c_descendants", segment_find, 1);
   rb_define_private_method(cSegment, "_c_children", segment_children, 1);
   rb_define_private_method(cSegment, "_c_parent", segment_parent, 0);
-  rb_define_method(cSegment, "document_type", documentType, 0);
-  rb_define_method(cSegment, "name", segmentName, 0);
-  rb_define_method(cSegment, "get_property", getProperty, 1);
+  rb_define_private_method(cSegment, "get_property", getProperty, 1);
 
   rb_define_alloc_func(cInterchangeLoop, interchange_loop_alloc);
   rb_define_method(cInterchangeLoop, "document_type", documentType, 0);
   rb_define_method(cInterchangeLoop, "name", segmentName, 0);
-  rb_define_method(cInterchangeLoop, "get_property", getProperty, 1);
   rb_define_method(cInterchangeLoop, "errors", _errors, 0);
   rb_define_method(cInterchangeLoop, "to_hash", interchange_loop_to_hash, 0);
+  rb_define_private_method(cInterchangeLoop, "get_property", getProperty, 1);
   rb_define_private_method(cInterchangeLoop, "_errors", interchange_loop_errors, 0);
   rb_define_private_method(cInterchangeLoop, "_c_descendants", segment_find, 1);
   rb_define_private_method(cInterchangeLoop, "_c_children", segment_children, 1);

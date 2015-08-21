@@ -1,79 +1,3 @@
-td.id
-exit
-td
-td = TransactionDetail.find 59517686
-CentralFramework::ClientFinancialPeriodCalculator.calculate(td)
-td.reload
-ActiveRecord::Base.transaction {td.destroy; raise ActiveRecord::Rollback }
-td.posting_date
-td.financial_period
-td.reload
-td.financial_period = nil
-td.posting_date = nil
-ActiveRecord::Base.transaction {td.destroy; raise ActiveRecord::Rollback }
-td.posting_date
-td.financial_period
-td.id
-CreditTransaction.first
-CreditTransaction.where(credit_transaction_type_id: 1).first
-cc = _
-cc.posting_date
-cc.posting_date = nil
-cc.save!
-cc.reload
-exit
-list
-step
-list
-step
-list
-ty = 'gg'
-ty
-ty.upcase!
-ty
-quit
-ChooChoo.children("GS")
-names
-segments
-segments.map(&:name)
-quit
-exit
-ChooChoo.children("GS")
-_.length
-ChooChoo.children("ISA")
-ChooChoo.children("IEA")
-exit
-ChooChoo.descendants("IEA")
-ChooChoo.descendants("Gs")
-ChooChoo.descendants("SVC")
-ChooChoo.descendants("CAS")
-ChooChoo.descendants("ST")
-ChooChoo.descendants
-exit
-ChooChoo.descendants
-exit
-ChooChoo.descendants
-_.first
-ChooChoo.parse_835
-ChooChoo::Parser.parse_835
-ChooChoo::Parser.parse_835(ChooChoo.test_string)
-edi = _
-isa = edi.isa_segments.first
-isa.descendants
-isa.descendants("GS")
-exit
-exit
-ChooChoo.descendants
-exit
-ChooChoo.descendants
-ChooChoo.descendants(:GS, :GE, :ST)
-_.length
-ChooChoo.descendants(:GS, :GE, :ST)
-ChooChoo.descendants(:GS, :GE, :ST)
-exit
-ChooChoo.descendants(:GS, :GE, :ST)
-exit
-ChooChoo.descendants(:GS, :GE, :ST)
 exit
 'BPR*I*479.26*C*ACH*CCP*01*082000073*DA*004163086776*1710226428*USWM     *01*082900872*DA*28452504*20150102'.split('*')
 p = _
@@ -97,4 +21,80 @@ exit
 print_meths([ChooChoo::EDI835])
 exit
 print_meths([ChooChoo::EDI835])
+exit
+exit
+    edi = ChooChoo::Parser.parse_835(ChooChoo.test_string)
+    isa = edi.isa_segments.first
+isa.ISA
+isa.ISA01
+isa.ISA02
+isa.ISA03
+isa.ISA04
+isa.ISA19
+isa.GS
+isa.GS01
+exit
+    edi = ChooChoo::Parser.parse_835(ChooChoo.test_string)
+    isa = edi.isa_segments.first
+isa.ISA04
+isa.descendants
+isa.descendants(:GS)
+isa.descendants(:GS, :ST)
+isa.descendants(:SVC)
+_.first
+xx = _
+xx.name
+isa.descendants(:CLP)
+isa.children
+_.first
+xx =_
+xx.name
+xx.children
+dd = _.first
+dd.name
+dd.children
+dd.children.first
+tt = _
+tt.name
+tt.BPR05
+tt.BPR011
+tt.BPR11
+tt.BPR14
+tt.BPR15
+tt.BPR21
+tt.BPR22
+tt.BPR20
+exit
+    edi = ChooChoo::Parser.parse_835(ChooChoo.test_string)
+    isa = edi.isa_segments.first
+isa.descendants(:CLP)
+isa.children(:CLP)
+isa.children(:GS)
+isa.children(:GS, :IEA)
+isa.children(:GS, :IEA, :ST)
+isa.children(:ST)
+isa.children(:GS)
+p = _
+p.first
+p = _
+p.children(:ST)
+p.children(:N1)
+p.descendants(:N1)
+exit
+    edi = ChooChoo::Parser.parse_835(ChooChoo.test_string)
+    isa = edi.isa_segments.first
+isa.descendants(:CLP)
+isa.descendants(:SVC)
+isa.descendants(:SVC).map(&:name)
+isa.descendants(:SVC).map(&:SVC01)
+isa.descendants(:SVC).first
+kk = _
+kk.SVC01
+kk.ISA01
+kk.SVC07
+kk.SVC01_01
+kk.properties
+isa
+isa.to_h
+kk.SVC01_01
 exit

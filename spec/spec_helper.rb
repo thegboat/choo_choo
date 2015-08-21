@@ -23,7 +23,7 @@ module ChooChoo
   end
 
   def self.to_hash
-    edi = ChooChoo::Parser.parse_835(test_string)
+    edi = ChooChoo::Parser.parse_835(ChooChoo.test_string)
     isa = edi.isa_segments.first
     isa.to_hash
   end

@@ -25,9 +25,7 @@ module ChooChoo
 
     def children(*names)
       names = prepare_names(names)
-      segments = _c_children(names)
-      segments.select! { |segment| names.include?(segment.name.to_sym) } unless names.empty?
-      segments
+      _c_children(names)
     end
 
     private
@@ -51,7 +49,7 @@ module ChooChoo
     end
 
     def self.method_builder
-      document_types.inject({}) do |result, obj|
+      methods = document_types.inject({}) do |result, obj|
         hash = obj.valid_document_nodes
         hash.keys.each do |key|
 
