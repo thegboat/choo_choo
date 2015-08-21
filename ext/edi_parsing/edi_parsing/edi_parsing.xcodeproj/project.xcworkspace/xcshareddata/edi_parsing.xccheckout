@@ -5,23 +5,23 @@
 	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
 	<false/>
 	<key>IDESourceControlProjectIdentifier</key>
-	<string>E047D388-8B2E-42F9-8081-760E20703593</string>
+	<string>E13D91AB-1D42-4EBA-8F2B-53E7571B9F67</string>
 	<key>IDESourceControlProjectName</key>
-	<string>project</string>
+	<string>edi_parsing</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
 		<key>2D5AE63C0F7A7B82803BF482988CE17ECF668F06</key>
-		<string>github.com:ggriffin-carecloud/choo_choo.git</string>
+		<string>https://github.com/ggriffin-carecloud/choo_choo.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
-	<string>ext/edi_parsing/edi_parsing/edi_parsing.xcodeproj/project.xcworkspace</string>
+	<string>ext/edi_parsing/edi_parsing/edi_parsing.xcodeproj</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
 		<key>2D5AE63C0F7A7B82803BF482988CE17ECF668F06</key>
 		<string>../../../../..</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
-	<string>github.com:ggriffin-carecloud/choo_choo.git</string>
+	<string>https://github.com/ggriffin-carecloud/choo_choo.git</string>
 	<key>IDESourceControlProjectVersion</key>
 	<integer>111</integer>
 	<key>IDESourceControlProjectWCCIdentifier</key>
