@@ -86,7 +86,9 @@ static VALUE segment_children(VALUE self, VALUE names){
 static anchor_t *getAnchor(VALUE segment_rb){
   anchor_t *anchor;
   Data_Get_Struct(segment_rb, anchor_t, anchor);
-  if(NULL == anchor || anchor->parser->failure){
+  if(NULL == anchor || NULL == anchor->parser || NULL == anchor->segment){
+    rb_raise(rb_eRuntimeError, "The reference to the parsed document has been lost.");
+  }else if(anchor->parser->failure){
     rb_raise(rb_eRuntimeError, "Can not perform all operations when parsing fails.");
   }
   return anchor;
