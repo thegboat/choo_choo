@@ -41,17 +41,17 @@ module ChooChoo
   end
 end
 
-
-
-
-def str(segname, funcname)
-%{
-    def #{funcname}
-      raise ChooChoo::MethodNotImplemented, "no method #{funcname} for Document type } +'#{document_type}' + %{" if !["835"].include?(document_type)
-      raise ChooChoo::MethodNotImplemented, "no method #{funcname} for Segment #{segname}"  if name != :#{segname}
-      get_property('#{funcname}'')
-    end
-}
+def file_loc(name)
+  "./spec/support/#{name}"
 end
 
+def read_file(name)
+  File.read(file_loc(name))
+end
 
+def edit_line(message, line, string)
+  array = message.split('~')
+  array[line -1] = string
+  edi = ChooChoo::Parser.parse_835(array.join('~'))
+  edi.isa_segments.first
+end

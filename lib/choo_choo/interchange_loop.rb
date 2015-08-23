@@ -2,7 +2,15 @@ module ChooChoo
   class InterchangeLoop
     include ChooChoo::DocumentNode
 
+    def errors?
+      _errors?
+    end
+
     def errors
+      _errors
+    end
+
+    def humanized_errors
       _errors.map do |code|
         case code
         when "UNKNOWN_ERROR" then "An unknown error has occurred."

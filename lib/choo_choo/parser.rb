@@ -27,6 +27,7 @@ module ChooChoo
         trailer = stream.gets("ISA").to_s
         str_buffer << (trailer =~ /ISA\*$/ ? trailer[0..-5] : trailer)
         str_buffer.delete!("\000")
+        str_buffer.gsub!(/~\s+/,'~')
         isa = yield(str_buffer)
         obj_buffer << isa
         str_buffer = trailer[-4..-1]

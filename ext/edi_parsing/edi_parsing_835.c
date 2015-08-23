@@ -66,64 +66,70 @@ void parse835(anchor_t *anchor, char *ediFile){
 static void attach835Segment(parser835_t *parser, segment_t *segment){
   if(isISA(segment)){
     isa835Handler(parser, segment);
-  }else if(isIEA(segment)){
-    iea835Handler(parser, segment);
-  }else if(isTS3(segment)){
-    ts3835Handler(parser, segment);
-  }else if(isTS2(segment)){
-    ts2835Handler(parser, segment);
-  }else if(isCLP(segment)){
-    clp835Handler(parser, segment);
+  }else if(NULL == parser->loop){
+    parserFail(parser->super, ISA_SEGMENT_NOT_DETECTED_FIRST);
+  }else if(isQTY(segment)){
+    qty835Handler(parser, segment);
   }else if(isCAS(segment)){
     cas835Handler(parser, segment);
+  }else if(isAMT(segment)){
+    amt835Handler(parser, segment);
+  }else if(isDTM(segment)){
+    dtm835Handler(parser, segment);
+  }else if(isREF(segment)){
+    ref835Handler(parser, segment);
+  }else if(isSVC(segment)){
+    svc835Handler(parser, segment);
   }else if(isNM1(segment)){
     nm1835Handler(parser, segment);
   }else if(isMIA(segment)){
     mia835Handler(parser, segment);
   }else if(isMOA(segment)){
     moa835Handler(parser, segment);
-  }else if(isAMT(segment)){
-    amt835Handler(parser, segment);
-  }else if(isQTY(segment)){
-    qty835Handler(parser, segment);
-  }else if(isSVC(segment)){
-    svc835Handler(parser, segment);
+  }else if(isLQ(segment)){
+    lq835Handler(parser, segment);
+  }else if(isCLP(segment)){
+    clp835Handler(parser, segment);
   }else if(isPLB(segment)){
     plb835Handler(parser, segment);
+  }else if(isPER(segment)){
+    per835Handler(parser, segment);
+  }else if(isN4(segment)){
+    n4835Handler(parser, segment);
+  }else if(isN3(segment)){
+    n3835Handler(parser, segment);
   }else if(isRDM(segment)){
     rdm835Handler(parser, segment);
+  }else if(isN1(segment)){
+    n1835Handler(parser, segment);
+  }else if(isTS3(segment)){
+    ts3835Handler(parser, segment);
+  }else if(isTS2(segment)){
+    ts2835Handler(parser, segment);
+  }else if(isLX(segment)){
+    lx835Handler(parser, segment);
   }else if(isBPR(segment)){
     bpr835Handler(parser, segment);
   }else if(isTRN(segment)){
     trn835Handler(parser, segment);
   }else if(isCUR(segment)){
     cur835Handler(parser, segment);
-  }else if(isREF(segment)){
-    ref835Handler(parser, segment);
-  }else if(isDTM(segment)){
-    dtm835Handler(parser, segment);
-  }else if(isPER(segment)){
-    per835Handler(parser, segment);
-  }else if(isGS(segment)){
-    gs835Handler(parser, segment);
-  }else if(isGE(segment)){
-    ge835Handler(parser, segment);
   }else if(isST(segment)){
     st835Handler(parser, segment);
   }else if(isSE(segment)){
     se835Handler(parser, segment);
-  }else if(isN1(segment)){
-    n1835Handler(parser, segment);
-  }else if(isN4(segment)){
-    n4835Handler(parser, segment);
-  }else if(isN3(segment)){
-    n3835Handler(parser, segment);
-  }else if(isLX(segment)){
-    lx835Handler(parser, segment);
-  }else if(isLQ(segment)){
-    lq835Handler(parser, segment);
+  }else if(isGS(segment)){
+    gs835Handler(parser, segment);
+  }else if(isGE(segment)){
+    ge835Handler(parser, segment);
+  }else if(isIEA(segment)){
+    iea835Handler(parser, segment);
   }else{
-    parserFail(parser->super, UNKNOWN_ERROR);
+    if(NULL == parser->loop){
+      parserFail(parser->super, ISA_SEGMENT_NOT_DETECTED_FIRST);
+    }else{
+      parserFail(parser->super, UNKNOWN_ERROR);
+    }
   }
 }
 
@@ -132,9 +138,7 @@ static void default835Handler(parser835_t *parser, segment_t *segment){
 }
 
 static void isa835Handler(parser835_t *parser, segment_t *segment){
-  if(NULL != parser->interchange){
-    parserFail(parser->super, ISA_SEGMENT_NOT_DETECTED_FIRST);
-  }else if(NULL != parser->loop || parser->loop != parser->interchange){
+  if(NULL != parser->loop || parser->loop != parser->interchange){
     parserFail(parser->super, INVALID_ISA_SEGMENT);
   }else if(!elementCountIn(segment, 16,16)){
     parserFail(parser->super, WRONG_NUMBER_OF_ELEMENTS_FOR_ISA_SEGMENT);
@@ -149,16 +153,14 @@ static void isa835Handler(parser835_t *parser, segment_t *segment){
 }
 
 static void iea835Handler(parser835_t *parser, segment_t *segment){
-  if(elementCountIn(segment,2,2)){
-    if(parser->loop == parser->functional && isGE(parser->trailer)){
-      addChildSegment(parser->interchange, segment);
-      parser->loop = parser->interchange;
-      parser->trailer = segment;
-    }else{
-      parserFail(parser->super, INVALID_IEA_SEGMENT);
-    }
-  }else{
+  if(parser->loop != parser->functional && !isGE(parser->trailer)){
+    parserFail(parser->super, INVALID_IEA_SEGMENT);
+  }else if(!elementCountIn(segment,2,2)){
     parserFail(parser->super, WRONG_NUMBER_OF_ELEMENTS_FOR_IEA_SEGMENT);
+  }else{
+    addChildSegment(parser->interchange, segment);
+    parser->loop = parser->interchange;
+    parser->trailer = segment;
   }
 }
 
@@ -183,15 +185,15 @@ static void ts2835Handler(parser835_t *parser, segment_t *segment){
 }
 
 static void clp835Handler(parser835_t *parser, segment_t *segment){
-  if(!isLX(parser->loop) && !isCLP(parser->loop) && !isSVC(parser->loop)){
+  if(NULL == parser->header || (!isLX(parser->loop) && !isCLP(parser->loop) && !isSVC(parser->loop))){
     parserFail(parser->super, INVALID_CLP_SEGMENT);
   }else if(!elementCountIn(segment,3,14)){
     parserFail(parser->super, WRONG_NUMBER_OF_ELEMENTS_FOR_CLP_SEGMENT);
   }else{
     parser->service = NULL;
+    parser->loop = segment;
     addChildSegment(parser->header, segment);
     parser->claim = segment;
-    parser->loop = segment;
   }
 }
 
@@ -226,7 +228,7 @@ static void moa835Handler(parser835_t *parser, segment_t *segment){
 }
 
 static void amt835Handler(parser835_t *parser, segment_t *segment){
-  if(parser->loop != parser->service && parser->loop == parser->claim){
+  if(!isSVC(parser->loop) && !isCLP(parser->loop)){
     parserFail(parser->super, INVALID_AMT_SEGMENT);
   }else if(!elementCountIn(segment,2,3)){
     parserFail(parser->super, WRONG_NUMBER_OF_ELEMENTS_FOR_AMT_SEGMENT);
@@ -319,7 +321,9 @@ static void cur835Handler(parser835_t *parser, segment_t *segment){
 }
 
 static void ref835Handler(parser835_t *parser, segment_t *segment){
-  if(!elementCountIn(segment,1,4)){
+  if(!isN1(parser->loop) && !isST(parser->loop) && !isCLP(parser->loop) && !isSVC(parser->loop)){
+    parserFail(parser->super, INVALID_REF_SEGMENT);
+  }else if(!elementCountIn(segment,1,4)){
     parserFail(parser->super, WRONG_NUMBER_OF_ELEMENTS_FOR_REF_SEGMENT);
   }else{
     addChildSegment(parser->loop, segment);
@@ -327,7 +331,9 @@ static void ref835Handler(parser835_t *parser, segment_t *segment){
 }
 
 static void dtm835Handler(parser835_t *parser, segment_t *segment){
-  if(!elementCountIn(segment,1,4)){
+  if(!isST(parser->loop) && !isCLP(parser->loop) && !isSVC(parser->loop)){
+    parserFail(parser->super, INVALID_DTM_SEGMENT);
+  }else if(!elementCountIn(segment,1,4)){
     parserFail(parser->super, WRONG_NUMBER_OF_ELEMENTS_FOR_DTM_SEGMENT);
   }else{
     addChildSegment(parser->loop, segment);
@@ -370,9 +376,9 @@ static void ge835Handler(parser835_t *parser, segment_t *segment){
 
 static void st835Handler(parser835_t *parser, segment_t *segment){
   if(!isGS(parser->loop) && !isSE(parser->trailer)){
-    parserFail(parser->super, INVALID_SE_SEGMENT);
+    parserFail(parser->super, INVALID_ST_SEGMENT);
   }else if(!elementCountIn(segment, 2,2)){
-    parserFail(parser->super, WRONG_NUMBER_OF_ELEMENTS_FOR_SE_SEGMENT);
+    parserFail(parser->super, WRONG_NUMBER_OF_ELEMENTS_FOR_ST_SEGMENT);
   }else{
     addChildSegment(parser->loop, segment);
     parser->transaction = segment;
@@ -381,7 +387,7 @@ static void st835Handler(parser835_t *parser, segment_t *segment){
 }
 
 static void se835Handler(parser835_t *parser, segment_t *segment){
-  if(NULL != parser->trailer && !isSE(parser->trailer)){
+  if(!isST(parser->transaction) || (NULL != parser->trailer && !isSE(parser->trailer) && !isGE(parser->trailer))){
     parserFail(parser->super, INVALID_SE_SEGMENT);
   }else if(!elementCountIn(segment,2,2)){
     parserFail(parser->super, WRONG_NUMBER_OF_ELEMENTS_FOR_SE_SEGMENT);
@@ -393,20 +399,18 @@ static void se835Handler(parser835_t *parser, segment_t *segment){
 }
 
 static void n1835Handler(parser835_t *parser, segment_t *segment){
-  if(elementCountIn(segment,2,6)){
-    if(isST(parser->loop)){
-      addChildSegment(parser->loop, segment);
-      parser->payer = segment;
-      parser->loop = segment;
-    }else if(parser->loop == parser->payer){
-      addChildSegment(parser->loop, segment);
-      parser->payee = segment;
-      parser->loop = segment;
-    }else{
-      parserFail(parser->super, INVALID_N1_SEGMENT);
-    }
-  }else{
+  if(!isST(parser->loop) && (NULL == parser->payer || parser->loop != parser->payer)){
+    parserFail(parser->super, INVALID_N1_SEGMENT);
+  }else if(!elementCountIn(segment,2,6)){
     parserFail(parser->super, WRONG_NUMBER_OF_ELEMENTS_FOR_N1_SEGMENT);
+  }else if(isST(parser->loop)){
+    addChildSegment(parser->loop, segment);
+    parser->payer = segment;
+    parser->loop = segment;
+  }else{
+    addChildSegment(parser->loop, segment);
+    parser->payee = segment;
+    parser->loop = segment;
   }
 }
 

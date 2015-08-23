@@ -67,13 +67,14 @@ module ChooChoo
                 result[funcname] << obj.document_type
               elsif item.is_a?(Range)
                 item.each do |n|
-                  funcname = "#{key}#{n.to_s.rjust(2,'0')}"
+                funcname = "#{key}#{n.to_s.rjust(2,'0')}"
                 result[funcname] ||= []
                 result[funcname] << obj.document_type
                 end
               else
                 el = item.keys.first
-                item.values.each do |n|
+                cm = item.values.first
+                1.upto(cm).each do |n|
                   funcname = "#{key}#{el.to_s.rjust(2,'0')}_#{n.to_s.rjust(2,'0')}"
                   result[funcname] ||= []
                   result[funcname] << obj.document_type

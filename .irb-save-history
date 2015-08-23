@@ -1,100 +1,100 @@
+      string = "#{str}"
+      isa = edit_line(test_message, 1, string)
+      expect(isa.errors.include?("WRONG_NUMBER_OF_ELEMENTS_FOR_#{seg}_SEGMENT")).to eq(true)
+    end
+  }
+end
 exit
-'BPR*I*479.26*C*ACH*CCP*01*082000073*DA*004163086776*1710226428*USWM     *01*082900872*DA*28452504*20150102'.split('*')
-p = _
-p.length
+xx = ChooChoo.test_string
+ar = xx.split('~')
+ChooChoo::EDI835.valid_segments.to_a.each do |seg|
+  str = ar.detect {|s| s =~ /^#{seg}/}
+  i = ar.index(str)
+  next unless str
+  str = str.gsub(/^#{seg}/, "#{seg}*extra_element*")
+  puts %{
+    it "handles WRONG_NUMBER_OF_ELEMENTS_FOR_#{seg}_SEGMENT" do
+      string = "#{str}"
+      isa = edit_line(test_message, #{i}, string)
+      expect(isa.errors.include?("WRONG_NUMBER_OF_ELEMENTS_FOR_#{seg}_SEGMENT")).to eq(true)
+    end
+  }
+end
 exit
-EDI835
-ChooChoo::EDI835
-print_meths
-print_meths(ChooChoo::EDI835)
-print_meths([ChooChoo::EDI835])
-ChooChoo::EDI835.valid_document_nodes
+xx = ChooChoo.test_string
+ar = xx.split('~')
+ChooChoo::EDI835.valid_segments.to_a.each do |seg|
+  str = ar.detect {|s| s =~ /^#{seg}/}
+  i = ar.index(str)
+  next unless str
+  str = str.gsub(/^#{seg}/, "#{seg}*extra_element*")
+  puts %{
+    it "handles WRONG_NUMBER_OF_ELEMENTS_FOR_#{seg}_SEGMENT" do
+      string = "#{str}"
+      isa = edit_line(test_message, #{i+1}, string)
+      expect(isa.errors.include?("WRONG_NUMBER_OF_ELEMENTS_FOR_#{seg}_SEGMENT")).to eq(true)
+    end
+  }
+end
 exit
-print_meths([ChooChoo::EDI835])
+xx = ChooChoo.test_string
+ar = xx.split('~')
+ChooChoo::EDI835.valid_segments.to_a.each do |seg|
+  str = ar.detect {|s| s =~ /^#{seg}/}
+  i = ar.index(str)
+  next unless str
+  str = str.gsub(/^#{seg}/, ("#{seg}" << '*'*30))
+  puts %{
+    it "handles WRONG_NUMBER_OF_ELEMENTS_FOR_#{seg}_SEGMENT" do
+      string = "#{str}"
+      isa = edit_line(test_message, #{i+1}, string)
+      expect(isa.errors.include?("WRONG_NUMBER_OF_ELEMENTS_FOR_#{seg}_SEGMENT")).to eq(true)
+    end
+  }
+end
 exit
-print_meths([ChooChoo::EDI835])
-exit
-print_meths([ChooChoo::EDI835])
-exit
-print_meths([ChooChoo::EDI835])
-exit
-print_meths([ChooChoo::EDI835])
-exit
-print_meths([ChooChoo::EDI835])
-exit
-exit
-    edi = ChooChoo::Parser.parse_835(ChooChoo.test_string)
-    isa = edi.isa_segments.first
-isa.ISA
-isa.ISA01
-isa.ISA02
-isa.ISA03
-isa.ISA04
-isa.ISA19
-isa.GS
-isa.GS01
-exit
-    edi = ChooChoo::Parser.parse_835(ChooChoo.test_string)
-    isa = edi.isa_segments.first
-isa.ISA04
-isa.descendants
-isa.descendants(:GS)
-isa.descendants(:GS, :ST)
-isa.descendants(:SVC)
-_.first
-xx = _
-xx.name
-isa.descendants(:CLP)
-isa.children
-_.first
-xx =_
-xx.name
-xx.children
-dd = _.first
-dd.name
-dd.children
-dd.children.first
-tt = _
-tt.name
-tt.BPR05
-tt.BPR011
-tt.BPR11
-tt.BPR14
-tt.BPR15
-tt.BPR21
-tt.BPR22
-tt.BPR20
-exit
-    edi = ChooChoo::Parser.parse_835(ChooChoo.test_string)
-    isa = edi.isa_segments.first
-isa.descendants(:CLP)
-isa.children(:CLP)
-isa.children(:GS)
-isa.children(:GS, :IEA)
-isa.children(:GS, :IEA, :ST)
-isa.children(:ST)
-isa.children(:GS)
-p = _
-p.first
-p = _
-p.children(:ST)
-p.children(:N1)
-p.descendants(:N1)
-exit
-    edi = ChooChoo::Parser.parse_835(ChooChoo.test_string)
-    isa = edi.isa_segments.first
-isa.descendants(:CLP)
-isa.descendants(:SVC)
-isa.descendants(:SVC).map(&:name)
-isa.descendants(:SVC).map(&:SVC01)
-isa.descendants(:SVC).first
-kk = _
-kk.SVC01
-kk.ISA01
-kk.SVC07
-kk.SVC01_01
-kk.properties
-isa
-isa.to_h
-kk.SVC01_01
+xx = ChooChoo.test_string
+ar = xx.split('~')
+ChooChoo::EDI835.valid_segments.to_a.each do |seg|
+  str = ar.detect {|s| s =~ /^#{seg}/}
+  i = ar.index(str)
+  next unless str
+  str = str.gsub(/^#{seg}/, ("#{seg}" << '* '*30))
+  puts %{
+    it "handles WRONG_NUMBER_OF_ELEMENTS_FOR_#{seg}_SEGMENT" do
+      string = "#{str}"
+      isa = edit_line(test_message, #{i+1}, string)
+      expect(isa.errors.include?("WRONG_NUMBER_OF_ELEMENTS_FOR_#{seg}_SEGMENT")).to eq(true)
+    end
+  }
+end
+xx = ChooChoo.test_string
+ar = xx.split('~')
+ChooChoo::EDI835.valid_segments.to_a.each do |seg|
+  str = ar.detect {|s| s =~ /^#{seg}/}
+  i = ar.index(str)
+  next unless str
+  str << ('* '*30)
+  puts %{
+    it "handles WRONG_NUMBER_OF_ELEMENTS_FOR_#{seg}_SEGMENT" do
+      string = "#{str}"
+      isa = edit_line(test_message, #{i+1}, string)
+      expect(isa.errors.include?("WRONG_NUMBER_OF_ELEMENTS_FOR_#{seg}_SEGMENT")).to eq(true)
+    end
+  }
+end
+xx = ChooChoo.test_string
+ar = xx.split('~')
+ChooChoo::EDI835.valid_segments.to_a.each do |seg|
+  str = ar.detect {|s| s =~ /^#{seg}/}
+  i = ar.index(str)
+  next unless str
+  str << ('* '*30)
+  puts %{
+    it "handles WRONG_NUMBER_OF_ELEMENTS_FOR_#{seg}_SEGMENT" do
+      string = "#{str}"
+      isa = edit_line(test_message, #{i+1}, string)
+      expect(isa.errors.include?("WRONG_NUMBER_OF_ELEMENTS_FOR_#{seg}_SEGMENT")).to eq(true)
+    end}
+end
 exit
