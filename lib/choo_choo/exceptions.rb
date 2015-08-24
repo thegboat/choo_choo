@@ -5,4 +5,7 @@ module ChooChoo
 
   class UnhandledParserError < StandardError
   end
+
+  class AssertedValueNotFound < StandardError
+  end
 end

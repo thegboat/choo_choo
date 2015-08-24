@@ -18,17 +18,61 @@ module ChooChoo
       Oj.dump(to_hash)
     end
 
+    def descendant(name)
+      names = prepare_names([name])
+      _c_descendants(names, 1)
+    end
+
+    def descendant!(name)
+      names = prepare_names([name])
+      _c_descendants(names, 2)
+    end
+
     def descendants(*names)
       names = prepare_names(names)
-      _c_descendants(names)
+      _c_descendants(names, -1)
+    end
+
+    def child(name)
+      names = prepare_names([name])
+      _c_children(names, 1)
+    end
+
+    def child!(name)
+      names = prepare_names([name])
+      _c_children(names, 2)
     end
 
     def children(*names)
       names = prepare_names(names)
-      _c_children(names)
+      _c_children(names, -1)
+    end
+
+    def where(sym, val)
+      _where(sym, val, -1)
+    end
+
+    def first(sym,val)
+      _where(sym, val, 1)
+    end
+
+    def first!(sym,val)
+      result = _where(sym, val, 2)
+      len = result.length
+      if len != 1
+        raise AssertedValueNotFound, "No singular element of name #{sym} with value #{val} exists."
+      else
+        result.first
+      end
     end
 
     private
+
+    def _where(sym, val, limit)
+      sym.to_s =~ ChooChoo.segment_regex
+      name = prepare_names([$1]).first
+      name ? _c_where(name, sym.to_s, val, limit) : []
+    end
 
     def prepare_names(list)
       list = list.flatten
@@ -88,7 +132,8 @@ module ChooChoo
       end
 
       methods.keys.map do |funcname|
-        segname = funcname.gsub(/[0-9_]+$/, '')
+        funcname =~ ChooChoo.segment_regex
+        segname = $1
         docs = methods[funcname].inspect.to_s
         %{
             def #{funcname}

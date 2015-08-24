@@ -77,6 +77,7 @@ struct segment_struct
   segment_t *firstSegment;
   segment_t *lastSegment;
   int elements;
+  int children;
   int depth;
   int pkey;
   int boundary;
@@ -151,15 +152,15 @@ void parserFail(parser_t *parser, short error);
 // traversal
 
 void buildIndexes(parser_t *parser);
-VALUE segmentFind(parser_t *parser, segment_t *segment, VALUE names);
+VALUE segmentFind(parser_t *parser, segment_t *segment, VALUE names_rb, VALUE limit_rb);
 VALUE segmentToHash(segment_t *segment);
-VALUE segmentChildren(parser_t *parser, segment_t *segment, VALUE names);
+VALUE segmentChildren(parser_t *parser, segment_t *segment, VALUE names_rb, VALUE limit_rb);
 VALUE propertiesToHash(property_t *property);
-void traversalLibInit();
 index_stat_t nameIndexSearch(parser_t *parser, const char *name);
 bool missingSegment(parser_t *parser, char *src);
 int segmentsWithName(parser_t *parser, char *src);
 bool multipleWithName(parser_t *parser, char *src);
+VALUE segmentWhere(parser_t *parser, segment_t *segment, VALUE name_rb, VALUE key_rb, VALUE value_rb, VALUE limit_rb);
 
 // 835
 

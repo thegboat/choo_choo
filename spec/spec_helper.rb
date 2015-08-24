@@ -28,6 +28,11 @@ module ChooChoo
     isa.to_hash
   end
 
+  def self.isa
+    edi = ChooChoo::Parser.parse_835(ChooChoo.test_string)
+    edi.isa_segments.first
+  end
+
   def self.children(*names)
     edi = ChooChoo::Parser.parse_835(ChooChoo.test_string)
     isa = edi.isa_segments.first
@@ -38,6 +43,11 @@ module ChooChoo
     edi = ChooChoo::Parser.parse_835(ChooChoo.test_string)
     isa = edi.isa_segments.first
     isa.descendants(*names)
+  end
+
+  def self.methods_835
+    file = File.open("methods_835.rb", "w+")
+    file.write DocumentNode.method_builder.join("\n")
   end
 end
 
@@ -55,3 +65,4 @@ def edit_line(message, line, string)
   edi = ChooChoo::Parser.parse_835(array.join('~'))
   edi.isa_segments.first
 end
+

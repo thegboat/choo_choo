@@ -14,15 +14,15 @@ static VALUE segment_alloc(VALUE self);
 static VALUE choo_choo_parse_835(VALUE segment, VALUE isa_str);
 static VALUE interchange_loop_to_hash(VALUE self);
 static VALUE segment_parent(VALUE self);
-static VALUE segment_children(VALUE self, VALUE names);
+static VALUE segment_children(VALUE self, VALUE names_rb, VALUE limit_rb);
 static anchor_t *getAnchor(VALUE segment_rb);
 static anchor_t *getAnchorUnsafe(VALUE segment_rb);
-static VALUE segment_find(VALUE self, VALUE names);
-static VALUE document_type(VALUE self);
-static VALUE get_property(VALUE self, VALUE key_rb);
+static VALUE segment_find(VALUE self, VALUE names_rb, VALUE limit_rb);
+static VALUE segment_document_type(VALUE self);
+static VALUE segment_get_property(VALUE self, VALUE key_rb);
 static VALUE segment_name(VALUE self);
-static VALUE _has_errors(VALUE self);
-static VALUE _errors(VALUE self);
+static VALUE segment_has_errors(VALUE self);
+static VALUE segment_errors(VALUE self);
 
 static void interchange_loop_free(VALUE self){
   anchor_t *anchor;
@@ -63,14 +63,9 @@ static VALUE choo_choo_parse_835(VALUE segment, VALUE isa_str){
   return isa;
 }
 
-static VALUE interchange_loop_to_hash(VALUE self){  
+static VALUE segment_to_hash(VALUE self){  
   anchor_t *anchor = getAnchor(self);
-  if(anchor->parser->failure){
-    return rb_hash_new(); 
-  }else{
-    return segmentToHash(anchor->parser->root);
-  }
-
+  return segmentToHash(anchor->segment);
 }
 
 static VALUE segment_parent(VALUE self){
@@ -78,9 +73,14 @@ static VALUE segment_parent(VALUE self){
   return buildSegmentNode(anchor->parser, anchor->segment);
 }
 
-static VALUE segment_children(VALUE self, VALUE names){
+static VALUE segment_children(VALUE self, VALUE names_rb, VALUE limit_rb){
   anchor_t *anchor = getAnchor(self);
-  return segmentChildren(anchor->parser, anchor->segment, names);
+  if(anchor->segment->children > 0){
+    return segmentChildren(anchor->parser, anchor->segment, names_rb, limit_rb);
+  }
+  else{
+    return rb_ary_new();
+  }
 }
 
 static anchor_t *getAnchor(VALUE segment_rb){
@@ -100,9 +100,14 @@ static anchor_t *getAnchorUnsafe(VALUE segment_rb){
   return anchor;
 }
 
-static VALUE segment_find(VALUE self, VALUE names){
+static VALUE segment_find(VALUE self, VALUE names_rb, VALUE limit_rb){
   anchor_t *anchor = getAnchor(self);
-  return segmentFind(anchor->parser, anchor->segment, names);
+  if(anchor->segment->children > 0){
+    return segmentFind(anchor->parser, anchor->segment, names_rb, limit_rb);
+  }
+  else{
+    return rb_ary_new();
+  }
 }
 
 VALUE buildSegmentNode(parser_t *parser, segment_t *segment){
@@ -116,7 +121,7 @@ VALUE buildSegmentNode(parser_t *parser, segment_t *segment){
   return segment_rb;
 }
 
-static VALUE document_type(VALUE self){
+static VALUE segment_document_type(VALUE self){
   anchor_t *anchor = getAnchorUnsafe(self);
   return rb_str_new_cstr(anchor->parser->documentType);
 }
@@ -127,7 +132,7 @@ static VALUE segment_name(VALUE self){
   return ID2SYM(id_name);
 }
 
-static VALUE get_property(VALUE self, VALUE key_rb){
+static VALUE segment_get_property(VALUE self, VALUE key_rb){
   char *key = StringValueCStr(key_rb);
   anchor_t *anchor = getAnchor(self);
   property_t *property = anchor->segment->firstProperty;
@@ -141,14 +146,24 @@ static VALUE get_property(VALUE self, VALUE key_rb){
   return Qnil;
 }
 
-static VALUE _errors(VALUE self){
+static VALUE segment_errors(VALUE self){
   anchor_t *anchor = getAnchorUnsafe(self);
   return getErrors(anchor->parser);
 }
 
-static VALUE _has_errors(VALUE self){
+static VALUE segment_has_errors(VALUE self){
   anchor_t *anchor = getAnchorUnsafe(self);
   return (anchor->parser->errorCount == 0 ? Qfalse : Qtrue);
+}
+
+static VALUE segment_where(VALUE self, VALUE name_rb, VALUE key_rb, VALUE value_rb, VALUE limit_rb){
+  anchor_t *anchor = getAnchor(self);
+  if(anchor->segment->children > 0){
+    return segmentWhere(anchor->parser, anchor->segment, name_rb, key_rb, value_rb, limit_rb);
+  }
+  else{
+    return rb_ary_new();
+  }
 }
 
 void Init_edi_parsing(void) {
@@ -160,20 +175,22 @@ void Init_edi_parsing(void) {
   rb_define_method(cParser, "_c_parse_835", choo_choo_parse_835, 1);
 
   rb_define_alloc_func(cSegment, segment_alloc);
-  rb_define_method(cSegment, "document_type", document_type, 0);
+  rb_define_method(cSegment, "document_type", segment_document_type, 0);
   rb_define_method(cSegment, "name", segment_name, 0);
-  rb_define_private_method(cSegment, "_c_descendants", segment_find, 1);
-  rb_define_private_method(cSegment, "_c_children", segment_children, 1);
+  rb_define_method(cSegment, "to_hash", segment_to_hash, 0);
+  rb_define_private_method(cSegment, "_c_descendants", segment_find, 2);
+  rb_define_private_method(cSegment, "_c_children", segment_children, 2);
   rb_define_private_method(cSegment, "_c_parent", segment_parent, 0);
-  rb_define_private_method(cSegment, "get_property", get_property, 1);
+  rb_define_private_method(cSegment, "get_property", segment_get_property, 1);
 
   rb_define_alloc_func(cInterchangeLoop, interchange_loop_alloc);
-  rb_define_method(cInterchangeLoop, "document_type", document_type, 0);
+  rb_define_method(cInterchangeLoop, "document_type", segment_document_type, 0);
   rb_define_method(cInterchangeLoop, "name", segment_name, 0);
-  rb_define_method(cInterchangeLoop, "to_hash", interchange_loop_to_hash, 0);
-  rb_define_private_method(cInterchangeLoop, "get_property", get_property, 1);
-  rb_define_private_method(cInterchangeLoop, "_errors", _errors, 0);
-  rb_define_private_method(cInterchangeLoop, "_errors?", _has_errors, 0);
+  rb_define_method(cInterchangeLoop, "to_hash", segment_to_hash, 0);
+  rb_define_private_method(cInterchangeLoop, "get_property", segment_get_property, 1);
+  rb_define_private_method(cInterchangeLoop, "_errors", segment_errors, 0);
+  rb_define_private_method(cInterchangeLoop, "_errors?", segment_has_errors, 0);
   rb_define_private_method(cInterchangeLoop, "_c_descendants", segment_find, 1);
   rb_define_private_method(cInterchangeLoop, "_c_children", segment_children, 1);
+  rb_define_private_method(cInterchangeLoop, "_c_where", segment_where, 4);
 }
