@@ -16,38 +16,33 @@ module ChooChoo
 
   def self.benchmark(times)
     time = Benchmark.realtime do
-      ChooChoo::Parser.parse_835(test_string*times)
+      EDI835::Parser.parse(test_string*times)
     end
 
     puts "#{time*1000} ms"
   end
 
   def self.to_hash
-    edi = ChooChoo::Parser.parse_835(ChooChoo.test_string)
+    edi = EDI835::Parser.parse(ChooChoo.test_string)
     isa = edi.isa_segments.first
     isa.to_hash
   end
 
   def self.isa
-    edi = ChooChoo::Parser.parse_835(ChooChoo.test_string)
+    edi = EDI835::Parser.parse(ChooChoo.test_string)
     edi.isa_segments.first
   end
 
   def self.children(*names)
-    edi = ChooChoo::Parser.parse_835(ChooChoo.test_string)
+    edi = EDI835::Parser.parse(ChooChoo.test_string)
     isa = edi.isa_segments.first
     isa.children(*names)
   end
 
   def self.descendants(*names)
-    edi = ChooChoo::Parser.parse_835(ChooChoo.test_string)
+    edi = EDI835::Parser.parse(ChooChoo.test_string)
     isa = edi.isa_segments.first
     isa.descendants(*names)
-  end
-
-  def self.methods_835
-    file = File.open("methods_835.rb", "w+")
-    file.write DocumentNode.method_builder.join("\n")
   end
 end
 
@@ -59,10 +54,10 @@ def read_file(name)
   File.read(file_loc(name))
 end
 
-def edit_line(message, line, string)
+def edit_835_line(message, line, string)
   array = message.split('~')
   array[line -1] = string
-  edi = ChooChoo::Parser.parse_835(array.join('~'))
+  edi = EDI835::Parser.parse(array.join('~'))
   edi.isa_segments.first
 end
 

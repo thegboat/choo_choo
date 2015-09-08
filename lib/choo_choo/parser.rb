@@ -9,14 +9,12 @@ module ChooChoo
       @stream = file_or_string.is_a?(String) ? StringIO.new(file_or_string) : file_or_string
     end
 
-    def self.parse_835(file_or_string)
-      parser = new(file_or_string)
-      parser.parse_835
+    def self.parse
+      raise MethodImplementationRequired
     end
 
-    def parse_835
-      isas = split {|isa_segment| _c_parse_835(isa_segment) }
-      EDI835.new(isas)
+    def parse
+      raise MethodImplementationRequired
     end
 
     def split

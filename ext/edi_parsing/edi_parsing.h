@@ -41,6 +41,7 @@ struct parser_struct
   char componentSeparator[2];
   int segmentCount;
   int propertyCount;
+  int references;
   bool failure;
   bool finished;
 };

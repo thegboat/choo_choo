@@ -62,6 +62,7 @@ void parserInitialization(parser_t *parser){
   parser->errorCount = 0;
   parser->segmentCount = 0;
   parser->propertyCount = 0;
+  parser->references = 1;
   parser->componentSeparator[0] = '\0';
   memset(&parser->errors, 0, sizeof(short)*10);
 }

@@ -1,0 +1,143 @@
+#!/usr/bin/env ruby
+require 'fileutils'
+
+class DocumentType
+
+  attr_reader :name, :valid_document_nodes, :filename
+
+  def initialize(name, filename, structure)
+    @valid_document_nodes = structure
+    @name = name
+    @filename = filename
+  end
+
+end
+
+def edi_835
+  DocumentType.new("EDI835", "edi_835",
+    {
+      ISA: 16,
+      BPR: 21,
+      TRN: 4,
+      CUR: 21,
+      DTM: 6,
+      PER: 9,
+      MIA: 24,
+      REF: 4,
+      CAS: 19,
+      IEA: 2,
+      QTY: 4,
+      SVC: [{1 => 7}, (2..5), {6 => 8}, 7],
+      CLP: 14, 
+      PLB: [(1..2), {3 => 2}, 4, {5 => 2}, 6, {7 => 2}, 8, {9 => 2}, 10, {11 => 2}, 12, {13 => 2}, 14],
+      TS3: 19,
+      TS2: 24,
+      MOA: 9,
+      RDM: 3,
+      LX: 1,
+      LQ: 2,
+      N1: 6,
+      N3: 2,
+      N4: 6,
+      GS: 8,
+      ST: 3,
+      GE: 2,
+      SE: 2,
+      NM1: 11,
+      AMT: 3
+    }
+  )
+end
+
+def document_types
+  [edi_835]
+end
+
+
+def generate
+  methods = document_types.inject({}) do |result, obj|
+    hash = obj.valid_document_nodes
+    hash.keys.each do |key|
+
+      if hash[key].is_a?(Fixnum)
+        1.upto(hash[key]) do |n|
+          funcname = "#{key}#{n.to_s.rjust(2,'0')}"
+          result[funcname] ||= []
+          result[funcname] << obj.name
+        end
+      else
+        hash[key].each do |item|
+          if item.is_a?(Fixnum)
+            funcname = "#{key}#{item.to_s.rjust(2,'0')}"
+            result[funcname] ||= []
+            result[funcname] << obj.name
+          elsif item.is_a?(Range)
+            item.each do |n|
+            funcname = "#{key}#{n.to_s.rjust(2,'0')}"
+            result[funcname] ||= []
+            result[funcname] << obj.name
+            end
+          else
+            el = item.keys.first
+            cm = item.values.first
+            1.upto(cm).each do |n|
+              funcname = "#{key}#{el.to_s.rjust(2,'0')}_#{n.to_s.rjust(2,'0')}"
+              result[funcname] ||= []
+              result[funcname] << obj.name
+            end
+          end
+        end
+      end
+    end
+
+    result
+  end
+
+  method_hash = methods.keys.inject({}) do |r, funcname|
+    #regex should be same as ChooChoo.segment_regex
+    funcname =~ /^([A-Z][A-Z][A-Z1-9]|[A-Z][A-Z]|[A-Z][1-9])/
+    segname = $1
+    str = %{
+    def #{funcname}
+      get_property('#{funcname}')
+    end
+    }
+
+    r[segname] ||= []
+    r[segname] << str
+    r
+  end
+
+  FileUtils.mkdir('lib/choo_choo/segments') unless File.exists?('lib/choo_choo/segments')
+
+  method_hash.keys.each do |key|
+    
+    file = File.open("lib/choo_choo/segments/#{key.downcase}.rb", "w+")
+file << %{module ChooChoo
+  class #{key} < Segment
+#{method_hash[key].join}
+  end
+end
+}
+file.close
+  end
+
+  document_types.each do |obj|
+    FileUtils.mkdir("lib/choo_choo/#{obj.filename}") unless File.exists?("lib/choo_choo/#{obj.filename}")
+    FileUtils.mkdir("lib/choo_choo/#{obj.filename}/segments") unless File.exists?("lib/choo_choo/#{obj.filename}/segments")
+
+    obj.valid_document_nodes.keys.each do |key|
+      file = File.open("lib/choo_choo/#{obj.filename}/segments/#{key.downcase}.rb", "w+")
+
+file << %{module #{obj.name}
+  class #{key} < ChooChoo::#{key}
+
+  end
+end
+}
+file.close
+    end
+  end
+end
+
+generate
