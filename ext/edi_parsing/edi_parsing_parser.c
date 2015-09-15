@@ -54,7 +54,10 @@ int parseElement(segment_t *segment, char *str, const char componentSeparator[2]
   return cnt;
 }
 
-void parserInitialization(parser_t *parser){
+void parserInitialization(parser_t *parser, char *document){
+  size_t size = sizeof(char)*(strlen(document)+1);
+  parser->document = (char *)ediParsingMalloc(size);
+  memcpy(parser->document, document, size);
   parser->nameIndex = NULL;
   parser->primaryIndex = NULL;
   parser->failure = false;
@@ -75,6 +78,7 @@ void parserFree(parser_t *parser){
     free(parser->primaryIndex);
   }
   if(NULL != parser->nameIndex) free(parser->nameIndex);
+  if(NULL != parser->document) free(parser->document);
   free(parser);
 }
 

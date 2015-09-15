@@ -31,9 +31,11 @@ void addProperty(segment_t *segment, property_t *property){
 void buildProperty(segment_t *segment, char *data, short seg_cnt, short elem_cnt){
   property_t *property = ediParsingMalloc(sizeof(property_t));
   property->owner = segment;
+  long len = (strcmp(data, CHOOCHOO_EMPTY) == 0) ? 0 : strlen(data);
   buildKey(property->key, segment->name, seg_cnt, elem_cnt);
-  property->value = ediParsingMalloc(sizeof(char)*strlen(data));
-  memcpy(property->value, data, strlen(data));
+  property->value = ediParsingMalloc(sizeof(char)*(len+1));
+  memcpy(property->value, data, len);
+  property->value[len] = '\0';
   addProperty(segment, property);
 }
 

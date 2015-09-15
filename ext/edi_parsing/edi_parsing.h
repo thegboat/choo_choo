@@ -38,6 +38,7 @@ struct parser_struct
   segment_t **nameIndex;
   segment_t **primaryIndex;
   char *str;
+  char *document;
   char componentSeparator[2];
   int segmentCount;
   int propertyCount;
@@ -146,7 +147,7 @@ bool elementCountIn(segment_t *segment, int start, int end);
 void *ediParsingMalloc(size_t size);
 segment_t *parseSegment(parser_t *parser);
 int parseElement(segment_t *segment, char *str, const char componentSeparator[2], short seg_cnt);
-void parserInitialization(parser_t *parser);
+void parserInitialization(parser_t *parser, char*document);
 void parserFree(parser_t *parser);
 void parserFail(parser_t *parser, short error);
 
@@ -162,6 +163,7 @@ bool missingSegment(parser_t *parser, char *src);
 int segmentsWithName(parser_t *parser, char *src);
 bool multipleWithName(parser_t *parser, char *src);
 VALUE segmentWhere(parser_t *parser, segment_t *segment, VALUE name_rb, VALUE key_rb, VALUE value_rb, VALUE limit_rb);
+VALUE segmentExists(parser_t *parser, segment_t *segment, VALUE name_rb, VALUE key_rb, VALUE value_rb);
 
 // 835
 

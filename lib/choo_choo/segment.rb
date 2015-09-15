@@ -15,12 +15,12 @@ module ChooChoo
 
     def descendant(name)
       names = prepare_names([name])
-      _c_descendants(names, 1)
+      _c_descendants(names, 1).first
     end
 
     def descendant!(name)
       names = prepare_names([name])
-      assert_one { _c_descendants(names, 2) }
+      assert_one { _c_descendants(names, 2) }.first
     end
 
     def descendants(*names)
@@ -30,12 +30,12 @@ module ChooChoo
 
     def child(name)
       names = prepare_names([name])
-      _c_children(names, 1)
+      _c_children(names, 1).first
     end
 
     def child!(name)
       names = prepare_names([name])
-      assert_one { _c_children(names, 2) }
+      assert_one { _c_children(names, 2) }.first
     end
 
     def children(*names)
@@ -47,20 +47,24 @@ module ChooChoo
       _where(sym, val, -1)
     end
 
+    def exists?(sym,val)
+      _exists?(sym, val)
+    end
+
     def first(sym,val)
-      _where(sym, val, 1)
+      _where(sym, val, 1).first
     end
 
     def first!(sym,val)
-      assert_one { _where(sym, val, 2) }
+      assert_one { _where(sym, val, 2) }.first
     end
 
     def errors?
-      _errors?
+      _c_errors?
     end
 
     def errors
-      _errors
+      _c_errors
     end
 
     def humanized_errors
@@ -74,21 +78,138 @@ module ChooChoo
       end.compact
     end
 
+    def boolean(key, options = {})
+      cast(:boolean, key, options)
+    end
+    alias :bool :boolean
+
+    def integer(key, options = {})
+      cast(:integer, key, options)
+    end
+    alias :int :integer
+
+    def upper(key, options = {})
+      cast(:string, key, options.merge(apply: [:upcase, :strip]))
+    end
+    alias :up :upper
+
+    def lower(key, options = {})
+      cast(:string, key, options.merge(apply: [:downcase, :strip]))
+    end
+    alias :low :lower
+
+    def string(key, options = {})
+      cast(:string, key, options)
+    end
+    alias :str :string
+    alias :raw :string
+
+    def strip(key, options = {})
+      cast(:string, key, options.merge(apply: :strip))
+    end
+
+    def date(key, options = {})
+      cast(:date, key, options)
+    end
+
+    def money(key, options = {})
+      cast(:decimal, key, options.merge(precision: 2))
+    end
+
+    def decimal(key, options = {})
+      cast(:decimal, key, options)
+    end
+    alias :dec :decimal
+
+    protected
+
+    def self.apply_methods(val, methods)
+      methods = [methods].flatten.compact
+      methods.each do |sym|
+        meth = sym.to_s
+        next unless val.respond_to?(meth)
+        val = val.send(meth)
+      end
+      val
+    end
+
     private
+
+    def cast(assign_type, key, options)
+      val = extract(key)
+      options[:default] ||= nil
+      options[:blank] ||= nil
+      return options[:default] if val.to_s.empty?
+      return options[:blank] if val =~ /^\s+$/
+      casted = case assign_type
+      when :boolean then _boolean(val, options)
+      when :integer then _integer(val, options)
+      when :string then _string(val, options)
+      when :date then _date(val, options)
+      when :decimal then _decimal(val, options)
+      else raise ArgumentError, "not a valid assign_type"
+      end
+
+      casted = self.class.apply_methods(casted, options[:apply]) if options[:apply]
+      casted
+    end
+
+    def extract(key)
+      if respond_to?(key)
+        send(key)
+      else
+        key =~ ChooChoo.segment_regex
+        child!($1).send(key)
+      end
+    end
+
+    def _boolean(val, options)
+      !!(val.strip =~ /true/i)
+    end
+
+    def _integer(val, options)
+      rtn.to_i
+    end
+
+    def _string(val, options)
+      val = val.to_s
+      options.key?(:length) && val.length > options[:length].to_i ? val.to(options[:length].to_i - 1) : val
+    end
+
+    def _date(val, options)
+      return if val !~ /^\d+\/\d+\/\d+$/
+      if val =~ /^(\d{2})\/(\d{2})\/(\d{4})$/
+        return Date.parse("#{$3}/#{$1}/#{$2}")
+      end
+      Date.parse(val) rescue nil
+    end
+
+    def _decimal(val, options)
+      val = BigDecimal.new(val.to_s)
+      truncation = options[:truncation] || :floor
+      precision = options.key?(:precision) ? options[:precision].to_i : nil
+
+      precision ? val.send(truncation, *[precision].compact) : val
+    end
 
     def assert_one
       result = yield
       if result.length != 1
-        raise AssertedValueNotFound, "No singular element of name #{sym} with value #{val} exists."
-      else
-        result.first
+        raise AssertedValueNotFound, "No singular element exists."
       end
+      result
     end
 
     def _where(sym, val, limit)
       sym.to_s =~ ChooChoo.segment_regex
       name = prepare_names([$1]).first
       name ? _c_where(name, sym.to_s, val, limit) : []
+    end
+
+    def _exists?(sym, val)
+      sym.to_s =~ ChooChoo.segment_regex
+      name = prepare_names([$1]).first
+      name ? _c_exists?(name, sym.to_s, val) : false
     end
 
     def prepare_names(list)

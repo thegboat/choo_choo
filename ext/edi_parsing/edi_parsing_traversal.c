@@ -56,27 +56,49 @@ VALUE segmentChildWhere(parser_t *parser, segment_t *segment, VALUE name_rb, VAL
 
 VALUE segmentWhere(parser_t *parser, segment_t *segment, VALUE name_rb, VALUE key_rb, VALUE value_rb, VALUE limit_rb){
   VALUE result = rb_ary_new();
-  char *c_name = StringValueCStr(name_rb);
-  index_stat_t stat = nameIndexSearch(parser, c_name);
 
-  if(stat.lower > -1 && stat.upper > -1){
-    int max = (stat.upper - stat.lower) + 1;
-    char *key = StringValueCStr(key_rb);
-    char *value = StringValueCStr(value_rb);
-    const int limit = NUM2INT(limit_rb);
-    int cnt = 0;
-    segment_t *descendant;
-    for(int i=0;i<max;i++){
-      if(limit > -1 && cnt >= limit) break;
-      descendant = parser->nameIndex[i+stat.lower];
-      if(isDescendantOf(descendant, segment) && strcmp(descendant->name, c_name) == 0 && hasProperty(descendant, key, value)){
-        VALUE child_rb = buildSegmentNode(parser, descendant);
-        rb_ary_push(result, child_rb);
-        cnt++;
+  if(segment->children > 0){
+    char *c_name = StringValueCStr(name_rb);
+    index_stat_t stat = nameIndexSearch(parser, c_name);
+    if(stat.lower > -1 && stat.upper > -1){
+      int max = (stat.upper - stat.lower) + 1;
+      char *key = StringValueCStr(key_rb);
+      char *value = StringValueCStr(value_rb);
+      const int limit = NUM2INT(limit_rb);
+      int cnt = 0;
+      segment_t *descendant;
+      for(int i=0;i<max;i++){
+        if(limit > -1 && cnt >= limit) break;
+        descendant = parser->nameIndex[i+stat.lower];
+        if(isDescendantOf(descendant, segment) && strcmp(descendant->name, c_name) == 0 && hasProperty(descendant, key, value)){
+          VALUE child_rb = buildSegmentNode(parser, descendant);
+          rb_ary_push(result, child_rb);
+          cnt++;
+        }
       }
     }
   }
   return result;
+}
+
+VALUE segmentExists(parser_t *parser, segment_t *segment, VALUE name_rb, VALUE key_rb, VALUE value_rb){
+  if(segment->children > 0){
+    char *c_name = StringValueCStr(name_rb);
+    index_stat_t stat = nameIndexSearch(parser, c_name);
+    if(stat.lower > -1 && stat.upper > -1){
+      int max = (stat.upper - stat.lower) + 1;
+      char *key = StringValueCStr(key_rb);
+      char *value = StringValueCStr(value_rb);
+      segment_t *descendant;
+      for(int i=0;i<max;i++){
+        descendant = parser->nameIndex[i+stat.lower];
+        if(isDescendantOf(descendant, segment) && strcmp(descendant->name, c_name) == 0 && hasProperty(descendant, key, value)){
+          return Qtrue;
+        }
+      }
+    }
+  }
+  return Qfalse;
 }
 
 VALUE segmentChildren(parser_t *parser, segment_t *segment, VALUE names_rb, VALUE limit_rb){
@@ -158,7 +180,7 @@ VALUE segmentFind(parser_t *parser, segment_t *segment, VALUE names_rb, VALUE li
     VALUE name = rb_ary_pop(names_rb);
     char *c_name;
     index_stat_t stat;
-    while(name != Qnil && (limit == -1 && cnt < limit)){
+    while(name != Qnil && (limit == -1 || cnt < limit)){
       c_name = StringValueCStr(name);
       stat = nameIndexSearch(parser, c_name);
       int max = (stat.upper - stat.lower) + 1;
@@ -285,7 +307,7 @@ static bool isDescendantOf(segment_t *descendant, segment_t *parent){
 static bool hasProperty(segment_t *segment, char *key, char *value){
   property_t *property = segment->firstProperty;
   while(NULL != property){
-    if(strcmp(property->key, key) && strcmp(property->value, value)){
+    if(strcmp(property->key, key) == 0 && strcmp(property->value, value) == 0){
       return true;
     }
     property = property->tail;
