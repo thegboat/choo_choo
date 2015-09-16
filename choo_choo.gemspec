@@ -24,7 +24,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency "rake-compiler", "~> 0.9"
-  spec.add_dependency "activesupport"
+  #spec.add_dependency "activesupport"
   spec.add_dependency "oj", "~> 2.12"
   spec.add_dependency "ox", "~> 2.2"
   spec.add_development_dependency "bundler", "~> 1.8"

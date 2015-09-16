@@ -64,7 +64,11 @@ static VALUE segment_to_hash(VALUE self){
 
 static VALUE segment_parent(VALUE self){
   anchor_t *anchor = getAnchor(self);
-  return buildSegmentNode(anchor->parser, anchor->segment);
+  if(NULL != anchor->segment->parent){
+    return buildSegmentNode(anchor->parser, anchor->segment->parent);
+  }else{
+    return Qnil;
+  }
 }
 
 static VALUE segment_children(VALUE self, VALUE names_rb, VALUE limit_rb){

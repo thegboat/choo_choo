@@ -14,3 +14,4 @@
 /ext/edi_parsing/ruby
 /ext/edi_parsing/Makefile
 /lib/edi_parsing.bundle
+/.ruby-version
