@@ -16,8 +16,8 @@ ISA*00*          *00*          *ZZ*133052274      *ZZ*264007676      *150105*045
           REF*PQ*5G896~
           REF*TJ*263285850~
             LX*1~
-              CLP*095950951285*1*215*0*135.82*12*141230N11B94~
-                NM1*QC*1*WALKER*LANDON*M***MI*WMB09180949W~
+              CLP*095950951285*1*215*0*135.821*12*141230N11B94~
+                NM1*QC*1*walker*LANDON*M***MI*WMB09180949W~
                 NM1*74*1**LANDON M****C*WMB09180949W00~
                 NM1*82*1*LAFFERTY MD*WARREN SCOTT****XX*1639118391~
                 DTM*050*20141230~

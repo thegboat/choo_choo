@@ -168,7 +168,7 @@ module ChooChoo
     end
 
     def _integer(val, options)
-      rtn.to_i
+      val.to_i
     end
 
     def _string(val, options)
@@ -177,7 +177,7 @@ module ChooChoo
     end
 
     def _date(val, options)
-      return if val !~ /^\d+\/\d+\/\d+$/
+      return if val !~ /^(\d+\/\d+\/\d+|\d{8}|\d{4}-\d{2}\d{2})$/
       if val =~ /^(\d{2})\/(\d{2})\/(\d{4})$/
         return Date.parse("#{$3}/#{$1}/#{$2}")
       end

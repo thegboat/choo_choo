@@ -1,5 +1,5 @@
 
-
+require "bigdecimal"
 require "stringio"
 require "edi_parsing"
 # require "oj"
