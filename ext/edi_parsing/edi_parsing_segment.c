@@ -9,8 +9,9 @@
 
 void segmentInitializer(segment_t *segment, char *src){
   long idx = strlen(src);
-  idx = idx-1 > MAX_NAME_SIZE ? MAX_NAME_SIZE : idx;
-  memcpy(segment->name,src,idx);
+  idx = idx > MAX_NAME_SIZE ? MAX_NAME_SIZE : idx;
+  memset(segment->name,0,MAX_NAME_SIZE*sizeof(char));
+  memcpy(segment->name,src,idx*sizeof(char));
   segment->name[idx+1] = '\0';
   segment->elements = 0;
   segment->depth = 0;
@@ -31,10 +32,11 @@ void addProperty(segment_t *segment, property_t *property){
 void buildProperty(segment_t *segment, char *data, short seg_cnt, short elem_cnt){
   property_t *property = ediParsingMalloc(sizeof(property_t));
   property->owner = segment;
+  property->element = seg_cnt;
+  property->component = elem_cnt;
   long len = (strcmp(data, CHOOCHOO_EMPTY) == 0) ? 0 : strlen(data);
-  buildKey(property->key, segment->name, seg_cnt, elem_cnt);
   property->value = ediParsingMalloc(sizeof(char)*(len+1));
-  memcpy(property->value, data, len);
+  memcpy(property->value, data, sizeof(char)*len);
   property->value[len] = '\0';
   addProperty(segment, property);
 }
@@ -76,7 +78,7 @@ void segmentFree(segment_t *segment){
 }
 
 void propertyFree(property_t *property){
-  xfree(property->value);
+  if(NULL != property->value)xfree(property->value);
   xfree(property);
 }
 

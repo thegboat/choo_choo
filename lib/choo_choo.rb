@@ -18,4 +18,8 @@ module ChooChoo
     @segment_regex ||= /^([A-Z][A-Z][A-Z1-9]|[A-Z][A-Z]|[A-Z][1-9])/
   end
 
+  def self.property_regex
+    @segment_regex ||= /^#{segment_regex}([0-9]{2})(|_([0-9]{2}))$/
+  end
+
 end

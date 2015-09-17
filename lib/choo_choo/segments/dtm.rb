@@ -2,27 +2,27 @@ module ChooChoo
   class DTM < Segment
 
     def DTM01
-      get_property('DTM01')
+      _c_get_property(1, 0)
     end
     
     def DTM02
-      get_property('DTM02')
+      _c_get_property(2, 0)
     end
     
     def DTM03
-      get_property('DTM03')
+      _c_get_property(3, 0)
     end
     
     def DTM04
-      get_property('DTM04')
+      _c_get_property(4, 0)
     end
     
     def DTM05
-      get_property('DTM05')
+      _c_get_property(5, 0)
     end
     
     def DTM06
-      get_property('DTM06')
+      _c_get_property(6, 0)
     end
     
   end

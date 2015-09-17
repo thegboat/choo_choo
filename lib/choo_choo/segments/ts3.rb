@@ -2,79 +2,79 @@ module ChooChoo
   class TS3 < Segment
 
     def TS301
-      get_property('TS301')
+      _c_get_property(1, 0)
     end
     
     def TS302
-      get_property('TS302')
+      _c_get_property(2, 0)
     end
     
     def TS303
-      get_property('TS303')
+      _c_get_property(3, 0)
     end
     
     def TS304
-      get_property('TS304')
+      _c_get_property(4, 0)
     end
     
     def TS305
-      get_property('TS305')
+      _c_get_property(5, 0)
     end
     
     def TS306
-      get_property('TS306')
+      _c_get_property(6, 0)
     end
     
     def TS307
-      get_property('TS307')
+      _c_get_property(7, 0)
     end
     
     def TS308
-      get_property('TS308')
+      _c_get_property(8, 0)
     end
     
     def TS309
-      get_property('TS309')
+      _c_get_property(9, 0)
     end
     
     def TS310
-      get_property('TS310')
+      _c_get_property(10, 0)
     end
     
     def TS311
-      get_property('TS311')
+      _c_get_property(11, 0)
     end
     
     def TS312
-      get_property('TS312')
+      _c_get_property(12, 0)
     end
     
     def TS313
-      get_property('TS313')
+      _c_get_property(13, 0)
     end
     
     def TS314
-      get_property('TS314')
+      _c_get_property(14, 0)
     end
     
     def TS315
-      get_property('TS315')
+      _c_get_property(15, 0)
     end
     
     def TS316
-      get_property('TS316')
+      _c_get_property(16, 0)
     end
     
     def TS317
-      get_property('TS317')
+      _c_get_property(17, 0)
     end
     
     def TS318
-      get_property('TS318')
+      _c_get_property(18, 0)
     end
     
     def TS319
-      get_property('TS319')
+      _c_get_property(19, 0)
     end
     
   end

@@ -2,27 +2,27 @@ module ChooChoo
   class N1 < Segment
 
     def N101
-      get_property('N101')
+      _c_get_property(1, 0)
     end
     
     def N102
-      get_property('N102')
+      _c_get_property(2, 0)
     end
     
     def N103
-      get_property('N103')
+      _c_get_property(3, 0)
     end
     
     def N104
-      get_property('N104')
+      _c_get_property(4, 0)
     end
     
     def N105
-      get_property('N105')
+      _c_get_property(5, 0)
     end
     
     def N106
-      get_property('N106')
+      _c_get_property(6, 0)
     end
     
   end

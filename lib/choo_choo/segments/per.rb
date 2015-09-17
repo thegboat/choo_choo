@@ -2,39 +2,39 @@ module ChooChoo
   class PER < Segment
 
     def PER01
-      get_property('PER01')
+      _c_get_property(1, 0)
     end
     
     def PER02
-      get_property('PER02')
+      _c_get_property(2, 0)
     end
     
     def PER03
-      get_property('PER03')
+      _c_get_property(3, 0)
     end
     
     def PER04
-      get_property('PER04')
+      _c_get_property(4, 0)
     end
     
     def PER05
-      get_property('PER05')
+      _c_get_property(5, 0)
     end
     
     def PER06
-      get_property('PER06')
+      _c_get_property(6, 0)
     end
     
     def PER07
-      get_property('PER07')
+      _c_get_property(7, 0)
     end
     
     def PER08
-      get_property('PER08')
+      _c_get_property(8, 0)
     end
     
     def PER09
-      get_property('PER09')
+      _c_get_property(9, 0)
     end
     
   end

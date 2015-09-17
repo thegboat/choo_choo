@@ -94,12 +94,12 @@ def generate
   end
 
   method_hash = methods.keys.inject({}) do |r, funcname|
-    #regex should be same as ChooChoo.segment_regex
-    funcname =~ /^([A-Z][A-Z][A-Z1-9]|[A-Z][A-Z]|[A-Z][1-9])/
+    #regex should be same as ChooChoo.property_regex
+    funcname =~ /^([A-Z][A-Z][A-Z1-9]|[A-Z][A-Z]|[A-Z][1-9])([0-9]{2})(|_([0-9]{2}))$/
     segname = $1
     str = %{
     def #{funcname}
-      get_property('#{funcname}')
+      _c_get_property(#{$2.to_i}, #{$4.to_i})
     end
     }
 

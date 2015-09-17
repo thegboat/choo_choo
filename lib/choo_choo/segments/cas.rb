@@ -2,79 +2,79 @@ module ChooChoo
   class CAS < Segment
 
     def CAS01
-      get_property('CAS01')
+      _c_get_property(1, 0)
     end
     
     def CAS02
-      get_property('CAS02')
+      _c_get_property(2, 0)
     end
     
     def CAS03
-      get_property('CAS03')
+      _c_get_property(3, 0)
     end
     
     def CAS04
-      get_property('CAS04')
+      _c_get_property(4, 0)
     end
     
     def CAS05
-      get_property('CAS05')
+      _c_get_property(5, 0)
     end
     
     def CAS06
-      get_property('CAS06')
+      _c_get_property(6, 0)
     end
     
     def CAS07
-      get_property('CAS07')
+      _c_get_property(7, 0)
     end
     
     def CAS08
-      get_property('CAS08')
+      _c_get_property(8, 0)
     end
     
     def CAS09
-      get_property('CAS09')
+      _c_get_property(9, 0)
     end
     
     def CAS10
-      get_property('CAS10')
+      _c_get_property(10, 0)
     end
     
     def CAS11
-      get_property('CAS11')
+      _c_get_property(11, 0)
     end
     
     def CAS12
-      get_property('CAS12')
+      _c_get_property(12, 0)
     end
     
     def CAS13
-      get_property('CAS13')
+      _c_get_property(13, 0)
     end
     
     def CAS14
-      get_property('CAS14')
+      _c_get_property(14, 0)
     end
     
     def CAS15
-      get_property('CAS15')
+      _c_get_property(15, 0)
     end
     
     def CAS16
-      get_property('CAS16')
+      _c_get_property(16, 0)
     end
     
     def CAS17
-      get_property('CAS17')
+      _c_get_property(17, 0)
     end
     
     def CAS18
-      get_property('CAS18')
+      _c_get_property(18, 0)
     end
     
     def CAS19
-      get_property('CAS19')
+      _c_get_property(19, 0)
     end
     
   end

@@ -2,99 +2,99 @@ module ChooChoo
   class MIA < Segment
 
     def MIA01
-      get_property('MIA01')
+      _c_get_property(1, 0)
     end
     
     def MIA02
-      get_property('MIA02')
+      _c_get_property(2, 0)
     end
     
     def MIA03
-      get_property('MIA03')
+      _c_get_property(3, 0)
     end
     
     def MIA04
-      get_property('MIA04')
+      _c_get_property(4, 0)
     end
     
     def MIA05
-      get_property('MIA05')
+      _c_get_property(5, 0)
     end
     
     def MIA06
-      get_property('MIA06')
+      _c_get_property(6, 0)
     end
     
     def MIA07
-      get_property('MIA07')
+      _c_get_property(7, 0)
     end
     
     def MIA08
-      get_property('MIA08')
+      _c_get_property(8, 0)
     end
     
     def MIA09
-      get_property('MIA09')
+      _c_get_property(9, 0)
     end
     
     def MIA10
-      get_property('MIA10')
+      _c_get_property(10, 0)
     end
     
     def MIA11
-      get_property('MIA11')
+      _c_get_property(11, 0)
     end
     
     def MIA12
-      get_property('MIA12')
+      _c_get_property(12, 0)
     end
     
     def MIA13
-      get_property('MIA13')
+      _c_get_property(13, 0)
     end
     
     def MIA14
-      get_property('MIA14')
+      _c_get_property(14, 0)
     end
     
     def MIA15
-      get_property('MIA15')
+      _c_get_property(15, 0)
     end
     
     def MIA16
-      get_property('MIA16')
+      _c_get_property(16, 0)
     end
     
     def MIA17
-      get_property('MIA17')
+      _c_get_property(17, 0)
     end
     
     def MIA18
-      get_property('MIA18')
+      _c_get_property(18, 0)
     end
     
     def MIA19
-      get_property('MIA19')
+      _c_get_property(19, 0)
     end
     
     def MIA20
-      get_property('MIA20')
+      _c_get_property(20, 0)
     end
     
     def MIA21
-      get_property('MIA21')
+      _c_get_property(21, 0)
     end
     
     def MIA22
-      get_property('MIA22')
+      _c_get_property(22, 0)
     end
     
     def MIA23
-      get_property('MIA23')
+      _c_get_property(23, 0)
     end
     
     def MIA24
-      get_property('MIA24')
+      _c_get_property(24, 0)
     end
     
   end

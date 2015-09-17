@@ -2,99 +2,99 @@ module ChooChoo
   class TS2 < Segment
 
     def TS201
-      get_property('TS201')
+      _c_get_property(1, 0)
     end
     
     def TS202
-      get_property('TS202')
+      _c_get_property(2, 0)
     end
     
     def TS203
-      get_property('TS203')
+      _c_get_property(3, 0)
     end
     
     def TS204
-      get_property('TS204')
+      _c_get_property(4, 0)
     end
     
     def TS205
-      get_property('TS205')
+      _c_get_property(5, 0)
     end
     
     def TS206
-      get_property('TS206')
+      _c_get_property(6, 0)
     end
     
     def TS207
-      get_property('TS207')
+      _c_get_property(7, 0)
     end
     
     def TS208
-      get_property('TS208')
+      _c_get_property(8, 0)
     end
     
     def TS209
-      get_property('TS209')
+      _c_get_property(9, 0)
     end
     
     def TS210
-      get_property('TS210')
+      _c_get_property(10, 0)
     end
     
     def TS211
-      get_property('TS211')
+      _c_get_property(11, 0)
     end
     
     def TS212
-      get_property('TS212')
+      _c_get_property(12, 0)
     end
     
     def TS213
-      get_property('TS213')
+      _c_get_property(13, 0)
     end
     
     def TS214
-      get_property('TS214')
+      _c_get_property(14, 0)
     end
     
     def TS215
-      get_property('TS215')
+      _c_get_property(15, 0)
     end
     
     def TS216
-      get_property('TS216')
+      _c_get_property(16, 0)
     end
     
     def TS217
-      get_property('TS217')
+      _c_get_property(17, 0)
     end
     
     def TS218
-      get_property('TS218')
+      _c_get_property(18, 0)
     end
     
     def TS219
-      get_property('TS219')
+      _c_get_property(19, 0)
     end
     
     def TS220
-      get_property('TS220')
+      _c_get_property(20, 0)
     end
     
     def TS221
-      get_property('TS221')
+      _c_get_property(21, 0)
     end
     
     def TS222
-      get_property('TS222')
+      _c_get_property(22, 0)
     end
     
     def TS223
-      get_property('TS223')
+      _c_get_property(23, 0)
     end
     
     def TS224
-      get_property('TS224')
+      _c_get_property(24, 0)
     end
     
   end

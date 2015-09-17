@@ -90,6 +90,8 @@ struct property_struct
   segment_t *owner;
   char key[MAX_KEY_SIZE+1];
   char *value;
+  short element;
+  short component;
   property_t *head;
   property_t *tail;
 };
@@ -162,8 +164,8 @@ index_stat_t nameIndexSearch(parser_t *parser, const char *name);
 bool missingSegment(parser_t *parser, char *src);
 int segmentsWithName(parser_t *parser, char *src);
 bool multipleWithName(parser_t *parser, char *src);
-VALUE segmentWhere(parser_t *parser, segment_t *segment, VALUE name_rb, VALUE key_rb, VALUE value_rb, VALUE limit_rb);
-VALUE segmentExists(parser_t *parser, segment_t *segment, VALUE name_rb, VALUE key_rb, VALUE value_rb);
+VALUE segmentExists(parser_t *parser, segment_t *segment, VALUE name_rb, VALUE element_int_rb, VALUE component_int_rb, VALUE value_rb);
+VALUE segmentWhere(parser_t *parser, segment_t *segment, VALUE name_rb, VALUE element_int_rb, VALUE component_int_rb, VALUE value_rb, VALUE limit_rb);
 
 // 835
 

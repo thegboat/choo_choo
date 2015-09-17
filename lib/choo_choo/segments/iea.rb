@@ -2,11 +2,11 @@ module ChooChoo
   class IEA < Segment
 
     def IEA01
-      get_property('IEA01')
+      _c_get_property(1, 0)
     end
     
     def IEA02
-      get_property('IEA02')
+      _c_get_property(2, 0)
     end
     
   end

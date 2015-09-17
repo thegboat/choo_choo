@@ -2,19 +2,19 @@ module ChooChoo
   class TRN < Segment
 
     def TRN01
-      get_property('TRN01')
+      _c_get_property(1, 0)
     end
     
     def TRN02
-      get_property('TRN02')
+      _c_get_property(2, 0)
     end
     
     def TRN03
-      get_property('TRN03')
+      _c_get_property(3, 0)
     end
     
     def TRN04
-      get_property('TRN04')
+      _c_get_property(4, 0)
     end
     
   end

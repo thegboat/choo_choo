@@ -1,5 +1,9 @@
 module ChooChoo
   class Segment
+
+    def name
+      _name
+    end
     
     def parent
       _c_parent
@@ -65,6 +69,13 @@ module ChooChoo
 
     def errors
       _c_errors
+    end
+
+    def get_property(key)
+      unless key.starts_with?(_name_s) && args = ChooChoo.parse_property_key(key)
+        raise MethodNotImplemented, "Method #{key} not implemented for #{_name_s} segment."
+      end
+      _c_get_property(*args[1..-1])
     end
 
     def humanized_errors
@@ -135,6 +146,19 @@ module ChooChoo
 
     private
 
+    def parse_property_key(string)
+      string =~ ChooChoo.property_regex
+      $1.nil? ? nil : [$1, $2.to_i, $4.to_i]
+    end
+
+    def _name
+      @name ||= _c_name
+    end
+
+    def _name_s
+      @_name_s ||= name.to_s
+    end
+
     def cast(assign_type, key, options)
       val = extract(key)
       options[:default] ||= nil
@@ -159,7 +183,7 @@ module ChooChoo
         send(key)
       else
         key =~ ChooChoo.segment_regex
-        child!($1).send(key)
+        child!($1).get_property(key)
       end
     end
 
@@ -201,15 +225,15 @@ module ChooChoo
     end
 
     def _where(sym, val, limit)
-      sym.to_s =~ ChooChoo.segment_regex
-      name = prepare_names([$1]).first
-      name ? _c_where(name, sym.to_s, val, limit) : []
+      name, element, component = parse_property_key(sym.to_s)
+      name = prepare_names([name]).first
+      name ? _c_where(name, element, component, val, limit) : []
     end
 
     def _exists?(sym, val)
-      sym.to_s =~ ChooChoo.segment_regex
-      name = prepare_names([$1]).first
-      name ? _c_exists?(name, sym.to_s, val) : false
+      name, element, component = parse_property_key(sym.to_s)
+      name = prepare_names([name]).first
+      name ? _c_exists?(name, element, component, val) : false
     end
 
     def prepare_names(list)

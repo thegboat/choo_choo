@@ -47,7 +47,7 @@ static void parser835Cleanup(parser835_t *parser);
 
 void parse835(anchor_t *anchor, char *ediFile){
   parser_t *super = anchor->parser;
-  parser835_t *parser = (parser835_t *)ediParsingMalloc(sizeof(parser835_t));
+  parser835_t *parser = ediParsingMalloc(sizeof(parser835_t));
   parser->super = super;
   parser835Initialization(parser);
   segment_t *segment;

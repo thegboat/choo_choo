@@ -9,7 +9,7 @@
 
 void *ediParsingMalloc(size_t size){
   void *any;
-  any = calloc(1, size);
+  any = calloc(1,size);
   if(any == NULL){
     rb_raise(rb_eRuntimeError, "Memory could not be allocated");
   }
@@ -17,7 +17,7 @@ void *ediParsingMalloc(size_t size){
 }
 
 segment_t *parseSegment(parser_t *parser){
-  segment_t *segment = (segment_t *)ediParsingMalloc(sizeof(segment_t));
+  segment_t *segment = ediParsingMalloc(sizeof(segment_t));
   char *tok;
   char *saveptr;
   short cnt = 0;
@@ -56,7 +56,7 @@ int parseElement(segment_t *segment, char *str, const char componentSeparator[2]
 
 void parserInitialization(parser_t *parser, char *document){
   size_t size = sizeof(char)*(strlen(document)+1);
-  parser->document = (char *)ediParsingMalloc(size);
+  parser->document = ediParsingMalloc(size);
   memcpy(parser->document, document, size);
   parser->nameIndex = NULL;
   parser->primaryIndex = NULL;
