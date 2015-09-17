@@ -71,13 +71,13 @@ void segmentFree(segment_t *segment){
       propertyFree(property);
       property = tmp;
     }
-    free(segment);
+    xfree(segment);
   }
 }
 
 void propertyFree(property_t *property){
-  free(property->value);
-  free(property);
+  xfree(property->value);
+  xfree(property);
 }
 
 segment_t *rewindLoop(segment_t *loop){

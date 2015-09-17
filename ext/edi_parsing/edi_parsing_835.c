@@ -497,7 +497,7 @@ static void parser835Cleanup(parser835_t *parser){
 
 static void parser835Free(parser835_t *parser){
   if(NULL != parser){
-    free(parser);
+    xfree(parser);
   }
 }
 

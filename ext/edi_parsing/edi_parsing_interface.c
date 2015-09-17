@@ -30,7 +30,7 @@ static void segment_free(VALUE self){
       anchor->parser->references--;
       if(0 <= anchor->parser->references) parserFree(anchor->parser);
     }
-    free(anchor);
+    xfree(anchor);
   }
 }
 

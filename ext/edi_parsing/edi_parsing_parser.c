@@ -75,11 +75,11 @@ void parserFree(parser_t *parser){
     for(int i=0; i<parser->segmentCount;i++){
       segmentFree(parser->primaryIndex[i]);
     }
-    free(parser->primaryIndex);
+    xfree(parser->primaryIndex);
   }
-  if(NULL != parser->nameIndex) free(parser->nameIndex);
-  if(NULL != parser->document) free(parser->document);
-  free(parser);
+  if(NULL != parser->nameIndex) xfree(parser->nameIndex);
+  if(NULL != parser->document) xfree(parser->document);
+  xfree(parser);
 }
 
 void parserFail(parser_t *parser, short error){
