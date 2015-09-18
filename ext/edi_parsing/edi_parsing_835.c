@@ -46,17 +46,18 @@ static void parser835Initialization(parser835_t *parser);
 static void parser835Cleanup(parser835_t *parser);
 
 void parse835(anchor_t *anchor, char *ediFile){
-  parser_t *super = anchor->parser;
-  parser835_t *parser = ediParsingMalloc(sizeof(parser835_t));
-  parser->super = super;
+  char *copy = ediParsingMalloc(strlen(ediFile) + 1,sizeof(char));
+  strcpy(copy, ediFile);
+  parser835_t *parser = ediParsingMalloc(1,sizeof(parser835_t));
+  parser->super = anchor->parser;
   parser835Initialization(parser);
   segment_t *segment;
   char *saveptr;
-  super->str = strtok_r(ediFile, SEGMENT_SEPARATOR, &saveptr);
-  while(NULL != super->str && !super->finished && !super->failure){
-    segment = parseSegment(super);
+  parser->super->str = strtok_r(copy, SEGMENT_SEPARATOR, &saveptr);
+  while(NULL != parser->super->str && !parser->super->finished && !parser->super->failure){
+    segment = parseSegment(parser->super);
     attach835Segment(parser, segment);
-    super->str = strtok_r(NULL, SEGMENT_SEPARATOR, &saveptr);
+    parser->super->str = strtok_r(NULL, SEGMENT_SEPARATOR, &saveptr);
   }
   parser835Cleanup(parser);
   anchor->segment = parser->super->root;
@@ -497,7 +498,7 @@ static void parser835Cleanup(parser835_t *parser){
 
 static void parser835Free(parser835_t *parser){
   if(NULL != parser){
-    xfree(parser);
+    ediParsingDealloc(parser);
   }
 }
 

@@ -38,7 +38,6 @@ struct parser_struct
   segment_t **nameIndex;
   segment_t **primaryIndex;
   char *str;
-  char *document;
   char componentSeparator[2];
   int segmentCount;
   int propertyCount;
@@ -146,10 +145,11 @@ bool elementCountIn(segment_t *segment, int start, int end);
 
 // parser
 
-void *ediParsingMalloc(size_t size);
+void *ediParsingMalloc(size_t nitems, size_t size);
+void ediParsingDealloc(void *any);
 segment_t *parseSegment(parser_t *parser);
 int parseElement(segment_t *segment, char *str, const char componentSeparator[2], short seg_cnt);
-void parserInitialization(parser_t *parser, char*document);
+void parserInitialization(parser_t *parser);
 void parserFree(parser_t *parser);
 void parserFail(parser_t *parser, short error);
 

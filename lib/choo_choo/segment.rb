@@ -17,13 +17,13 @@ module ChooChoo
       Oj.dump(to_hash)
     end
 
-    def descendant(name)
-      names = prepare_names([name])
+    def descendant(seg_name)
+      names = prepare_names([seg_name])
       _c_descendants(names, 1).first
     end
 
-    def descendant!(name)
-      names = prepare_names([name])
+    def descendant!(seg_name)
+      names = prepare_names([seg_name])
       assert_one { _c_descendants(names, 2) }.first
     end
 
@@ -37,8 +37,8 @@ module ChooChoo
       _c_children(names, 1).first
     end
 
-    def child!(name)
-      names = prepare_names([name])
+    def child!(seg_name)
+      names = prepare_names([seg_name])
       assert_one { _c_children(names, 2) }.first
     end
 
@@ -72,10 +72,11 @@ module ChooChoo
     end
 
     def get_property(key)
-      unless key.starts_with?(_name_s) && args = ChooChoo.parse_property_key(key)
+      seg_name, element,component = parse_property_key(key.to_s)
+      unless seg_name == _name_s
         raise MethodNotImplemented, "Method #{key} not implemented for #{_name_s} segment."
       end
-      _c_get_property(*args[1..-1])
+      _c_get_property(element, component)
     end
 
     def humanized_errors
@@ -225,15 +226,15 @@ module ChooChoo
     end
 
     def _where(sym, val, limit)
-      name, element, component = parse_property_key(sym.to_s)
-      name = prepare_names([name]).first
-      name ? _c_where(name, element, component, val, limit) : []
+      seg_name, element, component = parse_property_key(sym.to_s)
+      seg_name = prepare_names([seg_name]).first
+      seg_name ? _c_where(seg_name, element, component, val, limit) : []
     end
 
     def _exists?(sym, val)
-      name, element, component = parse_property_key(sym.to_s)
-      name = prepare_names([name]).first
-      name ? _c_exists?(name, element, component, val) : false
+      seg_name, element, component = parse_property_key(sym.to_s)
+      seg_name = prepare_names([seg_name]).first
+      seg_name ? _c_exists?(seg_name, element, component, val) : false
     end
 
     def prepare_names(list)

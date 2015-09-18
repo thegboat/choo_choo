@@ -30,14 +30,13 @@ void addProperty(segment_t *segment, property_t *property){
 }
 
 void buildProperty(segment_t *segment, char *data, short seg_cnt, short elem_cnt){
-  property_t *property = ediParsingMalloc(sizeof(property_t));
+  property_t *property = ediParsingMalloc(1,sizeof(property_t));
   property->owner = segment;
   property->element = seg_cnt;
   property->component = elem_cnt;
   long len = (strcmp(data, CHOOCHOO_EMPTY) == 0) ? 0 : strlen(data);
-  property->value = ediParsingMalloc(sizeof(char)*(len+1));
-  memcpy(property->value, data, sizeof(char)*len);
-  property->value[len] = '\0';
+  property->value = ediParsingMalloc(len+1,sizeof(char));
+  strcpy(property->value, data);
   addProperty(segment, property);
 }
 
@@ -73,13 +72,13 @@ void segmentFree(segment_t *segment){
       propertyFree(property);
       property = tmp;
     }
-    xfree(segment);
+    ediParsingDealloc(segment);
   }
 }
 
 void propertyFree(property_t *property){
-  if(NULL != property->value)xfree(property->value);
-  xfree(property);
+  ediParsingDealloc(property->value);
+  ediParsingDealloc(property);
 }
 
 segment_t *rewindLoop(segment_t *loop){

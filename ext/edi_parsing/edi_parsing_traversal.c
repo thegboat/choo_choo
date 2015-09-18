@@ -280,8 +280,8 @@ static void indexSegment(parser_t *parser, segment_t *segment, int *segmentCount
 }
 
 static void allocIndexes(parser_t *parser){
-  parser->nameIndex = ediParsingMalloc(sizeof(segment_t*) * parser->segmentCount);
-  parser->primaryIndex = ediParsingMalloc(sizeof(segment_t*) * parser->segmentCount);
+  parser->nameIndex = ediParsingMalloc(parser->segmentCount,sizeof(segment_t*));
+  parser->primaryIndex = ediParsingMalloc(parser->segmentCount,sizeof(segment_t*));
 }
 
 bool missingSegment(parser_t *parser, char *src){

@@ -29,12 +29,12 @@ static void segment_free(anchor_t *anchor){
       anchor->parser->references--;
       if(0 <= anchor->parser->references) parserFree(anchor->parser);
     }
-    xfree(anchor);
+    ediParsingDealloc(anchor);
   }
 }
 
 static VALUE segment_alloc(VALUE self){
-  anchor_t *anchor = ediParsingMalloc(sizeof(anchor_t));
+  anchor_t *anchor = ediParsingMalloc(1,sizeof(anchor_t));
   return Data_Wrap_Struct(self, NULL, segment_free, anchor);
 }
 
@@ -43,9 +43,9 @@ static VALUE choo_choo_parse_835(VALUE self, VALUE isa_str){
   VALUE cSegment = rb_define_class_under(mChooChoo, "Segment", rb_cObject);  
   VALUE class_rb = rb_define_class_under(mChooChoo, "ISA", cSegment);
   char *c_isa_str = StringValueCStr(isa_str);
-  parser_t *parser = ediParsingMalloc(sizeof(parser_t));
+  parser_t *parser = ediParsingMalloc(1,sizeof(parser_t));
   anchor_t *anchor;
-  parserInitialization(parser, c_isa_str);
+  parserInitialization(parser);
   strcpy(parser->documentType, "835");
   VALUE isa = rb_class_new_instance(0, NULL, class_rb);
   Data_Get_Struct(isa, anchor_t, anchor);

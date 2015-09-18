@@ -7,17 +7,20 @@
 //
 #include "edi_parsing.h"
 
-void *ediParsingMalloc(size_t size){
-  void *any;
-  any = calloc(1,size);
+void *ediParsingMalloc(size_t nitems, size_t size){
+  void *any = calloc(nitems, size);
   if(any == NULL){
     rb_raise(rb_eRuntimeError, "Memory could not be allocated");
   }
   return any;
 }
 
+void ediParsingDealloc(void *any){
+  if(NULL != any) ediParsingDealloc(any);
+}
+
 segment_t *parseSegment(parser_t *parser){
-  segment_t *segment = ediParsingMalloc(sizeof(segment_t));
+  segment_t *segment = ediParsingMalloc(1,sizeof(segment_t));
   char *tok;
   char *saveptr;
   short cnt = 0;
@@ -54,10 +57,7 @@ int parseElement(segment_t *segment, char *str, const char componentSeparator[2]
   return cnt;
 }
 
-void parserInitialization(parser_t *parser, char *document){
-  size_t size = sizeof(char)*(strlen(document)+1);
-  parser->document = ediParsingMalloc(size);
-  memcpy(parser->document, document, size);
+void parserInitialization(parser_t *parser){
   parser->nameIndex = NULL;
   parser->primaryIndex = NULL;
   parser->failure = false;
@@ -75,11 +75,10 @@ void parserFree(parser_t *parser){
     for(int i=0; i<parser->segmentCount;i++){
       segmentFree(parser->primaryIndex[i]);
     }
-    xfree(parser->primaryIndex);
+    ediParsingDealloc(parser->primaryIndex);
   }
-  if(NULL != parser->nameIndex) xfree(parser->nameIndex);
-  if(NULL != parser->document) xfree(parser->document);
-  xfree(parser);
+  ediParsingDealloc(parser->nameIndex);
+  ediParsingDealloc(parser);
 }
 
 void parserFail(parser_t *parser, short error){
