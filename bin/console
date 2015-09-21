@@ -11,5 +11,6 @@ require "bundler/setup"
 
 require "irb"
 require_relative "../spec/spec_helper"
+require 'benchmark/ips'
 
 IRB.start
