@@ -22,12 +22,17 @@ static VALUE segment_has_errors(VALUE self);
 static VALUE segment_errors(VALUE self);
 static VALUE segment_document_type(VALUE self);
 static VALUE segment_exists(VALUE self, VALUE name_rb, VALUE element_int_rb, VALUE component_int_rb, VALUE value_rb);
+static anchor_t *parserSetup(const char documentType[10]);
+
+static VALUE mChooChoo;
+static VALUE cSegment;
+static VALUE cParser;
+static VALUE cDocument;
 
 static void segment_free(anchor_t *anchor){
   if(NULL != anchor){
-    if(NULL != anchor->parser){
-      anchor->parser->references--;
-      if(0 <= anchor->parser->references) parserFree(anchor->parser);
+    if(NULL != anchor->parser && anchor->parser->root == anchor->segment){
+      parserFree(anchor->parser);
     }
     ediParsingDealloc(anchor);
   }
@@ -39,19 +44,23 @@ static VALUE segment_alloc(VALUE self){
 }
 
 static VALUE choo_choo_parse_835(VALUE self, VALUE isa_str){
-  VALUE mChooChoo = rb_define_module("ChooChoo");
-  VALUE cSegment = rb_define_class_under(mChooChoo, "Segment", rb_cObject);  
-  VALUE class_rb = rb_define_class_under(mChooChoo, "ISA", cSegment);
   char *c_isa_str = StringValueCStr(isa_str);
+  anchor_t *anchor = parserSetup("835");
+  parse835(anchor, c_isa_str);
+  return anchor->parser->root_rb;
+}
+
+static anchor_t *parserSetup(const char documentType[10]){
+  VALUE class_rb = rb_define_class_under(mChooChoo, "ISA", cSegment);
   parser_t *parser = ediParsingMalloc(1,sizeof(parser_t));
   anchor_t *anchor;
   parserInitialization(parser);
-  strcpy(parser->documentType, "835");
+  strcpy(parser->documentType, documentType);
   VALUE isa = rb_class_new_instance(0, NULL, class_rb);
   Data_Get_Struct(isa, anchor_t, anchor);
   anchor->parser = parser;
-  parse835(anchor, c_isa_str);
-  return isa;
+  anchor->parser->root_rb = isa;
+  return anchor;
 }
 
 static VALUE segment_to_hash(VALUE self){  
@@ -121,18 +130,8 @@ static VALUE segment_name(VALUE self){
 }
 
 static VALUE segment_get_property(VALUE self, VALUE element_int_rb, VALUE component_int_rb){
-  short element = NUM2SHORT(element_int_rb);
-  short component = NUM2SHORT(component_int_rb);
   anchor_t *anchor = getAnchor(self);
-  property_t *property = anchor->segment->firstProperty;
-  short cnt = 0;
-  while(NULL != property && cnt < 10000){
-    if(element == property->element && component == property->component) return rb_str_new_cstr(property->value);
-    property = property->tail;
-    cnt++;
-  }
-
-  return Qnil;
+  return segmentGetProperty(anchor->segment, element_int_rb, component_int_rb);
 }
 
 static VALUE segment_errors(VALUE self){
@@ -157,8 +156,6 @@ static VALUE segment_where(VALUE self, VALUE name_rb, VALUE element_int_rb, VALU
 
 static VALUE segment_document_type(VALUE self){
   anchor_t *anchor = getAnchor(self);
-  VALUE mChooChoo = rb_define_module("ChooChoo");
-  VALUE cDocument = rb_define_class_under(mChooChoo, "Document", rb_cObject);
   VALUE mEDI;
   VALUE doc;
   if(strcmp(anchor->parser->documentType, "835") == 0){
@@ -171,17 +168,20 @@ static VALUE segment_document_type(VALUE self){
 }
 
 VALUE buildSegmentNode(parser_t *parser, segment_t *segment){
-  anchor_t *anchor;
-  VALUE mChooChoo = rb_define_module("ChooChoo");
-  VALUE cSegment = rb_define_class_under(mChooChoo, "Segment", rb_cObject);
+  VALUE segment_rb;
+  if(segment == parser->root){
+    segment_rb = parser->root_rb;
+  }else{
+    anchor_t *anchor;
 
-  VALUE class_rb = rb_define_class_under(mChooChoo, segment->name, cSegment);
-  VALUE segment_rb = rb_class_new_instance(0, NULL, class_rb);
+    VALUE class_rb = rb_define_class_under(mChooChoo, segment->name, cSegment);
+    segment_rb = rb_class_new_instance(0, NULL, class_rb);
 
-  Data_Get_Struct(segment_rb, anchor_t, anchor);
-  parser->references++;
-  anchor->parser = parser;
-  anchor->segment = segment;
+    Data_Get_Struct(segment_rb, anchor_t, anchor);
+    rb_gc_mark(parser->root_rb);
+    anchor->parser = parser;
+    anchor->segment = segment;
+  }
   return segment_rb;
 }
 
@@ -190,9 +190,10 @@ VALUE choo_choo_empty(self){
 }
 
 void Init_edi_parsing(void) {
-  VALUE mChooChoo = rb_define_module("ChooChoo");
-  VALUE cSegment = rb_define_class_under(mChooChoo, "Segment", rb_cObject);
-  VALUE cParser = rb_define_class_under(mChooChoo, "Parser", rb_cObject);
+  mChooChoo = rb_define_module("ChooChoo");
+  cSegment = rb_define_class_under(mChooChoo, "Segment", rb_cObject);
+  cParser = rb_define_class_under(mChooChoo, "Parser", rb_cObject);
+  cDocument = rb_define_class_under(mChooChoo, "Document", rb_cObject);
 
   rb_define_method(cParser, "_c_parse_835", choo_choo_parse_835, 1);
   rb_define_method(cParser, "empty", choo_choo_empty, 0);

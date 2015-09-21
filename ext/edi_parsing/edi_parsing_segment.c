@@ -16,36 +16,18 @@ void segmentInitializer(segment_t *segment, char *src){
   segment->elements = 0;
   segment->depth = 0;
   segment->children = 0;
+  segment->propertyCache = st_init_numtable();
 }
 
-void addProperty(segment_t *segment, property_t *property){
-  if(NULL == segment->firstProperty){
-    segment->firstProperty = property;
-    segment->lastProperty = property;
+void cacheProperty(segment_t *segment, char *data, short element, short component){
+  unsigned long key = getPropertyKey(element, component);
+  if(strcmp(data, CHOOCHOO_EMPTY) == 0){
+    st_add_direct(segment->propertyCache, (st_data_t)key, (unsigned long)(""));
   }else{
-    segment->lastProperty->tail = property;
-    property->head = segment->lastProperty;
-    segment->lastProperty = property;
-  }
-}
-
-void buildProperty(segment_t *segment, char *data, short seg_cnt, short elem_cnt){
-  property_t *property = ediParsingMalloc(1,sizeof(property_t));
-  property->owner = segment;
-  property->element = seg_cnt;
-  property->component = elem_cnt;
-  long len = (strcmp(data, CHOOCHOO_EMPTY) == 0) ? 0 : strlen(data);
-  property->value = ediParsingMalloc(len+1,sizeof(char));
-  strcpy(property->value, data);
-  addProperty(segment, property);
-}
-
-
-void buildKey(char *key, char *seg_name, short seg_cnt, short elem_cnt){
-  if(0 == elem_cnt){
-    sprintf(key, "%s%02i", seg_name, seg_cnt);
-  }else{
-    sprintf(key, "%s%02i_%02i", seg_name, seg_cnt, elem_cnt);
+    long len = strlen(data);
+    char *allocated = ediParsingMalloc(len+1,sizeof(char));
+    strcpy(allocated, data);
+    st_add_direct(segment->propertyCache, (st_data_t)key, (unsigned long)allocated);
   }
 }
 
@@ -63,22 +45,12 @@ void addChildSegment(segment_t *parent, segment_t *child){
 }
 
 void segmentFree(segment_t *segment){
-  if(NULL != segment){
-    property_t *property;
-    property_t *tmp;
-    property = segment->firstProperty;
-    while(NULL != property){
-      tmp = property->tail;
-      propertyFree(property);
-      property = tmp;
+  if(NULL != segment){    if(segment->propertyCache){
+      st_free_table(segment->propertyCache);
+      segment->propertyCache = NULL;
     }
     ediParsingDealloc(segment);
   }
-}
-
-void propertyFree(property_t *property){
-  ediParsingDealloc(property->value);
-  ediParsingDealloc(property);
 }
 
 segment_t *rewindLoop(segment_t *loop){

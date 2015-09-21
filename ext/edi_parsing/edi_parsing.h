@@ -12,6 +12,7 @@
 #include <string.h>
 #include <search.h>
 #include <ruby.h>
+#include <ruby/st.h>
 #include "edi_parsing_constants.h"
 
 // data types
@@ -34,6 +35,7 @@ struct parser_struct
   short errors[MAX_ERROR_SIZE];
   short errorCount;
   char documentType[10];
+  VALUE root_rb;
   segment_t *root;
   segment_t **nameIndex;
   segment_t **primaryIndex;
@@ -41,7 +43,6 @@ struct parser_struct
   char componentSeparator[2];
   int segmentCount;
   int propertyCount;
-  int references;
   bool failure;
   bool finished;
 };
@@ -82,6 +83,7 @@ struct segment_struct
   int depth;
   int pkey;
   int boundary;
+  st_table* propertyCache;
 };
 
 struct property_struct
@@ -133,15 +135,13 @@ bool isPE(segment_t *segment);
 // segment
 
 void segmentInitializer(segment_t *segment, char *src);
-void addProperty(segment_t *segment, property_t *property);
-void buildProperty(segment_t *segment, char *data, short seg_cnt, short elem_cnt);
-void buildKey(char *key, char *seg_name, short seg_cnt, short elem_cnt);
 void addChildSegment(segment_t *parent, segment_t *child);
 void loopFree(segment_t *loop);
 void segmentFree(segment_t *segment);
 void propertyFree(property_t *property);
 segment_t *rewindLoop(segment_t *loop);
 bool elementCountIn(segment_t *segment, int start, int end);
+void cacheProperty(segment_t *segment, char *data, short element, short component);
 
 // parser
 
@@ -166,6 +166,8 @@ int segmentsWithName(parser_t *parser, char *src);
 bool multipleWithName(parser_t *parser, char *src);
 VALUE segmentExists(parser_t *parser, segment_t *segment, VALUE name_rb, VALUE element_int_rb, VALUE component_int_rb, VALUE value_rb);
 VALUE segmentWhere(parser_t *parser, segment_t *segment, VALUE name_rb, VALUE element_int_rb, VALUE component_int_rb, VALUE value_rb, VALUE limit_rb);
+VALUE segmentGetProperty(segment_t *segment, VALUE element_int_rb, VALUE component_int_rb);
+unsigned long getPropertyKey(short element, short component);
 
 // 835
 

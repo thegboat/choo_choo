@@ -46,8 +46,7 @@ static void parser835Initialization(parser835_t *parser);
 static void parser835Cleanup(parser835_t *parser);
 
 void parse835(anchor_t *anchor, char *ediFile){
-  char *copy = ediParsingMalloc(strlen(ediFile) + 1,sizeof(char));
-  strcpy(copy, ediFile);
+  char *copy = strdup(ediFile);
   parser835_t *parser = ediParsingMalloc(1,sizeof(parser835_t));
   parser->super = anchor->parser;
   parser835Initialization(parser);
@@ -139,17 +138,19 @@ static void default835Handler(parser835_t *parser, segment_t *segment){
 }
 
 static void isa835Handler(parser835_t *parser, segment_t *segment){
+  unsigned long value;
   if(NULL != parser->loop || parser->loop != parser->interchange){
     parserFail(parser->super, INVALID_ISA_SEGMENT);
   }else if(!elementCountIn(segment, 16,16)){
     parserFail(parser->super, WRONG_NUMBER_OF_ELEMENTS_FOR_ISA_SEGMENT);
-  }else if(strlen(segment->lastProperty->value) != 1){
-    parserFail(parser->super, INVALID_COMPONENT_SEPARATOR);
   }else{
-    parser->interchange = segment;
-    parser->loop = segment;
-    parser->super->componentSeparator[0] = parser->interchange->lastProperty->value[0];
-    parser->super->componentSeparator[1] = '\0';
+    if(!st_lookup(segment->propertyCache, getPropertyKey(16,0), &value) || strlen((char *)value) != 1){
+      parserFail(parser->super, INVALID_COMPONENT_SEPARATOR);
+    }else{
+      parser->interchange = segment;
+      parser->loop = segment;
+      strcpy(parser->super->componentSeparator, (char *)value);
+    }
   }
 }
 

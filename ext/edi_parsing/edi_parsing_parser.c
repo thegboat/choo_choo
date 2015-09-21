@@ -8,7 +8,7 @@
 #include "edi_parsing.h"
 
 void *ediParsingMalloc(size_t nitems, size_t size){
-  void *any = calloc(nitems, size);
+  void *any = ruby_xcalloc(nitems, size);
   if(any == NULL){
     rb_raise(rb_eRuntimeError, "Memory could not be allocated");
   }
@@ -16,7 +16,10 @@ void *ediParsingMalloc(size_t nitems, size_t size){
 }
 
 void ediParsingDealloc(void *any){
-  if(NULL != any) ediParsingDealloc(any);
+  if(any) {
+    xfree(any);
+    any = NULL;
+  }
 }
 
 segment_t *parseSegment(parser_t *parser){
@@ -33,7 +36,8 @@ segment_t *parseSegment(parser_t *parser){
     if(strlen(parser->componentSeparator) == 1 && NULL != strstr(tok, parser->componentSeparator)){
       parser->propertyCount += parseElement(segment, tok, parser->componentSeparator, cnt);
     }else{
-      buildProperty(segment, tok, cnt, 0);
+      cacheProperty(segment, tok, cnt, 0);
+      //buildProperty(segment, tok, cnt, 0);
       parser->propertyCount++;
     }
     tok = strtok_r(NULL, ELEMENT_SEPARATOR, &saveptr);
@@ -51,7 +55,8 @@ int parseElement(segment_t *segment, char *str, const char componentSeparator[2]
   while (tok != NULL)
   {
     cnt++;
-    buildProperty(segment, tok, seg_cnt, cnt);
+    //buildProperty(segment, tok, seg_cnt, cnt);
+    cacheProperty(segment, tok, cnt, cnt);
     tok = strtok_r(NULL, componentSeparator, &saveptr);
   }
   return cnt;
@@ -65,7 +70,6 @@ void parserInitialization(parser_t *parser){
   parser->errorCount = 0;
   parser->segmentCount = 0;
   parser->propertyCount = 0;
-  parser->references = 1;
   parser->componentSeparator[0] = '\0';
   memset(&parser->errors, 0, sizeof(short)*10);
 }

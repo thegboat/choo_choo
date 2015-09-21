@@ -203,6 +203,22 @@ VALUE segmentFind(parser_t *parser, segment_t *segment, VALUE names_rb, VALUE li
   return result;
 }
 
+VALUE segmentGetProperty(segment_t *segment, VALUE element_int_rb, VALUE component_int_rb){
+  short element = NUM2SHORT(element_int_rb);
+  short component = NUM2SHORT(component_int_rb);
+  unsigned long key = element*100+component;
+  unsigned long value; 
+  if(st_lookup(segment->propertyCache, key, &value)){
+    return rb_str_new_cstr((char*)value);
+  }else{
+    return Qnil;
+  }
+}
+
+unsigned long getPropertyKey(short element, short component){
+  return element*100+component;
+}
+
 index_stat_t nameIndexSearch(parser_t *parser, const char *name){
   index_stat_t stat = {-1,-1};
   int first = 0;
@@ -271,6 +287,13 @@ static void indexSegment(parser_t *parser, segment_t *segment, int *segmentCount
   parser->nameIndex[*segmentCount] = segment;
   parser->primaryIndex[*segmentCount] = segment;
   *segmentCount = *segmentCount + 1;
+  long key;
+
+  // while(NULL != property){
+  //   key = property->element*100+property->component;
+  //   st_add_direct(segment->propertyCache, key, (unsigned long)(property));
+  //   property = property->tail;
+  // }
 
   while(NULL != child){
     indexSegment(parser, child, segmentCount, depth+1);
@@ -307,16 +330,22 @@ static bool isDescendantOf(segment_t *descendant, segment_t *parent){
 }
 
 static bool hasProperty(segment_t *segment,  short element, short component, char *value){
-  property_t *property = segment->firstProperty;
-  if(element <= segment->elements){
-    while(NULL != property){
-      if(element == property->element && component == property->component && strcmp(property->value, value) == 0){
-        return true;
-      }
-      property = property->tail;
-    }
+  // property_t *property = segment->firstProperty;
+  // if(element <= segment->elements){
+  //   while(NULL != property){
+  //     if(element == property->element && component == property->component && strcmp(property->value, value) == 0){
+  //       return true;
+  //     }
+  //     property = property->tail;
+  //   }
+  // }
+  unsigned long hash_value;
+  unsigned long key = getPropertyKey(element, component);
+  if(st_lookup(segment->propertyCache, key, &hash_value)){
+    return strcmp(value, (char*)hash_value) == 0;
+  }else{
+    return false;
   }
-  return false;
 }
 
 
