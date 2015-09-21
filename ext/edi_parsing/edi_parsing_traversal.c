@@ -18,41 +18,37 @@ static bool hasProperty(segment_t *segment,  short element, short component, cha
 
 void buildIndexes(parser_t *parser){
   int segmentCount = 0;
-  int propertyCount = 0;
   allocIndexes(parser);
   indexSegment(parser, parser->root, &segmentCount, 0);
   qsort(parser->nameIndex, parser->segmentCount, sizeof(segment_t*), nameIndexFunc);
 }
 
-VALUE propertiesToHash(property_t *property){
+VALUE propertiesToHash(segment_t *segment){
   VALUE hash = rb_hash_new();
-  while(NULL != property){
-    VALUE key = ID2SYM(rb_intern(property->key));
-    rb_hash_aset(hash, key, rb_str_new_cstr(property->value));
-    property = property->tail;
+  unsigned long key;
+  unsigned long value;
+  char key_string[MAX_KEY_SIZE];
+  short element = 0;
+  short component = 0;
+  VALUE sym;
+  for(element=1;element<=segment->elements; element++){
+    for(component=0; component<100; component++){
+      key = getPropertyKey(element,component);
+      if(st_lookup(segment->propertyCache, key, &value)){
+        if(0 == component){
+          sprintf(key_string, "%s%02i", segment->name, element);
+        }else{
+          sprintf(key_string, "%s%02i_%02i", segment->name, element, component);
+        }
+        sym = ID2SYM(rb_intern(key_string));
+        rb_hash_aset(hash, sym, rb_str_new_cstr((char*)(value)));
+      }else{
+        break;
+      }
+    }
   }
   return hash;
 }
-
-// VALUE segmentChildWhere(parser_t *parser, segment_t *segment, VALUE name_rb, VALUE key_rb, VALUE value_rb, VALUE limit_rb){
-//   VALUE result = rb_ary_new();
-//   char *name = StringValueCStr(name_rb);
-//   char *key = StringValueCStr(key_rb);
-//   char *value = StringValueCStr(value_rb);
-//   const int limit = NUM2INT(limit_rb);
-//   segment_t *descendant = segment->firstSegment;
-//   int cnt = 0;
-
-//   while(NULL != descendant && (limit == -1 || cnt < limit)){
-//     if(strcmp(descendant->name, name) == 0 && hasProperty(descendant, key, value)){
-//       VALUE child_rb = buildSegmentNode(parser, descendant);
-//       rb_ary_push(result, child_rb);
-//       cnt++;
-//     }
-//     descendant = descendant->tail;
-//   }
-//   return result;
-// }
 
 VALUE segmentWhere(parser_t *parser, segment_t *segment, VALUE name_rb, VALUE element_int_rb, VALUE component_int_rb, VALUE value_rb, VALUE limit_rb){
   VALUE result = rb_ary_new();
@@ -146,7 +142,7 @@ VALUE segmentChildren(parser_t *parser, segment_t *segment, VALUE names_rb, VALU
 
 VALUE segmentToHash(segment_t *segment){
   segment_t *child = segment->firstSegment;
-  VALUE proxy = propertiesToHash(segment->firstProperty);
+  VALUE proxy = propertiesToHash(segment);
   VALUE children = rb_ary_new();
 
   if(NULL != child){

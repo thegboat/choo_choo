@@ -7,6 +7,8 @@
 //
 #include "edi_parsing.h"
 
+static void propertyFree(segment_t* segment);
+
 void segmentInitializer(segment_t *segment, char *src){
   long idx = strlen(src);
   idx = idx > MAX_NAME_SIZE ? MAX_NAME_SIZE : idx;
@@ -24,10 +26,7 @@ void cacheProperty(segment_t *segment, char *data, short element, short componen
   if(strcmp(data, CHOOCHOO_EMPTY) == 0){
     st_add_direct(segment->propertyCache, (st_data_t)key, (unsigned long)(""));
   }else{
-    long len = strlen(data);
-    char *allocated = ediParsingMalloc(len+1,sizeof(char));
-    strcpy(allocated, data);
-    st_add_direct(segment->propertyCache, (st_data_t)key, (unsigned long)allocated);
+    st_add_direct(segment->propertyCache, (st_data_t)key, (unsigned long)strdup(data));
   }
 }
 
@@ -45,9 +44,9 @@ void addChildSegment(segment_t *parent, segment_t *child){
 }
 
 void segmentFree(segment_t *segment){
-  if(NULL != segment){    if(segment->propertyCache){
-      st_free_table(segment->propertyCache);
-      segment->propertyCache = NULL;
+  if(NULL != segment){    
+    if(segment->propertyCache){
+      propertyFree(segment);
     }
     ediParsingDealloc(segment);
   }
@@ -65,4 +64,23 @@ segment_t *rewindLoop(segment_t *loop){
 
 bool elementCountIn(segment_t *segment, int start, int end){
   return segment->elements >= start && segment->elements <= end;
+}
+
+static void propertyFree(segment_t* segment){
+  unsigned long key;
+  unsigned long value;
+  char *tmp;
+  for(short element=1;element<=segment->elements; element++){
+    for(short component=0; component<100; component++){
+      key = getPropertyKey(element,component);
+      if(st_lookup(segment->propertyCache, key, &value)){
+        tmp = (char*)(value);
+        if(strlen(tmp)) ediParsingDealloc(tmp);
+      }else{
+        break;
+      }
+    }
+  }
+  st_free_table(segment->propertyCache);
+  segment->propertyCache = NULL;
 }

@@ -34,11 +34,9 @@ segment_t *parseSegment(parser_t *parser){
   {
     cnt++;
     if(strlen(parser->componentSeparator) == 1 && NULL != strstr(tok, parser->componentSeparator)){
-      parser->propertyCount += parseElement(segment, tok, parser->componentSeparator, cnt);
+      parseElement(segment, tok, parser->componentSeparator, cnt);
     }else{
       cacheProperty(segment, tok, cnt, 0);
-      //buildProperty(segment, tok, cnt, 0);
-      parser->propertyCount++;
     }
     tok = strtok_r(NULL, ELEMENT_SEPARATOR, &saveptr);
   }
@@ -55,7 +53,6 @@ int parseElement(segment_t *segment, char *str, const char componentSeparator[2]
   while (tok != NULL)
   {
     cnt++;
-    //buildProperty(segment, tok, seg_cnt, cnt);
     cacheProperty(segment, tok, cnt, cnt);
     tok = strtok_r(NULL, componentSeparator, &saveptr);
   }
@@ -69,7 +66,6 @@ void parserInitialization(parser_t *parser){
   parser->finished = false;
   parser->errorCount = 0;
   parser->segmentCount = 0;
-  parser->propertyCount = 0;
   parser->componentSeparator[0] = '\0';
   memset(&parser->errors, 0, sizeof(short)*10);
 }

@@ -1,3 +1,4 @@
+require 'set'
 require 'choo_choo/edi_835/document'
 require 'choo_choo/segments/amt'
 require 'choo_choo/segments/bpr'
