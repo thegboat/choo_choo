@@ -24,24 +24,24 @@ module ChooChoo
 
   def self.to_hash
     edi = EDI835::Parser.parse(ChooChoo.test_string)
-    isa = edi.isa_segments.first
+    isa = edi.isa_segment
     isa.to_hash
   end
 
   def self.isa
     edi = EDI835::Parser.parse(ChooChoo.test_string)
-    edi.isa_segments.first
+    edi.isa_segment
   end
 
   def self.children(*names)
     edi = EDI835::Parser.parse(ChooChoo.test_string)
-    isa = edi.isa_segments.first
+    isa = edi.isa_segment
     isa.children(*names)
   end
 
   def self.descendants(*names)
     edi = EDI835::Parser.parse(ChooChoo.test_string)
-    isa = edi.isa_segments.first
+    isa = edi.isa_segment
     isa.descendants(*names)
   end
 end
@@ -58,6 +58,6 @@ def edit_835_line(message, line, string)
   array = message.split('~')
   array[line -1] = string
   edi = EDI835::Parser.parse(array.join('~'))
-  edi.isa_segments.first
+  edi.isa_segment
 end
 

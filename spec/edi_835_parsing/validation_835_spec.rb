@@ -7,7 +7,7 @@ describe 'edi 835 validation' do
 
   it 'should have no errors' do
     edi = EDI835::Parser.parse(test_message)
-    isa = edi.isa_segments.first
+    isa = edi.isa_segment
     puts isa.errors.inspect
     expect(isa.errors.empty?).to eq(true)
   end

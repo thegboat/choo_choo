@@ -18,20 +18,29 @@ module ChooChoo
     end
 
     def split
-      str_buffer = ''
-      obj_buffer = []
-      until stream.eof?
-        str_buffer << stream.gets("~IEA")
-        trailer = stream.gets("ISA").to_s
-        str_buffer << (trailer =~ /ISA\*$/ ? trailer[0..-5] : trailer)
-        str_buffer.delete!("\000")
-        str_buffer.gsub!(/~\s+/,'~')
-        str_buffer.gsub!("**", "*#{empty}*")
-        isa = yield(str_buffer)
-        obj_buffer << isa
-        str_buffer = trailer[-4..-1]
-      end
-      obj_buffer
+      str_buffer = stream.read
+      str_buffer.delete!("\000")
+      str_buffer.gsub!(/~\s+/,'~')
+      str_buffer.gsub!("**", "*#{empty}*")
+      isa = yield(str_buffer)
+      isa
     end
+
+    # def split
+    #   str_buffer = ''
+    #   obj_buffer = []
+    #   until stream.eof?
+    #     str_buffer << stream.gets("~IEA")
+    #     trailer = stream.gets("ISA").to_s
+    #     str_buffer << (trailer =~ /ISA\*$/ ? trailer[0..-5] : trailer)
+    #     str_buffer.delete!("\000")
+    #     str_buffer.gsub!(/~\s+/,'~')
+    #     str_buffer.gsub!("**", "*#{empty}*")
+    #     isa = yield(str_buffer)
+    #     obj_buffer << isa
+    #     str_buffer = trailer[-4..-1]
+    #   end
+    #   obj_buffer
+    # end
   end
 end

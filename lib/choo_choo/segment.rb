@@ -59,6 +59,10 @@ module ChooChoo
       _where(sym, val, 1).first
     end
 
+    def first_or_null(sym,val)
+      _where(sym, val, 1).first || ChooChoo::NullSegment.new
+    end
+
     def first!(sym,val)
       assert_one { _where(sym, val, 2) }.first
     end
@@ -148,7 +152,7 @@ module ChooChoo
     private
 
     def parse_property_key(string)
-      string =~ ChooChoo.property_regex
+      string =~ ChooChoo::PROPERTY_REGEX
       $1.nil? ? nil : [$1, $2.to_i, $4.to_i]
     end
 
@@ -162,10 +166,8 @@ module ChooChoo
 
     def cast(assign_type, key, options)
       val = extract(key)
-      options[:default] ||= nil
-      options[:blank] ||= nil
-      return options[:default] if val.to_s.empty?
-      return options[:blank] if val =~ /^\s+$/
+      return options[:default] if options.key?(:default) && val.to_s.empty?
+      return options[:blank] if options.key?(:blank) && val =~ /^\s+$/
       casted = case assign_type
       when :boolean then _boolean(val, options)
       when :integer then _integer(val, options)
@@ -183,7 +185,7 @@ module ChooChoo
       if respond_to?(key)
         send(key)
       else
-        key =~ ChooChoo.segment_regex
+        key =~ ChooChoo::SEGMENT_REGEX
         child!($1).get_property(key)
       end
     end
@@ -197,7 +199,9 @@ module ChooChoo
     end
 
     def _string(val, options)
+      return ChooChoo::NULL if val.nil?
       val = val.to_s
+      return val if val.empty?
       options.key?(:length) && val.length > options[:length].to_i ? val.to(options[:length].to_i - 1) : val
     end
 
@@ -210,7 +214,9 @@ module ChooChoo
     end
 
     def _decimal(val, options)
-      val = BigDecimal.new(val.to_s)
+      val_s = val.to_s
+      return ChooChoo::DECIMAL_ZERO if val_s.empty?
+      val = BigDecimal.new(val_s)
       truncation = options[:truncation] || :floor
       precision = options.key?(:precision) ? options[:precision].to_i : nil
 
@@ -244,7 +250,6 @@ module ChooChoo
         item.upcase!
         item
       end
-      list.select! {|item| valid_segments.include?(item.to_sym) }
       list
     end
 

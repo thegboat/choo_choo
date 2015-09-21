@@ -6,7 +6,7 @@ describe 'edi 835 traversal' do
   }
 
   let(:edi) { EDI835::Parser.parse(test_message)}
-  let(:isa) { edi.isa_segments.first }
+  let(:isa) { edi.isa_segment }
 
   it "ISA segment has no parent" do
     expect(isa.parent).to be_nil

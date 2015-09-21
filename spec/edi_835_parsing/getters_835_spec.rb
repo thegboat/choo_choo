@@ -6,7 +6,7 @@ describe 'edi 835 getters' do
   }
 
   let(:edi) { EDI835::Parser.parse(test_message)}
-  let(:isa) { edi.isa_segments.first }
+  let(:isa) { edi.isa_segment }
   let(:clp) { isa.first!(:CLP01, '095950951285') }
   let(:nm1) { clp.first!(:NM101, 'QC')}
   let(:dtm) { clp.first!(:DTM01, '050')}

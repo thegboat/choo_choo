@@ -1,8 +1,8 @@
 module ChooChoo
   class Document
 
-    def initialize(isas)
-      @isa_segments = isas
+    def initialize(isa)
+      @isa_segment = isa
     end
 
     def self.name
@@ -14,23 +14,14 @@ module ChooChoo
     end
 
     def has_errors?
-      isa_segments.any? {|isa| isa.errors? }
+      isa_segment.errors?
     end
 
-    def isa_segments_with_errors
-      isa_segments.select {|isa| isa.errors? }
+    def isa_segment
+      @isa_segment
     end
-
-    def isa_segments_without_errors
-      isa_segments.reject {|isa| isa.errors? }
-    end
-
-    def isa_segments
-      @isa_segments
-    end
-
-    def isa_segment_count
-      isa_segments.length
-    end
+    alias :interchange_loop :isa_segment 
+    alias :interchange :isa_segment 
+    alias :root :isa_segment 
   end
 end
