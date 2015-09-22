@@ -285,12 +285,6 @@ static void indexSegment(parser_t *parser, segment_t *segment, int *segmentCount
   *segmentCount = *segmentCount + 1;
   long key;
 
-  // while(NULL != property){
-  //   key = property->element*100+property->component;
-  //   st_add_direct(segment->propertyCache, key, (unsigned long)(property));
-  //   property = property->tail;
-  // }
-
   while(NULL != child){
     indexSegment(parser, child, segmentCount, depth+1);
     child = child->tail;
@@ -326,15 +320,6 @@ static bool isDescendantOf(segment_t *descendant, segment_t *parent){
 }
 
 static bool hasProperty(segment_t *segment,  short element, short component, char *value){
-  // property_t *property = segment->firstProperty;
-  // if(element <= segment->elements){
-  //   while(NULL != property){
-  //     if(element == property->element && component == property->component && strcmp(property->value, value) == 0){
-  //       return true;
-  //     }
-  //     property = property->tail;
-  //   }
-  // }
   unsigned long hash_value;
   unsigned long key = getPropertyKey(element, component);
   if(st_lookup(segment->propertyCache, key, &hash_value)){
@@ -343,11 +328,3 @@ static bool hasProperty(segment_t *segment,  short element, short component, cha
     return false;
   }
 }
-
-
-
-
-
-
-
-
