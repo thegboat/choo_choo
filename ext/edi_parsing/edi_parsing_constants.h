@@ -72,6 +72,7 @@
 #define ELEMENT_SEPARATOR       "*"
 #define SEGMENT_SEPARATOR       "~"
 #define CHOOCHOO_EMPTY          "ch@@ch@@"
+#define MAX_SEGMENT_NAMES 24336
 
 #define MAX_NAME_SIZE 3
 #define MAX_KEY_SIZE 10

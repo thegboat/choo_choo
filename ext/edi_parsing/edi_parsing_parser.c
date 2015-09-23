@@ -60,24 +60,28 @@ int parseElement(segment_t *segment, char *str, const char componentSeparator[2]
 }
 
 void parserInitialization(parser_t *parser){
+  parser->byName = NULL;
   parser->nameIndex = NULL;
   parser->primaryIndex = NULL;
   parser->failure = false;
   parser->finished = false;
   parser->errorCount = 0;
   parser->segmentCount = 0;
+  parser->nameCount = 0;
   parser->componentSeparator[0] = '\0';
   memset(&parser->errors, 0, sizeof(short)*10);
 }
 
 void parserFree(parser_t *parser){
-  if(NULL != parser->primaryIndex){
-    for(int i=0; i<parser->segmentCount;i++){
+  long i;
+  if(parser->primaryIndex){
+    for(i=0; i<parser->segmentCount;i++){
       segmentFree(parser->primaryIndex[i]);
     }
     ediParsingDealloc(parser->primaryIndex);
   }
   ediParsingDealloc(parser->nameIndex);
+  ediParsingDealloc(parser->byName);
   ediParsingDealloc(parser);
 }
 

@@ -28,6 +28,7 @@ struct index_stat_struct
 {
   int lower;
   int upper;
+  char name[MAX_NAME_SIZE+1]; 
 };
 
 struct parser_struct
@@ -37,11 +38,13 @@ struct parser_struct
   char documentType[10];
   VALUE root_rb;
   segment_t *root;
-  segment_t **nameIndex;
+  index_stat_t *nameIndex;
+  segment_t **byName;
   segment_t **primaryIndex;
   char *str;
   char componentSeparator[2];
   unsigned long segmentCount;
+  unsigned long nameCount;
   bool failure;
   bool finished;
 };

@@ -7,20 +7,41 @@
 //
 #include "edi_parsing.h"
 
-static int littleUSearch(parser_t *parser, const char *name, int idx);
-static int littleLSearch(parser_t *parser, const char *name, int idx);
-static int nameIndexFunc(const void *p1, const void*p2);
+// static int littleUSearch(parser_t *parser, const char *name, int idx);
+// static int littleLSearch(parser_t *parser, const char *name, int idx);
+static int nameSortFunc(const void *p1, const void*p2);
 static void indexSegment(parser_t *parser, segment_t *segment, int *segmentCount, int depth);
-static void allocIndexes(parser_t *parser);
 static bool isChildOf(segment_t *child, segment_t *parent);
 static bool isDescendantOf(segment_t *descendant, segment_t *parent);
 static bool hasProperty(segment_t *segment,  short element, short component, char *value);
+static int nameIndexFunc(const void *p1, const void*p2);
 
 void buildIndexes(parser_t *parser){
   int segmentCount = 0;
-  allocIndexes(parser);
+  parser->byName = ediParsingMalloc(parser->segmentCount,sizeof(segment_t*));
+  parser->primaryIndex = ediParsingMalloc(parser->segmentCount,sizeof(segment_t*));
+  index_stat_t tmp[parser->segmentCount];
   indexSegment(parser, parser->root, &segmentCount, 0);
-  qsort(parser->nameIndex, parser->segmentCount, sizeof(segment_t*), nameIndexFunc);
+  qsort(parser->byName, parser->segmentCount, sizeof(segment_t*), nameSortFunc);
+
+  long index_i=-1;
+  segment_t* segment;
+
+  for(long data_i=0; data_i<parser->segmentCount; data_i++){
+    segment = parser->byName[data_i];
+    if(index_i == -1 || strcmp(tmp[index_i].name,segment->name)){
+      index_i++;
+      tmp[index_i].lower = data_i;
+      tmp[index_i].upper = data_i;
+      strcpy(tmp[index_i].name,segment->name);
+    }else{
+      tmp[index_i].upper = data_i;
+    }
+  }
+
+  parser->nameCount = index_i+1;
+  parser->nameIndex = ediParsingMalloc(parser->nameCount,sizeof(index_stat_t));
+  memcpy(parser->nameIndex,&tmp, parser->nameCount*sizeof(index_stat_t));
 }
 
 VALUE propertiesToHash(segment_t *segment){
@@ -66,7 +87,7 @@ VALUE segmentWhere(parser_t *parser, segment_t *segment, VALUE name_rb, VALUE el
       segment_t *descendant;
       for(int i=0;i<max;i++){
         if(limit > -1 && cnt >= limit) break;
-        descendant = parser->nameIndex[i+stat.lower];
+        descendant = parser->byName[i+stat.lower];
         if(isDescendantOf(descendant, segment) && hasProperty(descendant, element, component, value) && strcmp(descendant->name, c_name) == 0){
           VALUE child_rb = buildSegmentNode(parser, descendant);
           rb_ary_push(result, child_rb);
@@ -89,7 +110,7 @@ VALUE segmentExists(parser_t *parser, segment_t *segment, VALUE name_rb, VALUE e
       char *value = StringValueCStr(value_rb);
       segment_t *descendant;
       for(int i=0;i<max;i++){
-        descendant = parser->nameIndex[i+stat.lower];
+        descendant = parser->byName[i+stat.lower];
         if(isDescendantOf(descendant, segment) && hasProperty(descendant, element, component, value) && strcmp(descendant->name, c_name) == 0){
           return Qtrue;
         }
@@ -126,7 +147,7 @@ VALUE segmentChildren(parser_t *parser, segment_t *segment, VALUE names_rb, VALU
       if(stat.lower > -1 && stat.upper > -1){
         for(int i=0;i<max;i++){
           if(limit > -1 && cnt >= limit) break;
-          descendant = parser->nameIndex[i+stat.lower];
+          descendant = parser->byName[i+stat.lower];
           if(isChildOf(descendant, segment)){
             VALUE child_rb = buildSegmentNode(parser, descendant);
             rb_ary_push(result, child_rb);
@@ -185,7 +206,7 @@ VALUE segmentFind(parser_t *parser, segment_t *segment, VALUE names_rb, VALUE li
       if(stat.lower >= 0 && stat.upper >= 0){
         for(int i=0;i<max;i++){
           if(limit > -1 && cnt >= limit) break;
-          descendant = parser->nameIndex[i+stat.lower];
+          descendant = parser->byName[i+stat.lower];
           if(isDescendantOf(descendant, segment)){
             VALUE child_rb = buildSegmentNode(parser, descendant);
             rb_ary_push(result, child_rb);
@@ -216,54 +237,35 @@ unsigned long getPropertyKey(short element, short component){
 }
 
 index_stat_t nameIndexSearch(parser_t *parser, const char *name){
-  index_stat_t stat = {-1,-1};
-  int first = 0;
-  int last = parser->segmentCount;
-  int cmp = -1;
-  int middle = (first+last)/2;
-  segment_t* segment;
-
-  while(first <= last) {
-    segment = parser->nameIndex[middle];
-    cmp = strcmp(segment->name, name);
-    if(cmp < 0){
-      first = middle + 1;
-    }else if(cmp > 0){
-      last = middle - 1;
-    }else{
-      break;
-    }
-    middle = (first+last)/2;
-  }
-
-  if(cmp == 0){
-    stat.lower = littleLSearch(parser, name, middle);
-    stat.upper = littleUSearch(parser, name, middle);
-  }
-  return stat;
+  index_stat_t stat;
+  stat.upper = -1;
+  stat.lower = -1;
+  strcpy(stat.name, name);
+  index_stat_t *rtn = bsearch(&stat, parser->nameIndex, parser->nameCount, sizeof(index_stat_t), nameIndexFunc);
+  return rtn ? *rtn : stat;
 }
 
-static int littleLSearch(parser_t *parser, const char *name, int idx){
-  int cmp = 0;
-  while(cmp == 0 && idx > 0){
-    segment_t* segment = parser->nameIndex[idx-1];
-    cmp = strcmp(segment->name, name);
-    if(cmp == 0) idx--;
-  }
-  return idx;
-}
+// static int littleLSearch(parser_t *parser, const char *name, int idx){
+//   int cmp = 0;
+//   while(cmp == 0 && idx > 0){
+//     segment_t* segment = parser->nameIndex[idx-1];
+//     cmp = strcmp(segment->name, name);
+//     if(cmp == 0) idx--;
+//   }
+//   return idx;
+// }
 
-static int littleUSearch(parser_t *parser, const char *name, int idx){
-  int cmp = 0;
-  while(cmp == 0 && idx < parser->segmentCount - 1){
-    segment_t* segment = parser->nameIndex[idx+1];
-    cmp = strcmp(segment->name, name);
-    if(cmp == 0) idx++;
-  }
-  return idx;
-}
+// static int littleUSearch(parser_t *parser, const char *name, int idx){
+//   int cmp = 0;
+//   while(cmp == 0 && idx < parser->segmentCount - 1){
+//     segment_t* segment = parser->nameIndex[idx+1];
+//     cmp = strcmp(segment->name, name);
+//     if(cmp == 0) idx++;
+//   }
+//   return idx;
+// }
 
-static int nameIndexFunc(const void *p1, const void*p2){  
+static int nameSortFunc(const void *p1, const void*p2){  
   const segment_t *seg1 = *((segment_t **)p1);
   const segment_t *seg2 = *((segment_t **)p2);
   const int cmp = strcmp(seg1->name, seg2->name);
@@ -275,12 +277,18 @@ static int nameIndexFunc(const void *p1, const void*p2){
   }
 }
 
+static int nameIndexFunc(const void *p1, const void*p2){  
+  const index_stat_t stat1 = *((index_stat_t *)p1);
+  const index_stat_t stat2 = *((index_stat_t *)p2);
+  return strcmp(stat1.name, stat2.name);
+}
+
 static void indexSegment(parser_t *parser, segment_t *segment, int *segmentCount, int depth){
   property_t *property = segment->firstProperty;
   segment_t *child = segment->firstSegment;
   segment->pkey = *segmentCount;
   segment->depth = depth;
-  parser->nameIndex[*segmentCount] = segment;
+  parser->byName[*segmentCount] = segment;
   parser->primaryIndex[*segmentCount] = segment;
   *segmentCount = *segmentCount + 1;
   long key;
@@ -290,11 +298,6 @@ static void indexSegment(parser_t *parser, segment_t *segment, int *segmentCount
     child = child->tail;
   }
   segment->boundary = (*segmentCount) - 1;
-}
-
-static void allocIndexes(parser_t *parser){
-  parser->nameIndex = ediParsingMalloc(parser->segmentCount,sizeof(segment_t*));
-  parser->primaryIndex = ediParsingMalloc(parser->segmentCount,sizeof(segment_t*));
 }
 
 bool missingSegment(parser_t *parser, char *src){
