@@ -3,12 +3,10 @@
 //  choo_choo_parser
 //
 //  Created by Grady Griffin on 8/3/15.
-//  Copyright (c) 2015 Grady Griffin. All rights reserved.
+//  Copyright (c) 2015 CareCloud. All rights reserved.
 //
 #include "edi_parsing.h"
 
-// static int littleUSearch(parser_t *parser, const char *name, int idx);
-// static int littleLSearch(parser_t *parser, const char *name, int idx);
 static int nameSortFunc(const void *p1, const void*p2);
 static void indexSegment(parser_t *parser, segment_t *segment, int *segmentCount, int depth);
 static bool isChildOf(segment_t *child, segment_t *parent);
@@ -226,7 +224,7 @@ VALUE segmentFind(parser_t *parser, segment_t *segment, VALUE names_rb, VALUE li
 VALUE segmentGetProperty(segment_t *segment, VALUE element_int_rb, VALUE component_int_rb){
   short element = NUM2SHORT(element_int_rb);
   short component = NUM2SHORT(component_int_rb);
-  unsigned long key = element*100+component;
+  unsigned long key = getPropertyKey(element,component);
   unsigned long value; 
   if(st_lookup(segment->propertyCache, key, &value)){
     return rb_str_new_cstr((char*)value);
@@ -247,26 +245,6 @@ index_stat_t nameIndexSearch(parser_t *parser, const char *name){
   index_stat_t *rtn = bsearch(&stat, parser->nameIndex, parser->nameCount, sizeof(index_stat_t), nameIndexFunc);
   return rtn ? *rtn : stat;
 }
-
-// static int littleLSearch(parser_t *parser, const char *name, int idx){
-//   int cmp = 0;
-//   while(cmp == 0 && idx > 0){
-//     segment_t* segment = parser->nameIndex[idx-1];
-//     cmp = strcmp(segment->name, name);
-//     if(cmp == 0) idx--;
-//   }
-//   return idx;
-// }
-
-// static int littleUSearch(parser_t *parser, const char *name, int idx){
-//   int cmp = 0;
-//   while(cmp == 0 && idx < parser->segmentCount - 1){
-//     segment_t* segment = parser->nameIndex[idx+1];
-//     cmp = strcmp(segment->name, name);
-//     if(cmp == 0) idx++;
-//   }
-//   return idx;
-// }
 
 static int nameSortFunc(const void *p1, const void*p2){  
   const segment_t *seg1 = *((segment_t **)p1);

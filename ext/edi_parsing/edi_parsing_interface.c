@@ -3,7 +3,7 @@
 //  choo_choo_parser
 //
 //  Created by Grady Griffin on 8/3/15.
-//  Copyright (c) 2015 Grady Griffin. All rights reserved.
+//  Copyright (c) 2015 CareCloud. All rights reserved.
 
 #include "edi_parsing.h"
 
@@ -23,6 +23,7 @@ static VALUE segment_errors(VALUE self);
 static VALUE segment_document_type(VALUE self);
 static VALUE segment_exists(VALUE self, VALUE name_rb, VALUE element_int_rb, VALUE component_int_rb, VALUE value_rb);
 static anchor_t *parserSetup(const char documentType[10]);
+static VALUE choo_choo_empty(VALUE self);
 
 static VALUE mChooChoo;
 static VALUE cSegment;
@@ -169,12 +170,13 @@ static VALUE segment_document_type(VALUE self){
 
 VALUE buildSegmentNode(parser_t *parser, segment_t *segment){
   VALUE segment_rb;
+  VALUE class_rb;
+  anchor_t *anchor;
   if(segment == parser->root){
     segment_rb = parser->root_rb;
   }else{
-    anchor_t *anchor;
 
-    VALUE class_rb = rb_define_class_under(mChooChoo, segment->name, cSegment);
+    class_rb = rb_define_class_under(mChooChoo, segment->name, cSegment);
     segment_rb = rb_class_new_instance(0, NULL, class_rb);
 
     Data_Get_Struct(segment_rb, anchor_t, anchor);
@@ -185,7 +187,7 @@ VALUE buildSegmentNode(parser_t *parser, segment_t *segment){
   return segment_rb;
 }
 
-VALUE choo_choo_empty(self){
+static VALUE choo_choo_empty(VALUE self){
   return rb_str_new_cstr(CHOOCHOO_EMPTY);
 }
 
