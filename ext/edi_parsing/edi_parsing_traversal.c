@@ -121,7 +121,7 @@ VALUE segmentExists(parser_t *parser, segment_t *segment, VALUE name_rb, VALUE e
 }
 
 VALUE segmentChildren(parser_t *parser, segment_t *segment, VALUE names_rb, VALUE limit_rb){
-  VALUE result = rb_ary_new();
+  VALUE result;
   const int length = NUM2INT(rb_funcall(names_rb, rb_intern("length"), 0));
   const int limit = NUM2INT(limit_rb);
   segment_t *descendant;
@@ -129,7 +129,7 @@ VALUE segmentChildren(parser_t *parser, segment_t *segment, VALUE names_rb, VALU
 
   if(length == 0){
     descendant = segment->firstSegment;
-
+    result = rb_ary_new2(segment->children);
     while(NULL != descendant && (limit == -1 || cnt < limit)){
       VALUE child_rb = buildSegmentNode(parser, descendant);
       rb_ary_push(result, child_rb);
@@ -137,6 +137,7 @@ VALUE segmentChildren(parser_t *parser, segment_t *segment, VALUE names_rb, VALU
       cnt++;
     }
   }else{
+    result = rb_ary_new();
     VALUE name = rb_ary_pop(names_rb);
     char *c_name;
     index_stat_t stat;
@@ -164,7 +165,7 @@ VALUE segmentChildren(parser_t *parser, segment_t *segment, VALUE names_rb, VALU
 VALUE segmentToHash(segment_t *segment){
   segment_t *child = segment->firstSegment;
   VALUE proxy = propertiesToHash(segment);
-  VALUE children = rb_ary_new();
+  VALUE children = rb_ary_new2(segment->children);
 
   if(NULL != child){
     while(NULL != child){
@@ -179,7 +180,7 @@ VALUE segmentToHash(segment_t *segment){
 }
 
 VALUE segmentFind(parser_t *parser, segment_t *segment, VALUE names_rb, VALUE limit_rb){
-  VALUE result = rb_ary_new();
+  VALUE result;
   const int length = NUM2INT(rb_funcall(names_rb, rb_intern("length"), 0));
   const int limit = NUM2INT(limit_rb);
   segment_t *descendant;
@@ -187,6 +188,7 @@ VALUE segmentFind(parser_t *parser, segment_t *segment, VALUE names_rb, VALUE li
 
   if(length == 0){
     int max = (segment->boundary - segment->pkey) + 1;
+    result = rb_ary_new2(max);
     for(int i=1;i<max;i++){
       if(limit > -1 && cnt >= limit) break;
       descendant = parser->primaryIndex[i+segment->pkey];
@@ -196,6 +198,7 @@ VALUE segmentFind(parser_t *parser, segment_t *segment, VALUE names_rb, VALUE li
       }
     }
   }else{
+    result = rb_ary_new();
     VALUE name = rb_ary_pop(names_rb);
     char *c_name;
     index_stat_t stat;
