@@ -3,7 +3,7 @@
 //  choo_choo_parser
 //
 //  Created by Grady Griffin on 8/3/15.
-//  Copyright (c) 2015 Grady Griffin. All rights reserved.
+//  Copyright (c) 2015 CareCloud. All rights reserved.
 //
 
 #define ISA_SEGMENT "ISA"
@@ -170,5 +170,6 @@
 #define MISSING_N3_SEGMENT                                   87
 #define MISSING_LX_SEGMENT                                   88
 #define MISSING_LQ_SEGMENT                                   89
+#define INVALID_REPITITON_SEPARATOR                          90
 
 

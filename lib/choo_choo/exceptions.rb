@@ -9,6 +9,9 @@ module ChooChoo
   class AssertedValueNotFound < StandardError
   end
 
+  class MultipleChildrenFound < StandardError
+  end
+
   class MethodImplementationRequired < StandardError
   end
 end

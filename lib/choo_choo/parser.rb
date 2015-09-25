@@ -20,10 +20,16 @@ module ChooChoo
     def split
       str_buffer = stream.read
       str_buffer.delete!("\000")
+      str_buffer.strip!
       str_buffer.gsub!(/~\s+/,'~')
+      str_buffer.gsub!("**", "*#{empty}*")
       str_buffer.gsub!("**", "*#{empty}*")
       isa = yield(str_buffer)
       isa
+    end
+
+    def empty
+      _c_empty
     end
 
     # def split

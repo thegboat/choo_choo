@@ -3,14 +3,14 @@
 //  choo_choo_parser
 //
 //  Created by Grady Griffin on 8/3/15.
-//  Copyright (c) 2015 Grady Griffin. All rights reserved.
+//  Copyright (c) 2015 CareCloud. All rights reserved.
 //
 
 #include "edi_parsing.h"
 
 
 VALUE getErrors(parser_t *parser){
-  VALUE result = rb_ary_new();
+  VALUE result = rb_ary_new2(parser->errorCount);
   char error[60];
   short errorNumber;
 
@@ -286,6 +286,9 @@ VALUE getErrors(parser_t *parser){
         break;
       case MISSING_LQ_SEGMENT :
         rb_ary_push(result, rb_str_new_cstr("MISSING_LQ_SEGMENT"));
+        break;
+      case INVALID_REPITITON_SEPARATOR :
+        rb_ary_push(result, rb_str_new_cstr("INVALID_REPITITON_SEPARATOR"));
         break;
       default: 
         rb_raise(rb_eRuntimeError, "A failure occurred while resolving errors.");

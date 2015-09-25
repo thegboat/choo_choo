@@ -3,7 +3,7 @@
 //  choo_choo_parser
 //
 //  Created by Grady Griffin on 8/3/15.
-//  Copyright (c) 2015 Grady Griffin. All rights reserved.
+//  Copyright (c) 2015 CareCloud. All rights reserved.
 //
 #include "edi_parsing.h"
 
@@ -23,6 +23,7 @@ void ediParsingDealloc(void *any){
 }
 
 segment_t *parseSegment(parser_t *parser){
+  unsigned long value;
   segment_t *segment = ediParsingMalloc(1,sizeof(segment_t));
   char *tok;
   char *saveptr;
@@ -41,6 +42,18 @@ segment_t *parseSegment(parser_t *parser){
     tok = strtok_r(NULL, ELEMENT_SEPARATOR, &saveptr);
   }
   segment->elements = cnt;
+  if(parser->segmentCount == 0 && isISA(segment)){
+    if(!st_lookup(segment->propertyCache, getPropertyKey(16,0), &value) || strlen((char *)value) != 1){
+      parserFail(parser, INVALID_COMPONENT_SEPARATOR);
+    }else{
+      strcpy(parser->componentSeparator, (char *)value);
+      if(!st_lookup(segment->propertyCache, getPropertyKey(11,0), &value) || strlen((char *)value) != 1){
+        parserFail(parser, INVALID_REPITITON_SEPARATOR);
+      }else{
+        strcpy(parser->repititionSeparator, (char *)value);
+      }
+    }
+  }
   parser->segmentCount++;
   return segment;
 }
@@ -69,6 +82,7 @@ void parserInitialization(parser_t *parser){
   parser->segmentCount = 0;
   parser->nameCount = 0;
   parser->componentSeparator[0] = '\0';
+  parser->repititionSeparator[0] = '\0';
   memset(&parser->errors, 0, sizeof(short)*10);
 }
 
