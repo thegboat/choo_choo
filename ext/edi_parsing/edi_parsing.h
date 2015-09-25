@@ -76,8 +76,6 @@ struct segment_struct
   segment_t *head;
   segment_t *tail;
   segment_t *parent;
-  property_t *firstProperty;
-  property_t *lastProperty;
   segment_t *firstSegment;
   segment_t *lastSegment;
   short elements;

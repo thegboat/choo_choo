@@ -284,7 +284,6 @@ static int nameIndexFunc(const void *p1, const void*p2){
 }
 
 static void indexSegment(parser_t *parser, segment_t *segment, int *segmentCount, int depth){
-  property_t *property = segment->firstProperty;
   segment_t *child = segment->firstSegment;
   segment->pkey = *segmentCount;
   segment->depth = depth;
