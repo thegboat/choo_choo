@@ -287,6 +287,9 @@ VALUE getErrors(parser_t *parser){
       case MISSING_LQ_SEGMENT :
         rb_ary_push(result, rb_str_new_cstr("MISSING_LQ_SEGMENT"));
         break;
+      case INVALID_REPITITON_SEPARATOR :
+        rb_ary_push(result, rb_str_new_cstr("INVALID_REPITITON_SEPARATOR"));
+        break;
       default: 
         rb_raise(rb_eRuntimeError, "A failure occurred while resolving errors.");
     }

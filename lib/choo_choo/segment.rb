@@ -137,6 +137,49 @@ module ChooChoo
     end
     alias :dec :decimal
 
+    def boolean!(key, options = {})
+      boolean(key, options.merge(assert: true))
+    end
+    alias :bool! :boolean!
+
+    def integer!(key, options = {})
+      integer(key, options.merge(assert: true))
+    end
+    alias :int! :integer!
+
+    def upper!(key, options = {})
+      upper(key, options.merge(assert: true))
+    end
+    alias :up! :upper!
+
+    def lower!(key, options = {})
+      lower(key, options.merge(assert: true))
+    end
+    alias :low! :lower!
+
+    def string!(key, options = {})
+      string(key, options.merge(assert: true))
+    end
+    alias :str! :string!
+    alias :raw! :string!
+
+    def strip!(key, options = {})
+      strip(key, options.merge(assert: true))
+    end
+
+    def date!(key, options = {})
+      date(key, options.merge(assert: true))
+    end
+
+    def money!(key, options = {})
+      money(key, options.merge(assert: true))
+    end
+
+    def decimal!(key, options = {})
+      decimal(key, options.merge(assert: true))
+    end
+    alias :dec! :decimal!
+
     protected
 
     def self.apply_methods(val, methods)
@@ -165,7 +208,7 @@ module ChooChoo
     end
 
     def cast(assign_type, key, options)
-      val = extract(key)
+      val = options[:assert] ? extract!(key) : extract(key)
       return options[:default] if options.key?(:default) && val.to_s.empty?
       return options[:blank] if options.key?(:blank) && val =~ /^\s+$/
       casted = case assign_type
@@ -181,12 +224,28 @@ module ChooChoo
       casted
     end
 
-    def extract(key)
+    def extract!(key)
       if respond_to?(key)
         send(key)
       else
         key =~ ChooChoo::SEGMENT_REGEX
         child!($1).get_property(key)
+      end
+    end
+
+    def extract(key)
+      if respond_to?(key)
+        send(key)
+      else
+        key =~ ChooChoo::SEGMENT_REGEX
+        list = children($1)
+        if list.length == 1 
+          list.first.get_property(key)
+        elsif list.length > 1 
+          raise MultipleChildrenFound, "can not cast from multiple children."
+        else
+          ChooChoo::EMPTY_STRING
+        end
       end
     end
 

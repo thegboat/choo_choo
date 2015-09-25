@@ -41,6 +41,19 @@ segment_t *parseSegment(parser_t *parser){
     tok = strtok_r(NULL, ELEMENT_SEPARATOR, &saveptr);
   }
   segment->elements = cnt;
+  if(isISA(segment)){
+    unsigned long value;
+    if(!st_lookup(segment->propertyCache, getPropertyKey(16,0), &value) || strlen((char *)value) != 1){
+      parserFail(parser, INVALID_COMPONENT_SEPARATOR);
+    }else{
+      strcpy(parser->componentSeparator, (char *)value);
+      if(!st_lookup(segment->propertyCache, getPropertyKey(11,0), &value) || strlen((char *)value) != 1){
+        parserFail(parser, INVALID_REPITITON_SEPARATOR);
+      }else{
+        strcpy(parser->repititionSeparator, (char *)value);
+      }
+    }
+  }
   parser->segmentCount++;
   return segment;
 }

@@ -43,6 +43,7 @@ struct parser_struct
   segment_t **primaryIndex;
   char *str;
   char componentSeparator[2];
+  char repititionSeparator[2];
   unsigned long segmentCount;
   unsigned long nameCount;
   bool failure;

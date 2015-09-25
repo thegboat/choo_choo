@@ -196,7 +196,7 @@ void Init_edi_parsing(void) {
   cDocument = rb_define_class_under(mChooChoo, "Document", rb_cObject);
 
   rb_define_method(cParser, "_c_parse_835", choo_choo_parse_835, 1);
-  rb_define_method(cParser, "empty", choo_choo_empty, 0);
+  rb_define_method(cParser, "_c_empty", choo_choo_empty, 0);
 
   rb_define_alloc_func(cSegment, segment_alloc);
   rb_define_method(cSegment, "document_type", segment_document_type, 0);

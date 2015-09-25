@@ -138,19 +138,13 @@ static void default835Handler(parser835_t *parser, segment_t *segment){
 }
 
 static void isa835Handler(parser835_t *parser, segment_t *segment){
-  unsigned long value;
   if(NULL != parser->loop || parser->loop != parser->interchange){
     parserFail(parser->super, INVALID_ISA_SEGMENT);
   }else if(!elementCountIn(segment, 16,16)){
     parserFail(parser->super, WRONG_NUMBER_OF_ELEMENTS_FOR_ISA_SEGMENT);
-  }else{
-    if(!st_lookup(segment->propertyCache, getPropertyKey(16,0), &value) || strlen((char *)value) != 1){
-      parserFail(parser->super, INVALID_COMPONENT_SEPARATOR);
-    }else{
-      parser->interchange = segment;
-      parser->loop = segment;
-      strcpy(parser->super->componentSeparator, (char *)value);
-    }
+  }else{   
+    parser->interchange = segment;
+    parser->loop = segment;
   }
 }
 
@@ -343,7 +337,7 @@ static void dtm835Handler(parser835_t *parser, segment_t *segment){
 }
 
 static void per835Handler(parser835_t *parser, segment_t *segment){
-  if(parser->loop != parser->payer){
+  if(parser->loop != parser->payer && parser->loop != parser->claim){
     parserFail(parser->super, INVALID_PER_SEGMENT);
   }else if(!elementCountIn(segment,1,9)){
     parserFail(parser->super, WRONG_NUMBER_OF_ELEMENTS_FOR_PER_SEGMENT);

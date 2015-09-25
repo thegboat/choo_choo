@@ -170,5 +170,6 @@
 #define MISSING_N3_SEGMENT                                   87
 #define MISSING_LX_SEGMENT                                   88
 #define MISSING_LQ_SEGMENT                                   89
+#define INVALID_REPITITON_SEPARATOR                          90
 
 
