@@ -112,12 +112,12 @@ module ChooChoo
     alias :int :integer
 
     def upper(key, options = {})
-      cast(:string, key, options.merge(apply: [:upcase, :strip]))
+      cast(:string, key, options.merge(apply: [:upcase, :strip], default: nil))
     end
     alias :up :upper
 
     def lower(key, options = {})
-      cast(:string, key, options.merge(apply: [:downcase, :strip]))
+      cast(:string, key, options.merge(apply: [:downcase, :strip], default: nil))
     end
     alias :low :lower
 

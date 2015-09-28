@@ -27,21 +27,21 @@ segment_t *parseSegment(parser_t *parser){
   segment_t *segment = ediParsingMalloc(1,sizeof(segment_t));
   char *tok;
   char *saveptr;
-  short cnt = 0;
+  short element = 0;
   tok = strtok_r(parser->str, ELEMENT_SEPARATOR, &saveptr);
   segmentInitializer(segment, tok);
   tok = strtok_r(NULL, ELEMENT_SEPARATOR, &saveptr);
   while (tok != NULL)
   {
-    cnt++;
+    element++;
     if(strlen(parser->componentSeparator) == 1 && NULL != strstr(tok, parser->componentSeparator)){
-      parseElement(segment, tok, parser->componentSeparator, cnt);
+      parseElement(segment, tok, parser->componentSeparator, element);
     }else{
-      cacheProperty(segment, tok, cnt, 0);
+      cacheProperty(segment, tok, element, 0);
     }
     tok = strtok_r(NULL, ELEMENT_SEPARATOR, &saveptr);
   }
-  segment->elements = cnt;
+  segment->elements = element;
   if(parser->segmentCount == 0 && isISA(segment)){
     if(!st_lookup(segment->propertyCache, getPropertyKey(16,0), &value) || strlen((char *)value) != 1){
       parserFail(parser, INVALID_COMPONENT_SEPARATOR);
@@ -58,18 +58,18 @@ segment_t *parseSegment(parser_t *parser){
   return segment;
 }
 
-int parseElement(segment_t *segment, char *str, const char componentSeparator[2], short seg_cnt){
+int parseElement(segment_t *segment, char *str, const char componentSeparator[2], short element){
   char *tok;
   char *saveptr;
-  short cnt = 0;
+  short component = 0;
   tok = strtok_r(str, componentSeparator, &saveptr);
   while (tok != NULL)
   {
-    cnt++;
-    cacheProperty(segment, tok, cnt, cnt);
+    component++;
+    cacheProperty(segment, tok, element, component);
     tok = strtok_r(NULL, componentSeparator, &saveptr);
   }
-  return cnt;
+  return component;
 }
 
 void parserInitialization(parser_t *parser){

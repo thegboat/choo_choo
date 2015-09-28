@@ -12,9 +12,8 @@ static void propertyFree(segment_t* segment);
 void segmentInitializer(segment_t *segment, char *src){
   long idx = strlen(src);
   idx = idx > MAX_NAME_SIZE ? MAX_NAME_SIZE : idx;
-  memset(segment->name,0,MAX_NAME_SIZE*sizeof(char));
+  memset(segment->name,0,(MAX_NAME_SIZE+1)*sizeof(char));
   memcpy(segment->name,src,idx*sizeof(char));
-  segment->name[idx+1] = '\0';
   segment->elements = 0;
   segment->depth = 0;
   segment->children = 0;
