@@ -18,7 +18,6 @@
 // data types
 
 typedef struct segment_struct segment_t;
-typedef struct property_struct property_t;
 typedef struct parser_struct parser_t;
 typedef struct index_stat_struct index_stat_t;
 typedef struct parser835_struct parser835_t;
@@ -85,17 +84,6 @@ struct segment_struct
   unsigned long pkey;
   unsigned long boundary;
   st_table* propertyCache;
-};
-
-struct property_struct
-{
-  segment_t *owner;
-  char key[MAX_KEY_SIZE+1];
-  char *value;
-  short element;
-  short component;
-  property_t *head;
-  property_t *tail;
 };
 
 // inspection
