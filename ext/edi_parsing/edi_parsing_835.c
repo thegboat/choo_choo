@@ -61,6 +61,7 @@ void parse835(anchor_t *anchor, char *ediFile){
   parser835Cleanup(parser);
   anchor->segment = parser->super->root;
   parser835Free(parser);
+  xfree(copy);
 }
 
 static void attach835Segment(parser835_t *parser, segment_t *segment){
