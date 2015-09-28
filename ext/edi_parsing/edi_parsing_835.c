@@ -432,7 +432,7 @@ static void n4835Handler(parser835_t *parser, segment_t *segment){
 }
 
 static void lx835Handler(parser835_t *parser, segment_t *segment){
-  if(parser->loop != parser->payee || NULL == parser->payee){
+  if((parser->loop != parser->payee && parser->loop != parser->service) || NULL == parser->payee){
     parserFail(parser->super, INVALID_LX_SEGMENT);
   }else if(!elementCountIn(segment,1,1)){
     parserFail(parser->super, WRONG_NUMBER_OF_ELEMENTS_FOR_LX_SEGMENT);

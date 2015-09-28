@@ -268,7 +268,7 @@ module ChooChoo
     end
 
     def _string(val, options)
-      return ChooChoo::NULL if val.nil?
+      return nil if val.nil?
       val = val.to_s
       return val if val.empty?
       options.key?(:length) && val.length > options[:length].to_i ? val.to(options[:length].to_i - 1) : val
