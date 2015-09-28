@@ -238,7 +238,7 @@ module ChooChoo
       if respond_to?(key)
         send(key)
       else
-        seg_name, element, component = parse_property_key(sym.to_s)
+        seg_name, element, component = parse_property_key(key)
         child!(seg_name).send(:_c_get_property, element, component)
       end
     end
@@ -247,7 +247,7 @@ module ChooChoo
       if respond_to?(key)
         send(key)
       else
-        seg_name, element, component = parse_property_key(sym.to_s)
+        seg_name, element, component = parse_property_key(key)
         list = children(seg_name)
         if list.length == 1 
           list.first.send(:_c_get_property, element, component)

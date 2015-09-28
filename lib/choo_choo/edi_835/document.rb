@@ -6,7 +6,6 @@ module EDI835
     end
 
     def self.valid_segments
-      @valid_segments ||= Set.new([
       @valid_segments ||= Set.new(_valid_segments.flat_map {|i| [i,i.to_s]}).freeze
     end
 
