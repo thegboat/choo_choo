@@ -1,5 +1,10 @@
 module ChooChoo
   class NullSegment
+    attr_reader :document_type
+
+    def initialize(doc_type)
+      @document_type = doc_type
+    end
 
     def name
       ChooChoo::EMPTY_STRING
@@ -8,28 +13,51 @@ module ChooChoo
     def to_h
       ChooChoo::EMPTY_HASH
     end
+    alias :to_hash :to_h
     
     def to_json
       Oj.dump(to_hash)
     end
 
     def exists?(sym,val)
-      ChooChoo::FALSE
+      false
     end
 
     def first_or_null
       self
     end
 
+    def null_cast(key, options)
+      Segment.parse_property_key(key, document_type)
+      return options[:default] if options.key?(:default)
+      yield
+    end
+
     def cannot_assert(*args)
-      raise MethodNotImplemented, "NULL Segment can not assert one since it has no descendants."
+      raise MethodNotImplemented, "NULL Segment can not assert."
     end
     alias :descendant! :cannot_assert 
     alias :child! :cannot_assert 
-    alias :first! :cannot_assert 
+    alias :first! :cannot_assert
+    alias :first! :cannot_assert
+    alias :integer! :cannot_assert
+    alias :int! :cannot_assert
+    alias :money! :cannot_assert
+    alias :string! :cannot_assert
+    alias :str! :cannot_assert
+    alias :raw! :cannot_assert
+    alias :upper! :cannot_assert
+    alias :up! :cannot_assert
+    alias :lower! :cannot_assert
+    alias :low! :cannot_assert
+    alias :strip! :cannot_assert
+    alias :decimal! :cannot_assert
+    alias :boolean! :cannot_assert
+    alias :bool! :cannot_assert
+    alias :date! :cannot_assert
 
     def null(*args)
-      ChooChoo::NULL
+      nil
     end
     alias :parent :null
     alias :descendant :null
@@ -59,45 +87,45 @@ module ChooChoo
     end
 
     def boolean(key, options = {})
-      !!options[:default]
+      null_cast(key, options) { false }
     end
     alias :bool :boolean
 
     def integer(key, options = {})
-      options[:default].to_i
+      null_cast(key, options) { 0 }
     end
     alias :int :integer
 
     def upper(key, options = {})
-      string_cast(key, options)
+      null_cast(key, options) { nil }
     end
     alias :up :upper
 
     def lower(key, options = {})
-      string_cast(key, options)
+      null_cast(key, options) { nil }
     end
     alias :low :lower
 
     def string(key, options = {})
-      string_cast(key, options)
+      null_cast(key, options) { ChooChoo::EMPTY_STRING }
     end
     alias :str :string
     alias :raw :string
 
     def strip(key, options = {})
-      string_cast(key, options)
+      null_cast(key, options) { nil }
     end
 
     def date(key, options = {})
-      ChooChoo::NULL
+      null_cast(key, options) { nil }
     end
 
     def money(key, options = {})
-      ChooChoo::MONEY_ZERO
+      null_cast(key, options) { ChooChoo::MONEY_ZERO }
     end
 
     def decimal(key, options = {})
-      ChooChoo::DECIMAL_ZERO
+      null_cast(key, options) { ChooChoo::DECIMAL_ZERO }
     end
     alias :dec :decimal
   end

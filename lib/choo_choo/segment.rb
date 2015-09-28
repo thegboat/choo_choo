@@ -1,6 +1,13 @@
 module ChooChoo
   class Segment
 
+    def self.parse_property_key(string, document_type)
+      string =~ ChooChoo::PROPERTY_REGEX
+      raise InvalidPropertyName if $1.nil? || $2.nil?
+      raise InvalidElementName unless document_type.valid_segments.include?($1)
+      [$1, $2.to_i, $4.to_i]
+    end
+
     def name
       _name
     end
@@ -60,7 +67,7 @@ module ChooChoo
     end
 
     def first_or_null(sym,val)
-      _where(sym, val, 1).first || ChooChoo::NullSegment.new
+      _where(sym, val, 1).first || ChooChoo::NullSegment.new(document_type)
     end
 
     def first!(sym,val)
@@ -187,7 +194,11 @@ module ChooChoo
       methods.each do |sym|
         meth = sym.to_s
         next unless val.respond_to?(meth)
-        val = val.send(meth)
+        if meth[-1] == ChooChoo::SHEBANG
+          val.send(meth)
+        else
+          val = val.send(meth)
+        end
       end
       val
     end
@@ -195,8 +206,7 @@ module ChooChoo
     private
 
     def parse_property_key(string)
-      string =~ ChooChoo::PROPERTY_REGEX
-      $1.nil? ? nil : [$1, $2.to_i, $4.to_i]
+      self.class.parse_property_key(string, document_type)
     end
 
     def _name
@@ -228,8 +238,8 @@ module ChooChoo
       if respond_to?(key)
         send(key)
       else
-        key =~ ChooChoo::SEGMENT_REGEX
-        child!($1).get_property(key)
+        seg_name, element, component = parse_property_key(sym.to_s)
+        child!(seg_name).send(:_c_get_property, element, component)
       end
     end
 
@@ -237,10 +247,10 @@ module ChooChoo
       if respond_to?(key)
         send(key)
       else
-        key =~ ChooChoo::SEGMENT_REGEX
-        list = children($1)
+        seg_name, element, component = parse_property_key(sym.to_s)
+        list = children(seg_name)
         if list.length == 1 
-          list.first.get_property(key)
+          list.first.send(:_c_get_property, element, component)
         elsif list.length > 1 
           raise MultipleChildrenFound, "can not cast from multiple children."
         else
