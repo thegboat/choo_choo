@@ -6,6 +6,10 @@ module ChooChoo
       @document_type = doc_type
     end
 
+    def null_segment?
+      true
+    end
+
     def name
       ChooChoo::EMPTY_STRING
     end

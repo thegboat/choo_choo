@@ -8,6 +8,10 @@ module ChooChoo
       [$1, $2.to_i, $4.to_i]
     end
 
+    def null_segment?
+      false
+    end
+
     def name
       _name
     end
@@ -128,7 +132,7 @@ module ChooChoo
     alias :raw :string
 
     def strip(key, options = {})
-      cast(:string, key, options.merge(apply: :strip))
+      cast(:string, key, options.merge(apply: :strip, default: nil))
     end
 
     def date(key, options = {})
