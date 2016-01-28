@@ -1,0 +1,7 @@
+#!/bin/bash
+
+rm -rf tmp/*
+rm ext/edi_parsing/*.bundle
+rm ext/edi_parsing/*.o
+
+rake compile

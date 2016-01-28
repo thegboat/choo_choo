@@ -7,12 +7,14 @@
 //
 #include "edi_parsing.h"
 
+#define getCname(rstring) RSTRING_PTR(rb_funcall((rstring),id_force_8_bit,0))
+
 static int nameSortFunc(const void *p1, const void*p2);
 static void indexSegment(parser_t *parser, segment_t *segment, int *segmentCount, int depth);
-static bool isChildOf(segment_t *child, segment_t *parent);
-static bool isDescendantOf(segment_t *descendant, segment_t *parent);
 static bool hasProperty(segment_t *segment,  short element, short component, char *value);
 static int nameIndexFunc(const void *p1, const void*p2);
+
+static ID id_force_8_bit;
 
 void buildIndexes(parser_t *parser){
   int segmentCount = 0;
@@ -75,18 +77,18 @@ VALUE segmentWhere(parser_t *parser, segment_t *segment, VALUE name_rb, VALUE el
   if(segment->children > 0){
     short element = NUM2SHORT(element_int_rb);
     short component = NUM2SHORT(component_int_rb);
-    char *c_name = StringValueCStr(name_rb);
+    char *c_name = getCname(name_rb);
     index_stat_t stat = nameIndexSearch(parser, c_name);
     if(stat.lower > -1 && stat.upper > -1){
       int max = (stat.upper - stat.lower) + 1;
-      char *value = StringValueCStr(value_rb);
+      char *value = getCname(value_rb);
       const int limit = NUM2INT(limit_rb);
       int cnt = 0;
       segment_t *descendant;
       for(int i=0;i<max;i++){
         if(limit > -1 && cnt >= limit) break;
         descendant = parser->byName[i+stat.lower];
-        if(isDescendantOf(descendant, segment) && hasProperty(descendant, element, component, value) && strcmp(descendant->name, c_name) == 0){
+        if(isDescendantOf(descendant, segment) && hasProperty(descendant, element, component, value)){
           VALUE child_rb = buildSegmentNode(parser, descendant);
           rb_ary_push(result, child_rb);
           cnt++;
@@ -101,15 +103,15 @@ VALUE segmentExists(parser_t *parser, segment_t *segment, VALUE name_rb, VALUE e
   if(segment->children > 0){
     short element = NUM2SHORT(element_int_rb);
     short component = NUM2SHORT(component_int_rb);
-    char *c_name = StringValueCStr(name_rb);
+    char *c_name = getCname(name_rb);
     index_stat_t stat = nameIndexSearch(parser, c_name);
     if(stat.lower > -1 && stat.upper > -1){
       int max = (stat.upper - stat.lower) + 1;
-      char *value = StringValueCStr(value_rb);
+      char *value = getCname(value_rb);
       segment_t *descendant;
       for(int i=0;i<max;i++){
         descendant = parser->byName[i+stat.lower];
-        if(isDescendantOf(descendant, segment) && hasProperty(descendant, element, component, value) && strcmp(descendant->name, c_name) == 0){
+        if(isDescendantOf(descendant, segment) && hasProperty(descendant, element, component, value)){
           return Qtrue;
         }
       }
@@ -138,7 +140,7 @@ VALUE segmentChildren(parser_t *parser, segment_t *segment, VALUE names_rb, VALU
     char *c_name;
     index_stat_t stat;
     while(name != Qnil && (limit == -1 || cnt < limit)){
-      c_name = StringValueCStr(name);
+      c_name = getCname(name);
       stat = nameIndexSearch(parser, c_name);
       int max = (stat.upper - stat.lower) + 1;
       if(stat.lower > -1 && stat.upper > -1){
@@ -197,7 +199,7 @@ VALUE segmentFind(parser_t *parser, segment_t *segment, VALUE names_rb, VALUE li
     char *c_name;
     index_stat_t stat;
     while(name != Qnil && (limit == -1 || cnt < limit)){
-      c_name = StringValueCStr(name);
+      c_name = getCname(name);
       stat = nameIndexSearch(parser, c_name);
       int max = (stat.upper - stat.lower) + 1;
       if(stat.lower >= 0 && stat.upper >= 0){
@@ -227,10 +229,6 @@ VALUE segmentGetProperty(segment_t *segment, VALUE element_int_rb, VALUE compone
   }else{
     return Qnil;
   }
-}
-
-unsigned long getPropertyKey(short element, short component){
-  return element*100+component;
 }
 
 index_stat_t nameIndexSearch(parser_t *parser, const char *name){
@@ -286,18 +284,6 @@ int segmentsWithName(parser_t *parser, char *src){
   return (stat.lower < 0 || stat.upper < 0) ? 0 : ((stat.upper - stat.lower) + 1);
 }
 
-bool multipleWithName(parser_t *parser, char *src){
-  return segmentsWithName(parser, src) > 1;
-}
-
-static bool isChildOf(segment_t *child, segment_t *parent){
-  return parent == child->parent;
-}
-
-static bool isDescendantOf(segment_t *descendant, segment_t *parent){
-  return (isChildOf(descendant, parent) || (descendant->pkey > parent->pkey && descendant->pkey <= parent->boundary));
-}
-
 static bool hasProperty(segment_t *segment,  short element, short component, char *value){
   unsigned long hash_value;
   unsigned long key = getPropertyKey(element, component);
@@ -307,3 +293,8 @@ static bool hasProperty(segment_t *segment,  short element, short component, cha
     return false;
   }
 }
+
+void init_edi_parsing_traversal(){
+  id_force_8_bit = rb_intern("b");
+}
+

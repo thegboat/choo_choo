@@ -12,8 +12,8 @@ static VALUE segment_alloc(VALUE self);
 static VALUE choo_choo_parse_835(VALUE segment, VALUE isa_str);
 static VALUE segment_parent(VALUE self);
 static VALUE segment_children(VALUE self, VALUE names_rb, VALUE limit_rb);
-static anchor_t *getAnchor(VALUE segment_rb);
-static anchor_t *getAnchorUnsafe(VALUE segment_rb);
+static inline anchor_t *getAnchor(VALUE segment_rb);
+static inline anchor_t *getAnchorUnsafe(VALUE segment_rb);
 static VALUE segment_find(VALUE self, VALUE names_rb, VALUE limit_rb);
 static VALUE segment_get_property(VALUE self, VALUE element_int_rb, VALUE component_int_rb);
 static VALUE segment_where(VALUE self, VALUE name_rb, VALUE element_int_rb, VALUE component_int_rb, VALUE value_rb, VALUE limit_rb);
@@ -30,6 +30,8 @@ static VALUE cSegment;
 static VALUE cParser;
 static VALUE cDocument;
 
+static ID id_force_8_bit;
+
 static void segment_free(anchor_t *anchor){
   if(NULL != anchor){
     if(NULL != anchor->parser && anchor->parser->root == anchor->segment){
@@ -45,9 +47,10 @@ static VALUE segment_alloc(VALUE self){
 }
 
 static VALUE choo_choo_parse_835(VALUE self, VALUE isa_str){
-  char *c_isa_str = StringValueCStr(isa_str);
+  VALUE copy = rb_funcall(isa_str, id_force_8_bit, 0);
   anchor_t *anchor = parserSetup("835");
-  parse835(anchor, c_isa_str);
+  parse835(anchor, RSTRING_PTR(copy));
+  rb_str_free(copy);
   return anchor->parser->root_rb;
 }
 
@@ -88,7 +91,7 @@ static VALUE segment_children(VALUE self, VALUE names_rb, VALUE limit_rb){
   }
 }
 
-static anchor_t *getAnchor(VALUE segment_rb){
+static inline anchor_t *getAnchor(VALUE segment_rb){
   anchor_t *anchor;
   Data_Get_Struct(segment_rb, anchor_t, anchor);
   if(NULL == anchor || NULL == anchor->parser || NULL == anchor->segment){
@@ -99,7 +102,7 @@ static anchor_t *getAnchor(VALUE segment_rb){
   return anchor;
 }
 
-static anchor_t *getAnchorUnsafe(VALUE segment_rb){
+static inline anchor_t *getAnchorUnsafe(VALUE segment_rb){
   anchor_t *anchor;
   Data_Get_Struct(segment_rb, anchor_t, anchor);
   return anchor;
@@ -212,4 +215,9 @@ void Init_edi_parsing(void) {
   rb_define_method(cSegment, "_c_errors", segment_errors, 0);
   rb_define_method(cSegment, "_c_errors?", segment_has_errors, 0);
   rb_define_method(cSegment, "_c_exists?", segment_exists, 4);
+
+  id_force_8_bit = rb_intern("b");
+
+  //init_edi_parsing_835();
+  init_edi_parsing_traversal();
 }

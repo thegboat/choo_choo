@@ -15,6 +15,11 @@
 #include <ruby/st.h>
 #include "edi_parsing_constants.h"
 
+#define getPropertyKey(element,component) (element)*100+(component)
+#define isChildOf(thechild,theparent) (theparent)==(thechild)->parent
+#define isDescendantOf(descendant,parent) ((descendant)->pkey>(parent)->pkey && (descendant)->pkey<=(parent)->boundary)
+#define elementCountIn(segment,start,end) ((segment)->elements>=(start) && (segment)->elements<=(end))
+
 // data types
 
 typedef struct segment_struct segment_t;
@@ -128,7 +133,6 @@ void addChildSegment(segment_t *parent, segment_t *child);
 void loopFree(segment_t *loop);
 void segmentFree(segment_t *segment);
 segment_t *rewindLoop(segment_t *loop);
-bool elementCountIn(segment_t *segment, int start, int end);
 void cacheProperty(segment_t *segment, char *data, short element, short component);
 
 // parser
@@ -151,15 +155,15 @@ VALUE propertiesToHash(segment_t *segment);
 index_stat_t nameIndexSearch(parser_t *parser, const char *name);
 bool missingSegment(parser_t *parser, char *src);
 int segmentsWithName(parser_t *parser, char *src);
-bool multipleWithName(parser_t *parser, char *src);
 VALUE segmentExists(parser_t *parser, segment_t *segment, VALUE name_rb, VALUE element_int_rb, VALUE component_int_rb, VALUE value_rb);
 VALUE segmentWhere(parser_t *parser, segment_t *segment, VALUE name_rb, VALUE element_int_rb, VALUE component_int_rb, VALUE value_rb, VALUE limit_rb);
 VALUE segmentGetProperty(segment_t *segment, VALUE element_int_rb, VALUE component_int_rb);
-unsigned long getPropertyKey(short element, short component);
+void init_edi_parsing_traversal();
 
 // 835
 
-void parse835(anchor_t *anchor, char *ediFile);
+void parse835(anchor_t *anchor, const char *ediFile);
+void init_edi_parsing_835();
 
 // interface
 

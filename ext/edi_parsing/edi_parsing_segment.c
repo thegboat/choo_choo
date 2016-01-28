@@ -61,10 +61,6 @@ segment_t *rewindLoop(segment_t *loop){
   return loop;
 }
 
-bool elementCountIn(segment_t *segment, int start, int end){
-  return segment->elements >= start && segment->elements <= end;
-}
-
 static void propertyFree(segment_t* segment){
   unsigned long key;
   unsigned long value;
