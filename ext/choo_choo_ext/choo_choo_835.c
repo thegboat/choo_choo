@@ -1,12 +1,12 @@
 //
-//  edi_parsing_835.c
+//  choo_choo_835.c
 //  choo_choo_parser
 //
 //  Created by Grady Griffin on 8/3/15.
 //  Copyright (c) 2015 CareCloud. All rights reserved.
 //
 
-#include "edi_parsing.h"
+#include "choo_choo.h"
 
 static inline void attach835Segment(parser835_t *parser, segment_t *segment);
 static inline void default835Handler(parser835_t *parser, segment_t *segment);
@@ -490,7 +490,7 @@ static inline void parser835Cleanup(parser835_t *parser){
   parser->super->finished = true;
 }
 
-void init_edi_parsing_835(){
+void init_choo_choo_835(){
   
 }
 

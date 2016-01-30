@@ -1,11 +1,11 @@
 //
-//  edi_parsing_traversal.c
+//  choo_choo_traversal.c
 //  choo_choo_parser
 //
 //  Created by Grady Griffin on 8/3/15.
 //  Copyright (c) 2015 CareCloud. All rights reserved.
 //
-#include "edi_parsing.h"
+#include "choo_choo.h"
 
 #define getCname(rstring) RSTRING_PTR(rb_funcall((rstring),id_force_8_bit,0))
 
@@ -295,7 +295,7 @@ char *propertyLookup(segment_t *segment,  short element, short component){
   }
 }
 
-void init_edi_parsing_traversal(){
+void init_choo_choo_traversal(){
   id_force_8_bit = rb_intern("b");
   id_length = rb_intern("length");
   sym_children =ID2SYM(rb_intern("children"));

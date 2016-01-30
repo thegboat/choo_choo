@@ -1,11 +1,11 @@
 //
-//  edi_parsing_parser.c
+//  choo_choo_parser.c
 //  choo_choo_parser
 //
 //  Created by Grady Griffin on 8/3/15.
 //  Copyright (c) 2015 CareCloud. All rights reserved.
 //
-#include "edi_parsing.h"
+#include "choo_choo.h"
 
 void *ediParsingMalloc(size_t nitems, size_t size){
   void *any = ruby_xcalloc(nitems, size);
@@ -23,12 +23,10 @@ void ediParsingDealloc(void *any){
 }
 
 segment_t *parseSegment(parser_t *parser){
-  char *ptr;
+  char *ptr, *saveptr;
   segment_t *segment = ediParsingMalloc(1,sizeof(segment_t));
-  char *tok;
-  char *saveptr;
   short element = 0;
-  tok = strtok_r(parser->str, ELEMENT_SEPARATOR, &saveptr);
+  char *tok = strtok_r(parser->str, ELEMENT_SEPARATOR, &saveptr);
   segmentInitializer(segment, tok);
   tok = strtok_r(NULL, ELEMENT_SEPARATOR, &saveptr);
   while (tok != NULL)

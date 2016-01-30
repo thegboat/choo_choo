@@ -1,11 +1,11 @@
 //
-//  edi_parsing_interface.c
+//  choo_choo_interface.c
 //  choo_choo_parser
 //
 //  Created by Grady Griffin on 8/3/15.
 //  Copyright (c) 2015 CareCloud. All rights reserved.
 
-#include "edi_parsing.h"
+#include "choo_choo.h"
 
 static void segment_free(anchor_t *anchor);
 static VALUE segment_alloc(VALUE self);
@@ -199,7 +199,7 @@ static VALUE segment_root(VALUE self){
   return anchor->parser->root_rb;
 }
 
-void Init_edi_parsing(void) {
+void Init_choo_choo_ext(void) {
   mEDI835 = rb_define_module("EDI835");
   mChooChoo = rb_define_module("ChooChoo");
   cSegment = rb_define_class_under(mChooChoo, "Segment", rb_cObject);
@@ -225,7 +225,7 @@ void Init_edi_parsing(void) {
 
   id_force_8_bit = rb_intern("b");
 
-  //init_edi_parsing_835();
-  init_edi_parsing_traversal();
+  //init_choo_choo_835();
+  init_choo_choo_traversal();
   init_care_cloud_edi_835();
 }

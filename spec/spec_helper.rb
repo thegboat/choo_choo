@@ -1,6 +1,6 @@
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 require 'choo_choo'
-require 'benchmark'
+require 'benchmark/ips'
 require 'pry'
 require 'pry-byebug'
 

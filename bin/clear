@@ -1,7 +1,7 @@
 #!/bin/bash
 
 rm -rf tmp/*
-rm ext/edi_parsing/*.bundle
-rm ext/edi_parsing/*.o
+rm ext/choo_choo_ext/*.bundle
+rm ext/choo_choo_ext/*.o
 
 rake compile

@@ -1,5 +1,5 @@
 //
-//  edi_parsing.h
+//  choo_choo.h
 //  choo_choo_parser
 //
 //  Created by Grady Griffin on 8/11/15.
@@ -13,7 +13,7 @@
 #include <search.h>
 #include <ruby.h>
 #include <ruby/st.h>
-#include "edi_parsing_constants.h"
+#include "choo_choo_constants.h"
 
 #define getPropertyKey(element,component) (element)*100+(component)
 #define isChildOf(thechild,theparent) (theparent)==(thechild)->parent
@@ -159,16 +159,16 @@ VALUE segmentExists(parser_t *parser, segment_t *segment, VALUE name_rb, VALUE e
 VALUE segmentWhere(parser_t *parser, segment_t *segment, VALUE name_rb, VALUE element_int_rb, VALUE component_int_rb, VALUE value_rb, VALUE limit_rb);
 VALUE segmentGetProperty(segment_t *segment, VALUE element_int_rb, VALUE component_int_rb);
 char *propertyLookup(segment_t *segment,  short element, short component);
-void init_edi_parsing_traversal();
+void init_choo_choo_traversal();
 
 // 835
 
 void parse835(anchor_t *anchor, const char *ediFile);
-void init_edi_parsing_835();
+void init_choo_choo_835();
 
 // interface
 
-void Init_edi_parsing(void);
+void Init_choo_choo(void);
 VALUE buildSegmentNode(parser_t *parser, segment_t *segment);
 anchor_t *getAnchor(VALUE segment_rb);
 

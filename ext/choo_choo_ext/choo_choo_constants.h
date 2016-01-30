@@ -1,5 +1,5 @@
 //
-//  edi_parsing_constants.h
+//  choo_choo_constants.h
 //  choo_choo_parser
 //
 //  Created by Grady Griffin on 8/3/15.

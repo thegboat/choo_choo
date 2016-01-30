@@ -1,12 +1,12 @@
 //
-//  edi_parsing_errors.c
+//  choo_choo_errors.c
 //  choo_choo_parser
 //
 //  Created by Grady Griffin on 8/3/15.
 //  Copyright (c) 2015 CareCloud. All rights reserved.
 //
 
-#include "edi_parsing.h"
+#include "choo_choo.h"
 
 
 VALUE getErrors(parser_t *parser){

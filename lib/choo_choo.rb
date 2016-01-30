@@ -1,7 +1,7 @@
 
 require "bigdecimal"
 require "stringio"
-require "edi_parsing"
+require "choo_choo_ext"
 # require "oj"
 # require "ox"
 require "choo_choo/version"

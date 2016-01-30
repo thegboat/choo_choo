@@ -20,9 +20,9 @@ Gem::Specification.new do |spec|
 
   spec.files         = `git ls-files -z`.split("\x0")
   spec.bindir        = "exe"
-  spec.extensions     = ["ext/edi_parsing/extconf.rb"]
+  spec.extensions     = ["ext/choo_choo_ext/extconf.rb"]
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
-  spec.require_paths = ["lib", "ext/edi_parsing"]
+  spec.require_paths = ["lib", "ext/choo_choo_ext"]
 
   spec.add_dependency "rake-compiler", "~> 0.9"
   #spec.add_dependency "activesupport"

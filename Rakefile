@@ -13,5 +13,5 @@ Gem::PackageTask.new(spec) do |pkg|
 end
 
 # feed the ExtensionTask with your spec
-Rake::ExtensionTask.new('edi_parsing', spec)
+Rake::ExtensionTask.new('choo_choo_ext', spec)
 

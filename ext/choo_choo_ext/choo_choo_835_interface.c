@@ -1,13 +1,13 @@
 
 //
-//  edi_parsing_835_interface.c
+//  choo_choo_835_interface.c
 //  choo_choo_parser
 //
 //  Created by Grady Griffin on 1/28/16.
 //  Copyright (c) 2015 CareCloud. All rights reserved.
 //
 
-#include "edi_parsing.h"
+#include "choo_choo.h"
 
 static inline VALUE segmentGetPropery(VALUE segment_rb, short element, short component);
 
