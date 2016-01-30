@@ -22,10 +22,10 @@ void segmentInitializer(segment_t *segment, char *src){
 
 void cacheProperty(segment_t *segment, char *data, short element, short component){
   unsigned long key = getPropertyKey(element, component);
-  if(strcmp(data, CHOOCHOO_EMPTY) == 0){
-    st_add_direct(segment->propertyCache, (st_data_t)key, (unsigned long)(""));
-  }else{
+  if(strlen(data)){
     st_add_direct(segment->propertyCache, (st_data_t)key, (unsigned long)strdup(data));
+  }else{
+    st_add_direct(segment->propertyCache, (st_data_t)key, (unsigned long)(""));
   }
 }
 

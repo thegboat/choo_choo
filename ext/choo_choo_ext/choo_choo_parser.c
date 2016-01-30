@@ -57,9 +57,9 @@ segment_t *parseSegment(parser_t *parser){
 }
 
 int parseElement(segment_t *segment, char *str, const char componentSeparator[2], short element){
-  char *tok, *rest, *saveptr;
+  char *tok, *rest = str;
   short component = 0;
-  while((tok = strsep(&rest, (char*)&ELEMENT_SEPARATOR)))
+  while((tok = strsep(&rest, componentSeparator)))
   {
     component++;
     cacheProperty(segment, tok, element, component);
