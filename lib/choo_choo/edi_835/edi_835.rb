@@ -1,54 +1,41 @@
 require 'set'
+require 'choo_choo/edi_835/has_adjustments'
 require 'choo_choo/edi_835/document'
-require 'choo_choo/segments/amt'
-require 'choo_choo/segments/bpr'
-require 'choo_choo/segments/cas'
-require 'choo_choo/segments/clp'
-require 'choo_choo/segments/cur'
-require 'choo_choo/segments/dtm'
-require 'choo_choo/segments/ge'
-require 'choo_choo/segments/gs'
-require 'choo_choo/segments/iea'
-require 'choo_choo/segments/isa'
-require 'choo_choo/segments/lq'
-require 'choo_choo/segments/lx'
-require 'choo_choo/segments/mia'
-require 'choo_choo/segments/moa'
-require 'choo_choo/segments/n1'
-require 'choo_choo/segments/n3'
-require 'choo_choo/segments/n4'
-require 'choo_choo/segments/nm1'
-require 'choo_choo/segments/per'
-require 'choo_choo/segments/plb'
-require 'choo_choo/segments/qty'
-require 'choo_choo/segments/rdm'
-require 'choo_choo/segments/ref'
-require 'choo_choo/segments/se'
-require 'choo_choo/segments/st'
-require 'choo_choo/segments/svc'
-require 'choo_choo/segments/trn'
-require 'choo_choo/segments/ts2'
-require 'choo_choo/segments/ts3'
 require 'choo_choo/edi_835/parser'
+require 'choo_choo/edi_835/remittance'
+require 'choo_choo/edi_835/service_detail'
+require 'choo_choo/edi_835/claim_payment'
 
 module EDI835
-  UPIN                    = '1G'
-  PAYER_ID                = '2U'
-  STATE_NUMBER            = '0B'
-  PAYEE_ID                = 'PQ'
-  EIN                     = 'TJ'
-  RENDERING_PROVIDER      = '82' 
-  INSURED_OR_SUBSCRIBER   = 'IL'
-  PATIENT                 = 'QC'
-  CORRECTED_INSURED       = '74'
-  CROSSOVER               = 'TT'
-  DEDUCTIBLE              = '1'
-  CO_INSURANCE            = '2'
-  CO_PAYMENT              = '3'
-  PERSON                  = '1'
-  ORGANIZATION            = '2'
-  PATIENT_RESPONSIBILITY  = 'PR'
-  CHARGE_NUMBER           = '6R'
+  UPIN                    = '1G'.freeze
+  PAYER_ID                = '2U'.freeze
+  STATE_NUMBER            = '0B'.freeze
+  PAYEE_ID                = 'PQ'.freeze
+  EIN                     = 'TJ'.freeze
+  RENDERING_PROVIDER      = '82' .freeze
+  INSURED_OR_SUBSCRIBER   = 'IL'.freeze
+  PATIENT                 = 'QC'.freeze
+  CORRECTED_INSURED       = '74'.freeze
+  CROSSOVER               = 'TT'.freeze
+  DEDUCTIBLE              = '1'.freeze
+  CO_INSURANCE            = '2'.freeze
+  CO_PAYMENT              = '3'.freeze
+  PERSON                  = '1'.freeze
+  ORGANIZATION            = '2'.freeze
+  PATIENT_RESPONSIBILITY  = 'PR'.freeze
+  CHARGE_NUMBER           = '6R'.freeze
+  N1_XX                   = 'XX'.freeze
+  N1_FI                   = 'FI'.freeze
+  NM1_PI                  = 'PI'.freeze
+  AMT_AU                  = 'AU'.freeze
+
+  SVC_HC                  = 'HC'.freeze
+  DTM_150                 = '150'.freeze
+  DTM_472                 = '472'.freeze
+  DTM_232                 = '232'.freeze
+  DTM_233                 = '232'.freeze
+  DTM_151                 = '151'.freeze
+  AMT_B6                  = 'B6'.freeze
 
   PR_CODES                = Set.new([DEDUCTIBLE, CO_INSURANCE, CO_PAYMENT])
   WITHHOLD_CODES          = Set.new(%w{104 253 105 245 144})

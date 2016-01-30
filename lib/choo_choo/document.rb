@@ -23,5 +23,6 @@ module ChooChoo
     alias :interchange_loop :isa_segment 
     alias :interchange :isa_segment 
     alias :root :isa_segment 
+    alias :isa :isa_segment 
   end
 end

@@ -1,0 +1,121 @@
+#!/usr/bin/env ruby
+require 'fileutils'
+
+hash = {
+  ISA: 16,
+  BPR: 21,
+  TRN: 4,
+  CUR: 21,
+  DTM: 6,
+  PER: 9,
+  MIA: 24,
+  REF: 4,
+  CAS: 19,
+  IEA: 2,
+  QTY: 4,
+  SVC: [{1 => 7}, (2..5), {6 => 8}, 7],
+  CLP: 14, 
+  PLB: [(1..2), {3 => 2}, 4, {5 => 2}, 6, {7 => 2}, 8, {9 => 2}, 10, {11 => 2}, 12, {13 => 2}, 14],
+  TS3: 19,
+  TS2: 24,
+  MOA: 9,
+  RDM: 3,
+  LX: 1,
+  LQ: 2,
+  N1: 6,
+  N3: 2,
+  N4: 6,
+  GS: 8,
+  ST: 3,
+  GE: 2,
+  SE: 2,
+  NM1: 11,
+  AMT: 3
+}
+
+funcnames = []
+
+hash.keys.each do |key|
+  if hash[key].is_a?(Fixnum)
+    1.upto(hash[key]) do |n|
+      funcnames << "#{key}#{n.to_s.rjust(2,'0')}"
+    end
+  else
+    hash[key].each do |item|
+      if item.is_a?(Fixnum)
+        funcnames << "#{key}#{item.to_s.rjust(2,'0')}"
+      elsif item.is_a?(Range)
+        item.each do |n|
+          funcnames <<  "#{key}#{n.to_s.rjust(2,'0')}"
+        end
+      else
+        el = item.keys.first
+        cm = item.values.first
+        1.upto(cm).each do |n|
+          funcnames <<  "#{key}#{el.to_s.rjust(2,'0')}_#{n.to_s.rjust(2,'0')}"
+        end
+      end
+    end
+  end
+end
+
+vars = hash.keys.map {|k| "static VALUE c#{k};"}.join("\n")
+
+functions = funcnames.map do |funcname|
+  funcname =~ /^([A-Z][A-Z][A-Z1-9]|[A-Z][A-Z]|[A-Z][1-9])([0-9]{2})(|_([0-9]{2}))$/
+  segname = $1
+  %{
+static VALUE #{funcname.downcase}(VALUE self){
+  return segmentGetPropery(self, #{$2.to_i}, #{$4.to_i});
+}
+}
+end.join
+
+cdefines = hash.keys.map do |klass|
+%{  c#{klass} = rb_define_class_under(mEDI835, "#{klass}", cSegment);}
+end.join("\n")
+
+inits = funcnames.map do |funcname|
+  funcname =~ /^([A-Z][A-Z][A-Z1-9]|[A-Z][A-Z]|[A-Z][1-9])([0-9]{2})(|_([0-9]{2}))$/
+  segname = $1
+%{  rb_define_method(c#{segname}, "#{funcname}", #{funcname.downcase}, 0);}
+end.join("\n")
+
+content = %{
+//
+//  edi_parsing_835_interface.c
+//  choo_choo_parser
+//
+//  Created by Grady Griffin on 1/28/16.
+//  Copyright (c) 2015 CareCloud. All rights reserved.
+//
+
+#include "edi_parsing.h"
+
+static inline VALUE segmentGetPropery(VALUE segment_rb, short element, short component);
+
+static VALUE mChooChoo;
+static VALUE mEDI835;
+static VALUE cSegment;
+
+#{vars}
+
+static inline VALUE segmentGetPropery(VALUE segment_rb, short element, short component){
+  anchor_t *anchor = getAnchor(segment_rb);
+  char *ptr = propertyLookup(anchor->segment, element, component);
+  return (ptr ? rb_str_new_cstr(ptr) : Qnil);
+}
+#{functions}
+void init_care_cloud_edi_835(){
+  mEDI835 = rb_define_module("EDI835");
+  mChooChoo = rb_define_module("ChooChoo");
+  cSegment = rb_define_class_under(mChooChoo, "Segment", rb_cObject);
+#{cdefines}
+#{inits}
+}
+}
+
+file = File.open("ext/edi_parsing/edi_parsing_835_interface.c", "w+")
+
+file << content
+file.close

@@ -11,10 +11,13 @@
 
 static int nameSortFunc(const void *p1, const void*p2);
 static void indexSegment(parser_t *parser, segment_t *segment, int *segmentCount, int depth);
-static bool hasProperty(segment_t *segment,  short element, short component, char *value);
+static inline bool hasProperty(segment_t *segment,  short element, short component, char *value);
 static int nameIndexFunc(const void *p1, const void*p2);
 
 static ID id_force_8_bit;
+static ID id_length;
+static VALUE sym_name;
+static VALUE sym_children;
 
 void buildIndexes(parser_t *parser){
   int segmentCount = 0;
@@ -46,23 +49,21 @@ void buildIndexes(parser_t *parser){
 
 VALUE propertiesToHash(segment_t *segment){
   VALUE hash = rb_hash_new();
-  unsigned long key;
-  unsigned long value;
+  char *ptr;
   char key_string[MAX_KEY_SIZE];
   short element = 0;
   short component = 0;
   VALUE sym;
   for(element=1;element<=segment->elements; element++){
     for(component=0; component<100; component++){
-      key = getPropertyKey(element,component);
-      if(st_lookup(segment->propertyCache, key, &value)){
+      if((ptr = propertyLookup(segment, element, component))){
         if(0 == component){
           sprintf(key_string, "%s%02i", segment->name, element);
         }else{
           sprintf(key_string, "%s%02i_%02i", segment->name, element, component);
         }
         sym = ID2SYM(rb_intern(key_string));
-        rb_hash_aset(hash, sym, rb_str_new_cstr((char*)(value)));
+        rb_hash_aset(hash, sym, rb_str_new_cstr(ptr));
       }else{
         break;
       }
@@ -122,7 +123,7 @@ VALUE segmentExists(parser_t *parser, segment_t *segment, VALUE name_rb, VALUE e
 
 VALUE segmentChildren(parser_t *parser, segment_t *segment, VALUE names_rb, VALUE limit_rb){
   VALUE result = rb_ary_new();
-  const int length = NUM2INT(rb_funcall(names_rb, rb_intern("length"), 0));
+  const int length = NUM2INT(rb_funcall(names_rb, id_length, 0));
   const int limit = NUM2INT(limit_rb);
   segment_t *descendant;
   int cnt = 0;
@@ -170,16 +171,16 @@ VALUE segmentToHash(segment_t *segment){
       rb_ary_push(children, segmentToHash(child));
       child = child->tail;
     }
-    rb_hash_aset(proxy, ID2SYM(rb_intern("children")), children);
+    rb_hash_aset(proxy, sym_children, children);
   }
 
-  rb_hash_aset(proxy, ID2SYM(rb_intern("name")), rb_str_new_cstr(segment->name));
+  rb_hash_aset(proxy, sym_name, rb_str_new_cstr(segment->name));
   return proxy;
 }
 
 VALUE segmentFind(parser_t *parser, segment_t *segment, VALUE names_rb, VALUE limit_rb){
   VALUE result = rb_ary_new();
-  const int length = NUM2INT(rb_funcall(names_rb, rb_intern("length"), 0));
+  const int length = NUM2INT(rb_funcall(names_rb, id_length, 0));
   const int limit = NUM2INT(limit_rb);
   segment_t *descendant;
   int cnt = 0;
@@ -222,13 +223,8 @@ VALUE segmentFind(parser_t *parser, segment_t *segment, VALUE names_rb, VALUE li
 VALUE segmentGetProperty(segment_t *segment, VALUE element_int_rb, VALUE component_int_rb){
   short element = NUM2SHORT(element_int_rb);
   short component = NUM2SHORT(component_int_rb);
-  unsigned long key = getPropertyKey(element,component);
-  unsigned long value; 
-  if(st_lookup(segment->propertyCache, key, &value)){
-    return rb_str_new_cstr((char*)value);
-  }else{
-    return Qnil;
-  }
+  char *ptr = propertyLookup(segment, element, component);
+  return (ptr ? rb_str_new_cstr(ptr) : Qnil);
 }
 
 index_stat_t nameIndexSearch(parser_t *parser, const char *name){
@@ -284,17 +280,25 @@ int segmentsWithName(parser_t *parser, char *src){
   return (stat.lower < 0 || stat.upper < 0) ? 0 : ((stat.upper - stat.lower) + 1);
 }
 
-static bool hasProperty(segment_t *segment,  short element, short component, char *value){
-  unsigned long hash_value;
+static inline bool hasProperty(segment_t *segment,  short element, short component, char *value){
+  char *hash_value = propertyLookup(segment, element, component);
+  return (hash_value ? !strcmp(value, hash_value) : false);
+}
+
+char *propertyLookup(segment_t *segment,  short element, short component){
+  unsigned long value;
   unsigned long key = getPropertyKey(element, component);
-  if(st_lookup(segment->propertyCache, key, &hash_value)){
-    return strcmp(value, (char*)hash_value) == 0;
+  if(st_lookup(segment->propertyCache, key, &value)){
+    return (char*)value;
   }else{
-    return false;
+    return NULL;
   }
 }
 
 void init_edi_parsing_traversal(){
   id_force_8_bit = rb_intern("b");
+  id_length = rb_intern("length");
+  sym_children =ID2SYM(rb_intern("children"));
+  sym_name =ID2SYM(rb_intern("name"));
 }
 

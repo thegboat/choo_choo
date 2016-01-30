@@ -158,6 +158,7 @@ int segmentsWithName(parser_t *parser, char *src);
 VALUE segmentExists(parser_t *parser, segment_t *segment, VALUE name_rb, VALUE element_int_rb, VALUE component_int_rb, VALUE value_rb);
 VALUE segmentWhere(parser_t *parser, segment_t *segment, VALUE name_rb, VALUE element_int_rb, VALUE component_int_rb, VALUE value_rb, VALUE limit_rb);
 VALUE segmentGetProperty(segment_t *segment, VALUE element_int_rb, VALUE component_int_rb);
+char *propertyLookup(segment_t *segment,  short element, short component);
 void init_edi_parsing_traversal();
 
 // 835
@@ -169,8 +170,13 @@ void init_edi_parsing_835();
 
 void Init_edi_parsing(void);
 VALUE buildSegmentNode(parser_t *parser, segment_t *segment);
+anchor_t *getAnchor(VALUE segment_rb);
 
 // errors
 
 VALUE getErrors(parser_t *parser);
+
+// carecloud
+
+void init_care_cloud_edi_835();
 

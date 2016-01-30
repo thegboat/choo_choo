@@ -8,7 +8,6 @@
 
 #include "edi_parsing.h"
 
-
 static inline void attach835Segment(parser835_t *parser, segment_t *segment);
 static inline void default835Handler(parser835_t *parser, segment_t *segment);
 static inline void isa835Handler(parser835_t *parser, segment_t *segment);

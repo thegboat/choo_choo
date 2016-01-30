@@ -1,15 +1,12 @@
 module ChooChoo
   class Segment
 
-    def self.parse_property_key(string, document_type)
-      string =~ ChooChoo::PROPERTY_REGEX
-      raise InvalidPropertyName if $1.nil? || $2.nil?
-      raise InvalidElementName unless document_type.valid_segments.include?($1)
-      [$1, $2.to_i, $4.to_i]
-    end
-
     def null_segment?
       false
+    end
+
+    def isa
+      _c_isa
     end
 
     def name
@@ -84,14 +81,6 @@ module ChooChoo
 
     def errors
       _c_errors
-    end
-
-    def get_property(key)
-      seg_name, element,component = parse_property_key(key.to_s)
-      unless seg_name == _name_s
-        raise MethodNotImplemented, "Method #{key} not implemented for #{_name_s} segment."
-      end
-      _c_get_property(element, component)
     end
 
     def humanized_errors
@@ -207,6 +196,13 @@ module ChooChoo
       val
     end
 
+    def self.parse_property_key(string, document_type)
+      string =~ ChooChoo::PROPERTY_REGEX
+      raise InvalidPropertyName if $1.nil? || $2.nil?
+      raise InvalidElementName unless document_type.valid_segments.include?($1)
+      [$1, $2.to_i, $4.to_i]
+    end
+
     private
 
     def parse_property_key(string)
@@ -243,7 +239,7 @@ module ChooChoo
         send(key)
       else
         seg_name, element, component = parse_property_key(key)
-        child!(seg_name).send(:_c_get_property, element, component)
+        child!(seg_name).send(key)
       end
     end
 
@@ -254,7 +250,7 @@ module ChooChoo
         seg_name, element, component = parse_property_key(key)
         list = children(seg_name)
         if list.length == 1 
-          list.first.send(:_c_get_property, element, component)
+          list.first.send(key.to_sym)
         elsif list.length > 1 
           raise MultipleChildrenFound, "can not cast from multiple children."
         else

@@ -23,7 +23,7 @@ void ediParsingDealloc(void *any){
 }
 
 segment_t *parseSegment(parser_t *parser){
-  unsigned long value;
+  char *ptr;
   segment_t *segment = ediParsingMalloc(1,sizeof(segment_t));
   char *tok;
   char *saveptr;
@@ -43,14 +43,16 @@ segment_t *parseSegment(parser_t *parser){
   }
   segment->elements = element;
   if(parser->segmentCount == 0 && isISA(segment)){
-    if(!st_lookup(segment->propertyCache, getPropertyKey(16,0), &value) || strlen((char *)value) != 1){
+    ptr = propertyLookup(segment, 16, 0);
+    if(!ptr || strlen(ptr) != 1){
       parserFail(parser, INVALID_COMPONENT_SEPARATOR);
     }else{
-      strcpy(parser->componentSeparator, (char *)value);
-      if(!st_lookup(segment->propertyCache, getPropertyKey(11,0), &value) || strlen((char *)value) != 1){
+      strcpy(parser->componentSeparator, ptr);
+      ptr = propertyLookup(segment, 11, 0);
+      if(!ptr || strlen(ptr) != 1){
         parserFail(parser, INVALID_REPITITON_SEPARATOR);
       }else{
-        strcpy(parser->repititionSeparator, (char *)value);
+        strcpy(parser->repititionSeparator, ptr);
       }
     }
   }

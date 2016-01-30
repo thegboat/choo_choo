@@ -12,7 +12,6 @@ static VALUE segment_alloc(VALUE self);
 static VALUE choo_choo_parse_835(VALUE segment, VALUE isa_str);
 static VALUE segment_parent(VALUE self);
 static VALUE segment_children(VALUE self, VALUE names_rb, VALUE limit_rb);
-static inline anchor_t *getAnchor(VALUE segment_rb);
 static inline anchor_t *getAnchorUnsafe(VALUE segment_rb);
 static VALUE segment_find(VALUE self, VALUE names_rb, VALUE limit_rb);
 static VALUE segment_get_property(VALUE self, VALUE element_int_rb, VALUE component_int_rb);
@@ -24,11 +23,13 @@ static VALUE segment_document_type(VALUE self);
 static VALUE segment_exists(VALUE self, VALUE name_rb, VALUE element_int_rb, VALUE component_int_rb, VALUE value_rb);
 static anchor_t *parserSetup(const char documentType[10]);
 static VALUE choo_choo_empty(VALUE self);
+static VALUE segment_root(VALUE self);
 
 static VALUE mChooChoo;
 static VALUE cSegment;
 static VALUE cParser;
 static VALUE cDocument;
+static VALUE mEDI835;
 
 static ID id_force_8_bit;
 
@@ -55,7 +56,7 @@ static VALUE choo_choo_parse_835(VALUE self, VALUE isa_str){
 }
 
 static anchor_t *parserSetup(const char documentType[10]){
-  VALUE class_rb = rb_define_class_under(mChooChoo, "ISA", cSegment);
+  VALUE class_rb = rb_define_class_under(mEDI835, "ISA", cSegment);
   parser_t *parser = ediParsingMalloc(1,sizeof(parser_t));
   anchor_t *anchor;
   parserInitialization(parser);
@@ -91,7 +92,7 @@ static VALUE segment_children(VALUE self, VALUE names_rb, VALUE limit_rb){
   }
 }
 
-static inline anchor_t *getAnchor(VALUE segment_rb){
+anchor_t *getAnchor(VALUE segment_rb){
   anchor_t *anchor;
   Data_Get_Struct(segment_rb, anchor_t, anchor);
   if(NULL == anchor || NULL == anchor->parser || NULL == anchor->segment){
@@ -133,9 +134,10 @@ static VALUE segment_name(VALUE self){
   return ID2SYM(id_name);
 }
 
-static VALUE segment_get_property(VALUE self, VALUE element_int_rb, VALUE component_int_rb){
+static VALUE segment_get_property(VALUE self, VALUE element, VALUE component){
   anchor_t *anchor = getAnchor(self);
-  return segmentGetProperty(anchor->segment, element_int_rb, component_int_rb);
+  char *ptr = propertyLookup(anchor->segment, NUM2SHORT(element), NUM2SHORT(component));
+  return (ptr ? rb_str_new_cstr(ptr) : Qnil);
 }
 
 static VALUE segment_errors(VALUE self){
@@ -160,8 +162,7 @@ static VALUE segment_where(VALUE self, VALUE name_rb, VALUE element_int_rb, VALU
 
 static VALUE segment_document_type(VALUE self){
   anchor_t *anchor = getAnchor(self);
-  VALUE mEDI;
-  VALUE doc;
+  VALUE mEDI,doc;
   if(strcmp(anchor->parser->documentType, "835") == 0){
     mEDI = rb_define_module("EDI835");
     doc = rb_define_class_under(mEDI, "Document", cDocument);
@@ -172,14 +173,13 @@ static VALUE segment_document_type(VALUE self){
 }
 
 VALUE buildSegmentNode(parser_t *parser, segment_t *segment){
-  VALUE segment_rb;
-  VALUE class_rb;
+  VALUE segment_rb,class_rb;
   anchor_t *anchor;
   if(segment == parser->root){
     segment_rb = parser->root_rb;
   }else{
 
-    class_rb = rb_define_class_under(mChooChoo, segment->name, cSegment);
+    class_rb = rb_define_class_under(mEDI835, segment->name, cSegment);
     segment_rb = rb_class_new_instance(0, NULL, class_rb);
 
     Data_Get_Struct(segment_rb, anchor_t, anchor);
@@ -194,7 +194,13 @@ static VALUE choo_choo_empty(VALUE self){
   return rb_str_new_cstr(CHOOCHOO_EMPTY);
 }
 
+static VALUE segment_root(VALUE self){
+  anchor_t *anchor = getAnchor(self);
+  return anchor->parser->root_rb;
+}
+
 void Init_edi_parsing(void) {
+  mEDI835 = rb_define_module("EDI835");
   mChooChoo = rb_define_module("ChooChoo");
   cSegment = rb_define_class_under(mChooChoo, "Segment", rb_cObject);
   cParser = rb_define_class_under(mChooChoo, "Parser", rb_cObject);
@@ -206,6 +212,7 @@ void Init_edi_parsing(void) {
   rb_define_alloc_func(cSegment, segment_alloc);
   rb_define_method(cSegment, "document_type", segment_document_type, 0);
   rb_define_method(cSegment, "_c_name", segment_name, 0);
+  rb_define_method(cSegment, "_c_isa", segment_root, 0);
   rb_define_method(cSegment, "to_hash", segment_to_hash, 0);
   rb_define_method(cSegment, "_c_descendants", segment_find, 2);
   rb_define_method(cSegment, "_c_children", segment_children, 2);
@@ -220,4 +227,5 @@ void Init_edi_parsing(void) {
 
   //init_edi_parsing_835();
   init_edi_parsing_traversal();
+  init_care_cloud_edi_835();
 }

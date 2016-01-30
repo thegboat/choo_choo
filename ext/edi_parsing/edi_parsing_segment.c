@@ -62,15 +62,11 @@ segment_t *rewindLoop(segment_t *loop){
 }
 
 static void propertyFree(segment_t* segment){
-  unsigned long key;
-  unsigned long value;
-  char *tmp;
+  char *ptr;
   for(short element=1;element<=segment->elements; element++){
     for(short component=0; component<100; component++){
-      key = getPropertyKey(element,component);
-      if(st_lookup(segment->propertyCache, key, &value)){
-        tmp = (char*)(value);
-        if(strlen(tmp)) ediParsingDealloc(tmp);
+      if((ptr = propertyLookup(segment, element, component))){
+        if(strlen(ptr)) ediParsingDealloc(ptr);
       }else{
         break;
       }

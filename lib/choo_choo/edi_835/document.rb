@@ -18,5 +18,12 @@ module EDI835
       ]
     end
 
+    def find_claim(claim_number)
+      clp = isa.first!(:CLP01, claim_number)
+      remit = EDI835::Remittance.new(isa)
+      claim = EDI835::ClaimPayment.new(clp, remit)
+      claim
+    end
+
   end
 end
