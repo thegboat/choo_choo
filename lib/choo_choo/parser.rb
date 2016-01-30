@@ -22,8 +22,6 @@ module ChooChoo
       str_buffer.delete!("\000")
       str_buffer.strip!
       str_buffer.gsub!(/~\s+/,'~')
-      str_buffer.gsub!("**", "*#{empty}*")
-      str_buffer.gsub!("**", "*#{empty}*")
       isa = yield(str_buffer)
       isa
     end

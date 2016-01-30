@@ -46,16 +46,14 @@ static inline void parser835Cleanup(parser835_t *parser);
 
 void parse835(anchor_t *anchor, const char *ediFile){
   char *copy = strdup(ediFile);
+  char *rest = copy;
   parser835_t parser;
   parser.super = anchor->parser;
   parser835Initialization(&parser);
   segment_t *segment;
-  char *saveptr;
-  parser.super->str = strtok_r(copy, SEGMENT_SEPARATOR, &saveptr);
-  while(NULL != parser.super->str && !parser.super->finished && !parser.super->failure){
+  while((parser.super->str = strsep(&rest, (char*)&SEGMENT_SEPARATOR)) && !parser.super->finished && !parser.super->failure){
     segment = parseSegment(parser.super);
     attach835Segment(&parser, segment);
-    parser.super->str = strtok_r(NULL, SEGMENT_SEPARATOR, &saveptr);
   }
   parser835Cleanup(&parser);
   anchor->segment = parser.super->root;
