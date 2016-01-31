@@ -6,7 +6,7 @@ module ChooChoo
     attr_reader :stream
 
     def initialize(file_or_string)
-      @stream = file_or_string.is_a?(String) ? StringIO.new(file_or_string) : file_or_string
+      @stream = file_or_string.is_a?(String) ? file_or_string.dup : file_or_string.read
     end
 
     def self.parse
@@ -17,17 +17,12 @@ module ChooChoo
       raise MethodImplementationRequired
     end
 
-    def split
-      str_buffer = stream.read
-      str_buffer.delete!("\000")
-      str_buffer.strip!
-      str_buffer.gsub!(/~\s+/,'~')
-      isa = yield(str_buffer)
-      isa
-    end
-
-    def empty
-      _c_empty
+    def _parse
+      stream.delete!("\000")
+      stream.strip!
+      stream.gsub!(/~\s+/,'~')
+      start = stream =~ /ISA\*/
+      yield(stream[start..-1])
     end
 
     # def split

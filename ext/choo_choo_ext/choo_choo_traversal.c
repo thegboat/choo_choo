@@ -44,7 +44,7 @@ void buildIndexes(parser_t *parser){
 
   parser->nameCount = index_i+1;
   parser->nameIndex = ediParsingMalloc(parser->nameCount,sizeof(index_stat_t));
-  memcpy(parser->nameIndex,&tmp, parser->nameCount*sizeof(index_stat_t));
+  memcpy(parser->nameIndex,tmp, parser->nameCount*sizeof(index_stat_t));
 }
 
 VALUE propertiesToHash(segment_t *segment){
@@ -122,13 +122,14 @@ VALUE segmentExists(parser_t *parser, segment_t *segment, VALUE name_rb, VALUE e
 }
 
 VALUE segmentChildren(parser_t *parser, segment_t *segment, VALUE names_rb, VALUE limit_rb){
-  VALUE result = rb_ary_new();
+  VALUE result;
   const int length = NUM2INT(rb_funcall(names_rb, id_length, 0));
   const int limit = NUM2INT(limit_rb);
   segment_t *descendant;
   int cnt = 0;
 
   if(length == 0){
+    result = rb_ary_new_capa(segment->children);
     descendant = segment->firstSegment;
     while(NULL != descendant && (limit == -1 || cnt < limit)){
       VALUE child_rb = buildSegmentNode(parser, descendant);
@@ -137,6 +138,7 @@ VALUE segmentChildren(parser_t *parser, segment_t *segment, VALUE names_rb, VALU
       cnt++;
     }
   }else{
+    result = rb_ary_new();
     VALUE name = rb_ary_pop(names_rb);
     char *c_name;
     index_stat_t stat;
@@ -164,7 +166,7 @@ VALUE segmentChildren(parser_t *parser, segment_t *segment, VALUE names_rb, VALU
 VALUE segmentToHash(segment_t *segment){
   segment_t *child = segment->firstSegment;
   VALUE proxy = propertiesToHash(segment);
-  VALUE children = rb_ary_new();
+  VALUE children = rb_ary_new_capa(segment->children);
 
   if(NULL != child){
     while(NULL != child){
@@ -179,9 +181,10 @@ VALUE segmentToHash(segment_t *segment){
 }
 
 VALUE segmentFind(parser_t *parser, segment_t *segment, VALUE names_rb, VALUE limit_rb){
-  VALUE result = rb_ary_new();
+  VALUE result;
   const int length = NUM2INT(rb_funcall(names_rb, id_length, 0));
   const int limit = NUM2INT(limit_rb);
+  result = limit == 1 ? rb_ary_new_capa(1) : rb_ary_new();
   segment_t *descendant;
   int cnt = 0;
 
@@ -229,11 +232,14 @@ VALUE segmentGetProperty(segment_t *segment, VALUE element_int_rb, VALUE compone
 
 index_stat_t nameIndexSearch(parser_t *parser, const char *name){
   index_stat_t stat;
-  stat.upper = -1;
-  stat.lower = -1;
-  strcpy(stat.name, name);
+  strcpy(stat.name,name);
   index_stat_t *rtn = bsearch(&stat, parser->nameIndex, parser->nameCount, sizeof(index_stat_t), nameIndexFunc);
-  return rtn ? *rtn : stat;
+  if(NULL == rtn){
+    stat.upper = -1;
+    stat.lower = -1;
+    return stat;
+  }
+  return *rtn;
 }
 
 static int nameSortFunc(const void *p1, const void*p2){  

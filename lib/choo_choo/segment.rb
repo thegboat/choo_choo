@@ -5,9 +5,16 @@ module ChooChoo
       false
     end
 
-    def isa
-      _c_isa
+    def document
+      _c_document
     end
+    alias :doc :document
+
+    def isa
+      _c_isa_segment
+    end
+    alias :root :isa
+    alias :isa_segment :isa
 
     def name
       _name
@@ -17,9 +24,10 @@ module ChooChoo
       _c_parent
     end
 
-    def to_h
-      to_hash
+    def to_hash
+      _c_to_hash
     end
+    alias :to_h :to_hash
     
     def to_json
       Oj.dump(to_hash)
@@ -73,14 +81,6 @@ module ChooChoo
 
     def first!(sym,val)
       assert_one { _where(sym, val, 2) }.first
-    end
-
-    def errors?
-      _c_errors?
-    end
-
-    def errors
-      _c_errors
     end
 
     def humanized_errors

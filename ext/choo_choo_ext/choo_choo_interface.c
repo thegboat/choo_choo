@@ -17,27 +17,32 @@ static VALUE segment_find(VALUE self, VALUE names_rb, VALUE limit_rb);
 static VALUE segment_get_property(VALUE self, VALUE element_int_rb, VALUE component_int_rb);
 static VALUE segment_where(VALUE self, VALUE name_rb, VALUE element_int_rb, VALUE component_int_rb, VALUE value_rb, VALUE limit_rb);
 static VALUE segment_name(VALUE self);
-static VALUE segment_has_errors(VALUE self);
-static VALUE segment_errors(VALUE self);
+static VALUE document_has_errors(VALUE self);
+static VALUE document_errors(VALUE self);
 static VALUE segment_document_type(VALUE self);
 static VALUE segment_exists(VALUE self, VALUE name_rb, VALUE element_int_rb, VALUE component_int_rb, VALUE value_rb);
 static anchor_t *parserSetup(const char documentType[10]);
 static VALUE choo_choo_empty(VALUE self);
 static VALUE segment_root(VALUE self);
+static VALUE getDocClass(const char *doctype);
 
 static VALUE mChooChoo;
 static VALUE cSegment;
 static VALUE cParser;
 static VALUE cDocument;
 static VALUE mEDI835;
+static VALUE cISA;
+static VALUE cDoc835;
 
 static ID id_force_8_bit;
 
 static void segment_free(anchor_t *anchor){
+  ediParsingDealloc(anchor);
+}
+
+static void document_free(anchor_t *anchor){
   if(NULL != anchor){
-    if(NULL != anchor->parser && anchor->parser->root == anchor->segment){
-      parserFree(anchor->parser);
-    }
+    parserFree(anchor->parser);
     ediParsingDealloc(anchor);
   }
 }
@@ -47,24 +52,27 @@ static VALUE segment_alloc(VALUE self){
   return Data_Wrap_Struct(self, NULL, segment_free, anchor);
 }
 
+static VALUE document_alloc(VALUE self){
+  anchor_t *anchor = ediParsingMalloc(1,sizeof(anchor_t));
+  return Data_Wrap_Struct(self, NULL, document_free, anchor);
+}
+
 static VALUE choo_choo_parse_835(VALUE self, VALUE isa_str){
   VALUE copy = rb_funcall(isa_str, id_force_8_bit, 0);
   anchor_t *anchor = parserSetup("835");
-  parse835(anchor, RSTRING_PTR(copy));
+  parse835(anchor->parser, RSTRING_PTR(copy));
   rb_str_free(copy);
-  return anchor->parser->root_rb;
+  return anchor->parser->doc;
 }
 
-static anchor_t *parserSetup(const char documentType[10]){
-  VALUE class_rb = rb_define_class_under(mEDI835, "ISA", cSegment);
-  parser_t *parser = ediParsingMalloc(1,sizeof(parser_t));
+static anchor_t *parserSetup(const char *documentType){
   anchor_t *anchor;
-  parserInitialization(parser);
-  strcpy(parser->documentType, documentType);
-  VALUE isa = rb_class_new_instance(0, NULL, class_rb);
-  Data_Get_Struct(isa, anchor_t, anchor);
-  anchor->parser = parser;
-  anchor->parser->root_rb = isa;
+  VALUE doc = rb_class_new_instance(0, NULL, getDocClass(documentType));
+  Data_Get_Struct(doc, anchor_t, anchor);
+  anchor->parser = ediParsingMalloc(1,sizeof(parser_t));
+  anchor->parser->doc = doc;
+  parserInitialization(anchor->parser);
+  strcpy(anchor->parser->documentType, documentType);
   return anchor;
 }
 
@@ -95,7 +103,7 @@ static VALUE segment_children(VALUE self, VALUE names_rb, VALUE limit_rb){
 anchor_t *getAnchor(VALUE segment_rb){
   anchor_t *anchor;
   Data_Get_Struct(segment_rb, anchor_t, anchor);
-  if(NULL == anchor || NULL == anchor->parser || NULL == anchor->segment){
+  if(!anchor || !anchor->parser || (!anchor->segment && segment_rb != anchor->parser->doc)){
     rb_raise(rb_eRuntimeError, "The reference to the parsed document has been lost.");
   }else if(anchor->parser->failure){
     rb_raise(rb_eRuntimeError, "Can not perform all operations when parsing fails.");
@@ -140,12 +148,12 @@ static VALUE segment_get_property(VALUE self, VALUE element, VALUE component){
   return (ptr ? rb_str_new_cstr(ptr) : Qnil);
 }
 
-static VALUE segment_errors(VALUE self){
+static VALUE document_errors(VALUE self){
   anchor_t *anchor = getAnchorUnsafe(self);
   return getErrors(anchor->parser);
 }
 
-static VALUE segment_has_errors(VALUE self){
+static VALUE document_has_errors(VALUE self){
   anchor_t *anchor = getAnchorUnsafe(self);
   return (anchor->parser->errorCount == 0 ? Qfalse : Qtrue);
 }
@@ -160,43 +168,42 @@ static VALUE segment_where(VALUE self, VALUE name_rb, VALUE element_int_rb, VALU
   }
 }
 
-static VALUE segment_document_type(VALUE self){
-  anchor_t *anchor = getAnchor(self);
-  VALUE mEDI,doc;
-  if(strcmp(anchor->parser->documentType, "835") == 0){
-    mEDI = rb_define_module("EDI835");
-    doc = rb_define_class_under(mEDI, "Document", cDocument);
+static VALUE getDocClass(const char *doctype){
+  VALUE doc;
+  if(strcmp(doctype, "835") == 0){
+    doc = cDoc835;
   }else{
-    rb_raise(rb_eRuntimeError, "Can not perform all operations when parsing fails.");
+    rb_raise(rb_eRuntimeError, "Unable to create document.");
   }
   return doc;
+}
+
+static VALUE segment_document_type(VALUE self){
+  anchor_t *anchor = getAnchor(self);
+  return getDocClass(anchor->parser->documentType);
 }
 
 VALUE buildSegmentNode(parser_t *parser, segment_t *segment){
   VALUE segment_rb,class_rb;
   anchor_t *anchor;
-  if(segment == parser->root){
-    segment_rb = parser->root_rb;
-  }else{
+  class_rb = rb_define_class_under(mChooChoo, segment->name, cSegment);
+  segment_rb = rb_class_new_instance(0, NULL, class_rb);
 
-    class_rb = rb_define_class_under(mEDI835, segment->name, cSegment);
-    segment_rb = rb_class_new_instance(0, NULL, class_rb);
-
-    Data_Get_Struct(segment_rb, anchor_t, anchor);
-    rb_gc_mark(parser->root_rb);
-    anchor->parser = parser;
-    anchor->segment = segment;
-  }
+  Data_Get_Struct(segment_rb, anchor_t, anchor);
+  rb_gc_mark(parser->doc);
+  anchor->parser = parser;
+  anchor->segment = segment;
   return segment_rb;
-}
-
-static VALUE choo_choo_empty(VALUE self){
-  return rb_str_new_cstr(CHOOCHOO_EMPTY);
 }
 
 static VALUE segment_root(VALUE self){
   anchor_t *anchor = getAnchor(self);
-  return anchor->parser->root_rb;
+  return buildSegmentNode(anchor->parser, anchor->parser->root);
+}
+
+static VALUE segment_document(VALUE self){
+  anchor_t *anchor = getAnchor(self);
+  return anchor->parser->doc;
 }
 
 void Init_choo_choo_ext(void) {
@@ -205,27 +212,32 @@ void Init_choo_choo_ext(void) {
   cSegment = rb_define_class_under(mChooChoo, "Segment", rb_cObject);
   cParser = rb_define_class_under(mChooChoo, "Parser", rb_cObject);
   cDocument = rb_define_class_under(mChooChoo, "Document", rb_cObject);
+  cISA = rb_define_class_under(mChooChoo, "ISA", cSegment);
+  cDoc835 = rb_define_class_under(mEDI835, "Document", cDocument);
+
+  rb_define_alloc_func(cDocument, document_alloc);
+  rb_define_method(cDocument, "_c_isa_segment", segment_root,0);
+  rb_define_method(cDocument, "_c_errors", document_errors, 0);
+  rb_define_method(cDocument, "_c_errors?", document_has_errors, 0);
 
   rb_define_method(cParser, "_c_parse_835", choo_choo_parse_835, 1);
-  rb_define_method(cParser, "_c_empty", choo_choo_empty, 0);
 
   rb_define_alloc_func(cSegment, segment_alloc);
-  rb_define_method(cSegment, "document_type", segment_document_type, 0);
+  rb_define_method(cSegment, "_c_document_type", segment_document_type, 0);
   rb_define_method(cSegment, "_c_name", segment_name, 0);
-  rb_define_method(cSegment, "_c_isa", segment_root, 0);
-  rb_define_method(cSegment, "to_hash", segment_to_hash, 0);
+  rb_define_method(cSegment, "_c_isa_segment", segment_root, 0);
+  rb_define_method(cSegment, "_c_doc", segment_document, 0);
+  rb_define_method(cSegment, "_c_to_hash", segment_to_hash, 0);
   rb_define_method(cSegment, "_c_descendants", segment_find, 2);
   rb_define_method(cSegment, "_c_children", segment_children, 2);
   rb_define_method(cSegment, "_c_parent", segment_parent, 0);
   rb_define_method(cSegment, "_c_get_property", segment_get_property, 2);
   rb_define_method(cSegment, "_c_where", segment_where, 5);
-  rb_define_method(cSegment, "_c_errors", segment_errors, 0);
-  rb_define_method(cSegment, "_c_errors?", segment_has_errors, 0);
   rb_define_method(cSegment, "_c_exists?", segment_exists, 4);
 
   id_force_8_bit = rb_intern("b");
 
   //init_choo_choo_835();
   init_choo_choo_traversal();
-  init_care_cloud_edi_835();
+  init_choo_choo_segment();
 }

@@ -10,7 +10,7 @@
 
 
 VALUE getErrors(parser_t *parser){
-  VALUE result = rb_ary_new();
+  VALUE result = rb_ary_new_capa(parser->errorCount);
   char error[60];
   short errorNumber;
 

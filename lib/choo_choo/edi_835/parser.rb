@@ -7,8 +7,7 @@ module EDI835
     end
 
     def parse
-      isas = split {|isa_segment| _c_parse_835(isa_segment) }
-      EDI835::Document.new(isas)
+      _parse {|isa| _c_parse_835(isa) }
     end
   end
 end

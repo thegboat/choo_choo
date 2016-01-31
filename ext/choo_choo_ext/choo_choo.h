@@ -20,6 +20,43 @@
 #define isDescendantOf(descendant,parent) ((descendant)->pkey>(parent)->pkey && (descendant)->pkey<=(parent)->boundary)
 #define elementCountIn(segment,start,end) ((segment)->elements>=(start) && (segment)->elements<=(end))
 
+#define char1(segment,letter) segment->name[0]==letter
+#define char2(segment,letter) segment->name[1]==letter
+#define char3(segment,letter) segment->name[2]==letter
+#define char23(segment,letter2,letter3) (char2(letter2) && char3(letter3))
+#define identify(segment,segname) (segment&&!strcmp(segment->name,segname))
+#define isPR(segment) identify(segment,PR_LOOP)
+#define isPE(segment) identify(segment,PE_LOOP)
+#define isISA(segment) identify(segment,ISA_SEGMENT)
+#define isIEA(segment) identify(segment,IEA_SEGMENT)
+#define isTS3(segment) identify(segment,TS3_SEGMENT)
+#define isTS2(segment) identify(segment,TS2_SEGMENT)
+#define isCLP(segment) identify(segment,CLP_SEGMENT)
+#define isCAS(segment) identify(segment,CAS_SEGMENT)
+#define isNM1(segment) identify(segment,NM1_SEGMENT)
+#define isMIA(segment) identify(segment,MIA_SEGMENT)
+#define isMOA(segment) identify(segment,MOA_SEGMENT)
+#define isAMT(segment) identify(segment,AMT_SEGMENT)
+#define isQTY(segment) identify(segment,QTY_SEGMENT)
+#define isSVC(segment) identify(segment,SVC_SEGMENT)
+#define isPLB(segment) identify(segment,PLB_SEGMENT)
+#define isRDM(segment) identify(segment,RDM_SEGMENT)
+#define isBPR(segment) identify(segment,BPR_SEGMENT)
+#define isTRN(segment) identify(segment,TRN_SEGMENT)
+#define isCUR(segment) identify(segment,CUR_SEGMENT)
+#define isREF(segment) identify(segment,REF_SEGMENT)
+#define isDTM(segment) identify(segment,DTM_SEGMENT)
+#define isPER(segment) identify(segment,PER_SEGMENT)
+#define isGS(segment) identify(segment,GS_SEGMENT)
+#define isGE(segment) identify(segment,GE_SEGMENT)
+#define isST(segment) identify(segment,ST_SEGMENT)
+#define isSE(segment) identify(segment,SE_SEGMENT)
+#define isN1(segment) identify(segment,N1_SEGMENT)
+#define isN4(segment) identify(segment,N4_SEGMENT)
+#define isN3(segment) identify(segment,N3_SEGMENT)
+#define isLX(segment) identify(segment,LX_SEGMENT)
+#define isLQ(segment) identify(segment,LQ_SEGMENT)
+
 // data types
 
 typedef struct segment_struct segment_t;
@@ -40,7 +77,7 @@ struct parser_struct
   short errors[MAX_ERROR_SIZE];
   short errorCount;
   char documentType[10];
-  VALUE root_rb;
+  VALUE doc;
   segment_t *root;
   index_stat_t *nameIndex;
   segment_t **byName;
@@ -91,41 +128,6 @@ struct segment_struct
   st_table* propertyCache;
 };
 
-// inspection
-
-bool identify(segment_t *segment, const char *seg);
-bool isISA(segment_t *segment);
-bool isIEA(segment_t *segment);
-bool isTS3(segment_t *segment);
-bool isTS2(segment_t *segment);
-bool isCLP(segment_t *segment);
-bool isCAS(segment_t *segment);
-bool isNM1(segment_t *segment);
-bool isMIA(segment_t *segment);
-bool isMOA(segment_t *segment);
-bool isAMT(segment_t *segment);
-bool isQTY(segment_t *segment);
-bool isSVC(segment_t *segment);
-bool isPLB(segment_t *segment);
-bool isRDM(segment_t *segment);
-bool isBPR(segment_t *segment);
-bool isTRN(segment_t *segment);
-bool isCUR(segment_t *segment);
-bool isREF(segment_t *segment);
-bool isDTM(segment_t *segment);
-bool isPER(segment_t *segment);
-bool isGS(segment_t *segment); 
-bool isGE(segment_t *segment); 
-bool isST(segment_t *segment); 
-bool isSE(segment_t *segment); 
-bool isN1(segment_t *segment);
-bool isN4(segment_t *segment);
-bool isN3(segment_t *segment);
-bool isLX(segment_t *segment);
-bool isLQ(segment_t *segment);
-bool isPR(segment_t *segment);
-bool isPE(segment_t *segment);
-
 // segment
 
 void segmentInitializer(segment_t *segment, char *src);
@@ -163,7 +165,7 @@ void init_choo_choo_traversal();
 
 // 835
 
-void parse835(anchor_t *anchor, const char *ediFile);
+void parse835(parser_t *s_parser, const char *ediFile);
 void init_choo_choo_835();
 
 // interface
@@ -178,5 +180,5 @@ VALUE getErrors(parser_t *parser);
 
 // carecloud
 
-void init_care_cloud_edi_835();
+void init_choo_choo_segment();
 

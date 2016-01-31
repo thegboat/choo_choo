@@ -44,11 +44,11 @@ static inline void parser835Initialization(parser835_t *parser);
 static inline void parser835Cleanup(parser835_t *parser);
 
 
-void parse835(anchor_t *anchor, const char *ediFile){
+void parse835(parser_t *s_parser, const char *ediFile){
   char *copy = strdup(ediFile);
   char *rest = copy;
   parser835_t parser;
-  parser.super = anchor->parser;
+  parser.super = s_parser;
   parser835Initialization(&parser);
   segment_t *segment;
   while((parser.super->str = strsep(&rest, (char*)&SEGMENT_SEPARATOR)) && !parser.super->finished && !parser.super->failure){
@@ -56,7 +56,6 @@ void parse835(anchor_t *anchor, const char *ediFile){
     attach835Segment(&parser, segment);
   }
   parser835Cleanup(&parser);
-  anchor->segment = parser.super->root;
   xfree(copy);
 }
 
@@ -140,6 +139,7 @@ static inline void isa835Handler(parser835_t *parser, segment_t *segment){
   }else if(!elementCountIn(segment, 16,16)){
     parserFail(parser->super, WRONG_NUMBER_OF_ELEMENTS_FOR_ISA_SEGMENT);
   }else{   
+    parser->super->root = segment;
     parser->interchange = segment;
     parser->loop = segment;
   }
@@ -154,6 +154,7 @@ static inline void iea835Handler(parser835_t *parser, segment_t *segment){
     addChildSegment(parser->interchange, segment);
     parser->loop = parser->interchange;
     parser->trailer = segment;
+    parser->super->finished = true;
   }
 }
 

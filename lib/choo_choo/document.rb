@@ -1,10 +1,6 @@
 module ChooChoo
   class Document
 
-    def initialize(isa)
-      @isa_segment = isa
-    end
-
     def self.name
       raise MethodImplementationRequired
     end
@@ -13,12 +9,16 @@ module ChooChoo
       raise MethodImplementationRequired
     end
 
-    def has_errors?
-      isa_segment.errors?
+    def errors?
+      _c_errors?
+    end
+
+    def errors
+      _c_errors
     end
 
     def isa_segment
-      @isa_segment
+      _c_isa_segment
     end
     alias :interchange_loop :isa_segment 
     alias :interchange :isa_segment 

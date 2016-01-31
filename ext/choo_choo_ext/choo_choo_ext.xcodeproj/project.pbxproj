@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		2FFEAA111C5D2FDF004D3F9C /* choo_choo_835_interface.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = choo_choo_835_interface.c; sourceTree = "<group>"; };
 		2FFEAA121C5D2FDF004D3F9C /* choo_choo_835.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = choo_choo_835.c; sourceTree = "<group>"; };
 		2FFEAA131C5D2FDF004D3F9C /* choo_choo_constants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = choo_choo_constants.h; sourceTree = "<group>"; };
 		2FFEAA141C5D2FDF004D3F9C /* choo_choo_errors.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = choo_choo_errors.c; sourceTree = "<group>"; };
@@ -24,7 +23,6 @@
 		2FFEAA061C5D2E9D004D3F9C = {
 			isa = PBXGroup;
 			children = (
-				2FFEAA111C5D2FDF004D3F9C /* choo_choo_835_interface.c */,
 				2FFEAA121C5D2FDF004D3F9C /* choo_choo_835.c */,
 				2FFEAA131C5D2FDF004D3F9C /* choo_choo_constants.h */,
 				2FFEAA141C5D2FDF004D3F9C /* choo_choo_errors.c */,
