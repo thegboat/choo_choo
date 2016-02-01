@@ -60,71 +60,149 @@ void parse835(parser_t *s_parser, const char *ediFile){
 }
 
 static inline void attach835Segment(parser835_t *parser, segment_t *segment){
+  bool attached = true;
   if(isISA(segment)){
     isa835Handler(parser, segment);
   }else if(NULL == parser->loop){
     parserFail(parser->super, ISA_SEGMENT_NOT_DETECTED_FIRST);
-  }else if(isQTY(segment)){
-    qty835Handler(parser, segment);
-  }else if(isCAS(segment)){
-    cas835Handler(parser, segment);
-  }else if(isAMT(segment)){
-    amt835Handler(parser, segment);
-  }else if(isDTM(segment)){
-    dtm835Handler(parser, segment);
-  }else if(isREF(segment)){
-    ref835Handler(parser, segment);
-  }else if(isSVC(segment)){
-    svc835Handler(parser, segment);
-  }else if(isNM1(segment)){
-    nm1835Handler(parser, segment);
-  }else if(isMIA(segment)){
-    mia835Handler(parser, segment);
-  }else if(isMOA(segment)){
-    moa835Handler(parser, segment);
-  }else if(isLQ(segment)){
-    lq835Handler(parser, segment);
-  }else if(isCLP(segment)){
-    clp835Handler(parser, segment);
-  }else if(isPLB(segment)){
-    plb835Handler(parser, segment);
-  }else if(isPER(segment)){
-    per835Handler(parser, segment);
-  }else if(isN4(segment)){
-    n4835Handler(parser, segment);
-  }else if(isN3(segment)){
-    n3835Handler(parser, segment);
-  }else if(isRDM(segment)){
-    rdm835Handler(parser, segment);
-  }else if(isN1(segment)){
-    n1835Handler(parser, segment);
-  }else if(isTS3(segment)){
-    ts3835Handler(parser, segment);
-  }else if(isTS2(segment)){
-    ts2835Handler(parser, segment);
-  }else if(isLX(segment)){
-    lx835Handler(parser, segment);
-  }else if(isBPR(segment)){
-    bpr835Handler(parser, segment);
-  }else if(isTRN(segment)){
-    trn835Handler(parser, segment);
-  }else if(isCUR(segment)){
-    cur835Handler(parser, segment);
-  }else if(isST(segment)){
-    st835Handler(parser, segment);
-  }else if(isSE(segment)){
-    se835Handler(parser, segment);
-  }else if(isGS(segment)){
-    gs835Handler(parser, segment);
-  }else if(isGE(segment)){
-    ge835Handler(parser, segment);
-  }else if(isIEA(segment)){
-    iea835Handler(parser, segment);
   }else{
-    if(NULL == parser->loop){
-      parserFail(parser->super, ISA_SEGMENT_NOT_DETECTED_FIRST);
-    }else{
-      parserFail(parser->super, UNKNOWN_ERROR);
+    switch(segment->name[0]){
+      case 'Q' :
+        if(isQTY(segment)){
+          qty835Handler(parser, segment);
+        }else{
+          attached = false;
+        }
+        break;
+      case 'C' :
+        if(isCAS(segment)){
+          cas835Handler(parser, segment);
+        }else if(isCLP(segment)){
+          clp835Handler(parser, segment);
+        }else if(isCUR(segment)){
+          cur835Handler(parser, segment);
+        }else{
+          attached = false;
+        }
+        break;
+      case 'A' :
+        if(isAMT(segment)){
+          amt835Handler(parser, segment);
+        }else{
+          attached = false;
+        }
+        break;
+      case 'D' :
+        if(isDTM(segment)){
+          dtm835Handler(parser, segment);
+        }else{
+          attached = false;
+        }
+        break;
+      case 'R' :
+        if(isREF(segment)){
+          ref835Handler(parser, segment);
+        }else if(isRDM(segment)){
+          rdm835Handler(parser, segment);
+        }else{
+          attached = false;
+        }
+        break;
+      case 'S' :
+        if(isSVC(segment)){
+          svc835Handler(parser, segment);
+        }else if(isST(segment)){
+          st835Handler(parser, segment);
+        }else if(isSE(segment)){
+          se835Handler(parser, segment);
+        }else{
+          attached = false;
+        }
+        break;
+      case 'N' :
+        if(isNM1(segment)){
+          nm1835Handler(parser, segment);
+        }else if(isN4(segment)){
+          n4835Handler(parser, segment);
+        }else if(isN3(segment)){
+          n3835Handler(parser, segment);
+        }else if(isN1(segment)){
+          n1835Handler(parser, segment);
+        }else{
+          attached = false;
+        }
+        break;
+      case 'M' :
+        if(isMIA(segment)){
+          mia835Handler(parser, segment);
+        }else if(isMOA(segment)){
+          moa835Handler(parser, segment);
+        }else{
+          attached = false;
+        }
+        break;
+      case 'L' :
+        if(isLQ(segment)){
+          lq835Handler(parser, segment);
+        }else if(isLX(segment)){
+          lx835Handler(parser, segment);
+        }else{
+          attached = false;
+        }
+        break;
+      case 'P' :
+        if(isPLB(segment)){
+          plb835Handler(parser, segment);
+        }else if(isPER(segment)){
+          per835Handler(parser, segment);
+        }else{
+          attached = false;
+        }
+        break;
+      case 'T' :
+        if(isTS3(segment)){
+          ts3835Handler(parser, segment);
+        }else if(isTS2(segment)){
+          ts2835Handler(parser, segment);
+        }else if(isTRN(segment)){
+          trn835Handler(parser, segment);
+        }else{
+          attached = false;
+        }
+        break;
+      case 'B' :
+        if(isBPR(segment)){
+          bpr835Handler(parser, segment);
+        }else{
+          attached = false;
+        }
+        break;
+      case 'G' :
+        if(isGS(segment)){
+          gs835Handler(parser, segment);
+        }else if(isGE(segment)){
+          ge835Handler(parser, segment);
+        }else{
+          attached = false;
+        }
+        break;
+      case 'I' :
+        if(isIEA(segment)){
+          iea835Handler(parser, segment);
+        }else{
+          attached = false;
+        }
+        break;
+      default:
+        attached = false;
+    }
+
+    if(!attached){  
+      if(NULL == parser->loop){
+        parserFail(parser->super, ISA_SEGMENT_NOT_DETECTED_FIRST);
+      }else{
+        parserFail(parser->super, UNKNOWN_ERROR);
+      }
     }
   }
 }

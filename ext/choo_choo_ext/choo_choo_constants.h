@@ -36,36 +36,6 @@
 #define LX_SEGMENT "LX"
 #define LQ_SEGMENT "LQ"
 
-#define AMT_VALUE  0
-#define BPR_VALUE  1
-#define CAS_VALUE  2
-#define CLP_VALUE  3
-#define CUR_VALUE  4
-#define DTM_VALUE  5
-#define GE_VALUE   6
-#define GS_VALUE   7
-#define IEA_VALUE  8
-#define ISA_VALUE  9
-#define LQ_VALUE   10
-#define LX_VALUE   11
-#define MIA_VALUE  12
-#define MOA_VALUE  13
-#define N1_VALUE   14
-#define N3_VALUE   15
-#define N4_VALUE   16
-#define NM1_VALUE  17
-#define PER_VALUE  18
-#define PLB_VALUE  19
-#define QTY_VALUE  20
-#define RDM_VALUE  21
-#define REF_VALUE  22
-#define SE_VALUE   23
-#define ST_VALUE   24
-#define SVC_VALUE  25
-#define TRN_VALUE  26
-#define TS2_VALUE  27
-#define TS3_VALUE  28
-
 #define PR_LOOP "PR"
 #define PE_LOOP "PE"
 

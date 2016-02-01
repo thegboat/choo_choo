@@ -20,10 +20,6 @@
 #define isDescendantOf(descendant,parent) ((descendant)->pkey>(parent)->pkey && (descendant)->pkey<=(parent)->boundary)
 #define elementCountIn(segment,start,end) ((segment)->elements>=(start) && (segment)->elements<=(end))
 
-#define char1(segment,letter) segment->name[0]==letter
-#define char2(segment,letter) segment->name[1]==letter
-#define char3(segment,letter) segment->name[2]==letter
-#define char23(segment,letter2,letter3) (char2(letter2) && char3(letter3))
 #define identify(segment,segname) (segment&&!strcmp(segment->name,segname))
 #define isPR(segment) identify(segment,PR_LOOP)
 #define isPE(segment) identify(segment,PE_LOOP)
