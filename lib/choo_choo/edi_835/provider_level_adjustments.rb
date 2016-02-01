@@ -6,7 +6,7 @@ module EDI835
     include EDI835::HasAdjustments
 
     def initialize(plb, _remittance)
-      raise ArgumentError, "Initialization requires a CLP object" unless plb.is_a?(EDI835::PLB)
+      raise ArgumentError, "Initialization requires a PLB object" unless plb.is_a?(ChooChoo::PLB)
       @root = plb
       @remittance = _remittance
     end

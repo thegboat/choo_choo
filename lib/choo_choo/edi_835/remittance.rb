@@ -2,7 +2,7 @@ module EDI835
   class Remittance
 
     def initialize(isa)
-      raise ArgumentError, "Initialization requires a ISA object" unless isa.is_a?(EDI835::ISA)
+      raise ArgumentError, "Initialization requires a ISA object" unless isa.is_a?(ChooChoo::ISA)
       @interchange_loop = isa
     end
 

@@ -7,7 +7,7 @@ module EDI835
     SVC06 = 'SVC06'.freeze
 
     def initialize(service_loop, claim_loop)
-      raise ArgumentError, "Initialization requires a SVC object" unless service_loop.is_a?(EDI835::SVC)
+      raise ArgumentError, "Initialization requires a SVC object" unless service_loop.is_a?(ChooChoo::SVC)
       @claim = claim_loop
       @root = service_loop
     end

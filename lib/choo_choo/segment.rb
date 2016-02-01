@@ -5,8 +5,12 @@ module ChooChoo
       false
     end
 
+    def document_type
+      _c_doc.class
+    end
+
     def document
-      _c_document
+      _c_doc
     end
     alias :doc :document
 
@@ -76,7 +80,7 @@ module ChooChoo
     end
 
     def first_or_null(sym,val)
-      _where(sym, val, 1).first || ChooChoo::NullSegment.new(document_type)
+      _where(sym, val, 1).first || ChooChoo::NullSegment.new(_c_doc.class)
     end
 
     def first!(sym,val)
@@ -206,7 +210,7 @@ module ChooChoo
     private
 
     def parse_property_key(string)
-      self.class.parse_property_key(string, document_type)
+      self.class.parse_property_key(string, _c_doc.class)
     end
 
     def _name

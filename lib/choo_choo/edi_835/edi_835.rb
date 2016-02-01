@@ -27,7 +27,7 @@ module EDI835
   N1_XX                   = 'XX'.freeze
   N1_FI                   = 'FI'.freeze
   NM1_PI                  = 'PI'.freeze
-  AMT_AU                  = 'AU'.freeze
+  APPROVED_AMOUNT         = 'AU'.freeze
 
   SVC_HC                  = 'HC'.freeze
   DTM_150                 = '150'.freeze

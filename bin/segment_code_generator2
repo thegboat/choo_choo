@@ -66,13 +66,13 @@ functions = funcnames.map do |funcname|
   segname = $1
   %{
 static VALUE #{funcname.downcase}(VALUE self){
-  return segmentGetPropery(self, #{$2.to_i}, #{$4.to_i});
+  return segmentGetPropery(self, "@#{funcname.downcase}", #{$2.to_i}, #{$4.to_i});
 }
 }
 end.join
 
 cdefines = hash.keys.map do |klass|
-%{  c#{klass} = rb_define_class_under(mEDI835, "#{klass}", cSegment);}
+%{  c#{klass} = rb_define_class_under(mChooChoo, "#{klass}", cSegment);}
 end.join("\n")
 
 inits = funcnames.map do |funcname|
@@ -83,16 +83,17 @@ end.join("\n")
 
 content = %{
 //
-//  choo_choo_ext_835_interface.c
+//  choo_choo_segment.c
 //  choo_choo_parser
 //
 //  Created by Grady Griffin on 1/28/16.
 //  Copyright (c) 2015 CareCloud. All rights reserved.
 //
 
-#include "choo_choo_ext.h"
+#include "choo_choo.h"
 
-static inline VALUE segmentGetPropery(VALUE segment_rb, short element, short component);
+static inline VALUE segmentGetPropery(VALUE segment_rb, const char *key, short element, short component);
+static void propertyFree(segment_t* segment);
 
 static VALUE mChooChoo;
 static VALUE mEDI835;
@@ -100,13 +101,88 @@ static VALUE cSegment;
 
 #{vars}
 
-static inline VALUE segmentGetPropery(VALUE segment_rb, short element, short component){
-  anchor_t *anchor = getAnchor(segment_rb);
-  char *ptr = propertyLookup(anchor->segment, element, component);
-  return (ptr ? rb_str_new_cstr(ptr) : Qnil);
+void segmentInitializer(segment_t *segment, char *src){
+  long idx = strlen(src);
+  idx = idx > MAX_NAME_SIZE ? MAX_NAME_SIZE : idx;
+  memset(segment->name,0,(MAX_NAME_SIZE+1)*sizeof(char));
+  memcpy(segment->name,src,idx*sizeof(char));
+  segment->elements = 0;
+  segment->depth = 0;
+  segment->children = 0;
+  segment->propertyCache = st_init_numtable();
+}
+
+void cacheProperty(segment_t *segment, char *data, short element, short component){
+  unsigned long key = getPropertyKey(element, component);
+  if(strlen(data)){
+    st_add_direct(segment->propertyCache, (st_data_t)key, (unsigned long)strdup(data));
+  }else{
+    st_add_direct(segment->propertyCache, (st_data_t)key, (unsigned long)(""));
+  }
+}
+
+void addChildSegment(segment_t *parent, segment_t *child){
+  if(NULL == parent->firstSegment){
+    parent->firstSegment = child;
+  }else{
+    parent->lastSegment->tail = child;
+    child->head = parent->lastSegment;
+  }
+  parent->children++;
+  parent->lastSegment = child;
+  child->parent = parent;
+  child->depth = parent->depth + 1;
+}
+
+void segmentFree(segment_t *segment){
+  if(NULL != segment){    
+    if(segment->propertyCache){
+      propertyFree(segment);
+    }
+    ediParsingDealloc(segment);
+  }
+}
+
+segment_t *rewindLoop(segment_t *loop){
+  segment_t *tmp;
+  tmp = loop;
+  while(NULL != tmp){
+    loop = tmp;
+    tmp = loop->head;
+  }
+  return loop;
+}
+
+static void propertyFree(segment_t* segment){
+  char *ptr;
+  for(short element=1;element<=segment->elements; element++){
+    for(short component=0; component<100; component++){
+      if((ptr = propertyLookup(segment, element, component))){
+        if(strlen(ptr)) ediParsingDealloc(ptr);
+      }else{
+        break;
+      }
+    }
+  }
+  st_free_table(segment->propertyCache);
+  segment->propertyCache = NULL;
+}
+
+static inline VALUE segmentGetPropery(VALUE segment_rb, const char *key, short element, short component){
+  ID id_key = rb_intern(key);
+  VALUE rtn = rb_ivar_get(segment_rb,id_key);
+  anchor_t *anchor;
+  char *ptr;
+
+  if(rtn == Qnil){
+    anchor = getAnchor(segment_rb);
+    ptr = propertyLookup(anchor->segment, element, component);
+    rtn = (ptr ? rb_ivar_set(segment_rb,id_key, rb_str_new_cstr(ptr)) : Qnil);
+  }
+  return rtn;
 }
 #{functions}
-void init_care_cloud_edi_835(){
+void init_choo_choo_segment(){
   mEDI835 = rb_define_module("EDI835");
   mChooChoo = rb_define_module("ChooChoo");
   cSegment = rb_define_class_under(mChooChoo, "Segment", rb_cObject);
@@ -115,7 +191,7 @@ void init_care_cloud_edi_835(){
 }
 }
 
-file = File.open("ext/choo_choo_ext/choo_choo_ext_835_interface.c", "w+")
+file = File.open("ext/choo_choo_ext/choo_choo_segment.c", "w+")
 
 file << content
 file.close

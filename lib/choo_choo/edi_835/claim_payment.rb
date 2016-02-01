@@ -6,7 +6,7 @@ module EDI835
     include EDI835::HasAdjustments
 
     def initialize(claim_loop, _remittance)
-      raise ArgumentError, "Initialization requires a CLP object" unless claim_loop.is_a?(EDI835::CLP)
+      raise ArgumentError, "Initialization requires a CLP object" unless claim_loop.is_a?(ChooChoo::CLP)
       @root = claim_loop
       @remittance = _remittance
     end
@@ -20,11 +20,11 @@ module EDI835
     end
 
     def billed_amount
-      @billed_amount ||= root.strip(:CLP03)
+      @billed_amount ||= root.money(:CLP03)
     end
 
     def amount
-      @amount ||= root.strip(:CLP04)
+      @amount ||= root.money(:CLP04)
     end
 
     def patient_responsibility_amount
@@ -132,7 +132,7 @@ module EDI835
     end
 
     def approved
-      @approved ||= root.first_or_null(:AMT01, EDI835::AMT_AU).money(:AMT02)
+      @approved ||= root.first_or_null(:AMT01, EDI835::APPROVED_AMOUNT).money(:AMT02)
     end
 
     def billing_provider_secondary_number2

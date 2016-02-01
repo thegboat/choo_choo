@@ -1,16 +1,19 @@
+
 //
 //  choo_choo_segment.c
 //  choo_choo_parser
 //
-//  Created by Grady Griffin on 8/3/15.
+//  Created by Grady Griffin on 1/28/16.
 //  Copyright (c) 2015 CareCloud. All rights reserved.
 //
+
 #include "choo_choo.h"
 
+static inline VALUE segmentGetPropery(VALUE segment_rb, const char *key, short element, short component);
 static void propertyFree(segment_t* segment);
-static inline VALUE segmentGetPropery(VALUE segment_rb, short element, short component);
 
 static VALUE mChooChoo;
+static VALUE mEDI835;
 static VALUE cSegment;
 
 static VALUE cISA;
@@ -110,1184 +113,1193 @@ static void propertyFree(segment_t* segment){
   segment->propertyCache = NULL;
 }
 
-static inline VALUE segmentGetPropery(VALUE segment_rb, short element, short component){
-  anchor_t *anchor = getAnchor(segment_rb);
-  char *ptr = propertyLookup(anchor->segment, element, component);
-  return (ptr ? rb_str_new_cstr(ptr) : Qnil);
+static inline VALUE segmentGetPropery(VALUE segment_rb, const char *key, short element, short component){
+  ID id_key = rb_intern(key);
+  VALUE rtn = rb_ivar_get(segment_rb,id_key);
+  anchor_t *anchor;
+  char *ptr;
+
+  if(rtn == Qnil){
+    anchor = getAnchor(segment_rb);
+    ptr = propertyLookup(anchor->segment, element, component);
+    rtn = (ptr ? rb_ivar_set(segment_rb,id_key, rb_str_new_cstr(ptr)) : Qnil);
+  }
+  return rtn;
 }
 
 static VALUE isa01(VALUE self){
-  return segmentGetPropery(self, 1, 0);
+  return segmentGetPropery(self, "@isa01", 1, 0);
 }
 
 static VALUE isa02(VALUE self){
-  return segmentGetPropery(self, 2, 0);
+  return segmentGetPropery(self, "@isa02", 2, 0);
 }
 
 static VALUE isa03(VALUE self){
-  return segmentGetPropery(self, 3, 0);
+  return segmentGetPropery(self, "@isa03", 3, 0);
 }
 
 static VALUE isa04(VALUE self){
-  return segmentGetPropery(self, 4, 0);
+  return segmentGetPropery(self, "@isa04", 4, 0);
 }
 
 static VALUE isa05(VALUE self){
-  return segmentGetPropery(self, 5, 0);
+  return segmentGetPropery(self, "@isa05", 5, 0);
 }
 
 static VALUE isa06(VALUE self){
-  return segmentGetPropery(self, 6, 0);
+  return segmentGetPropery(self, "@isa06", 6, 0);
 }
 
 static VALUE isa07(VALUE self){
-  return segmentGetPropery(self, 7, 0);
+  return segmentGetPropery(self, "@isa07", 7, 0);
 }
 
 static VALUE isa08(VALUE self){
-  return segmentGetPropery(self, 8, 0);
+  return segmentGetPropery(self, "@isa08", 8, 0);
 }
 
 static VALUE isa09(VALUE self){
-  return segmentGetPropery(self, 9, 0);
+  return segmentGetPropery(self, "@isa09", 9, 0);
 }
 
 static VALUE isa10(VALUE self){
-  return segmentGetPropery(self, 10, 0);
+  return segmentGetPropery(self, "@isa10", 10, 0);
 }
 
 static VALUE isa11(VALUE self){
-  return segmentGetPropery(self, 11, 0);
+  return segmentGetPropery(self, "@isa11", 11, 0);
 }
 
 static VALUE isa12(VALUE self){
-  return segmentGetPropery(self, 12, 0);
+  return segmentGetPropery(self, "@isa12", 12, 0);
 }
 
 static VALUE isa13(VALUE self){
-  return segmentGetPropery(self, 13, 0);
+  return segmentGetPropery(self, "@isa13", 13, 0);
 }
 
 static VALUE isa14(VALUE self){
-  return segmentGetPropery(self, 14, 0);
+  return segmentGetPropery(self, "@isa14", 14, 0);
 }
 
 static VALUE isa15(VALUE self){
-  return segmentGetPropery(self, 15, 0);
+  return segmentGetPropery(self, "@isa15", 15, 0);
 }
 
 static VALUE isa16(VALUE self){
-  return segmentGetPropery(self, 16, 0);
+  return segmentGetPropery(self, "@isa16", 16, 0);
 }
 
 static VALUE bpr01(VALUE self){
-  return segmentGetPropery(self, 1, 0);
+  return segmentGetPropery(self, "@bpr01", 1, 0);
 }
 
 static VALUE bpr02(VALUE self){
-  return segmentGetPropery(self, 2, 0);
+  return segmentGetPropery(self, "@bpr02", 2, 0);
 }
 
 static VALUE bpr03(VALUE self){
-  return segmentGetPropery(self, 3, 0);
+  return segmentGetPropery(self, "@bpr03", 3, 0);
 }
 
 static VALUE bpr04(VALUE self){
-  return segmentGetPropery(self, 4, 0);
+  return segmentGetPropery(self, "@bpr04", 4, 0);
 }
 
 static VALUE bpr05(VALUE self){
-  return segmentGetPropery(self, 5, 0);
+  return segmentGetPropery(self, "@bpr05", 5, 0);
 }
 
 static VALUE bpr06(VALUE self){
-  return segmentGetPropery(self, 6, 0);
+  return segmentGetPropery(self, "@bpr06", 6, 0);
 }
 
 static VALUE bpr07(VALUE self){
-  return segmentGetPropery(self, 7, 0);
+  return segmentGetPropery(self, "@bpr07", 7, 0);
 }
 
 static VALUE bpr08(VALUE self){
-  return segmentGetPropery(self, 8, 0);
+  return segmentGetPropery(self, "@bpr08", 8, 0);
 }
 
 static VALUE bpr09(VALUE self){
-  return segmentGetPropery(self, 9, 0);
+  return segmentGetPropery(self, "@bpr09", 9, 0);
 }
 
 static VALUE bpr10(VALUE self){
-  return segmentGetPropery(self, 10, 0);
+  return segmentGetPropery(self, "@bpr10", 10, 0);
 }
 
 static VALUE bpr11(VALUE self){
-  return segmentGetPropery(self, 11, 0);
+  return segmentGetPropery(self, "@bpr11", 11, 0);
 }
 
 static VALUE bpr12(VALUE self){
-  return segmentGetPropery(self, 12, 0);
+  return segmentGetPropery(self, "@bpr12", 12, 0);
 }
 
 static VALUE bpr13(VALUE self){
-  return segmentGetPropery(self, 13, 0);
+  return segmentGetPropery(self, "@bpr13", 13, 0);
 }
 
 static VALUE bpr14(VALUE self){
-  return segmentGetPropery(self, 14, 0);
+  return segmentGetPropery(self, "@bpr14", 14, 0);
 }
 
 static VALUE bpr15(VALUE self){
-  return segmentGetPropery(self, 15, 0);
+  return segmentGetPropery(self, "@bpr15", 15, 0);
 }
 
 static VALUE bpr16(VALUE self){
-  return segmentGetPropery(self, 16, 0);
+  return segmentGetPropery(self, "@bpr16", 16, 0);
 }
 
 static VALUE bpr17(VALUE self){
-  return segmentGetPropery(self, 17, 0);
+  return segmentGetPropery(self, "@bpr17", 17, 0);
 }
 
 static VALUE bpr18(VALUE self){
-  return segmentGetPropery(self, 18, 0);
+  return segmentGetPropery(self, "@bpr18", 18, 0);
 }
 
 static VALUE bpr19(VALUE self){
-  return segmentGetPropery(self, 19, 0);
+  return segmentGetPropery(self, "@bpr19", 19, 0);
 }
 
 static VALUE bpr20(VALUE self){
-  return segmentGetPropery(self, 20, 0);
+  return segmentGetPropery(self, "@bpr20", 20, 0);
 }
 
 static VALUE bpr21(VALUE self){
-  return segmentGetPropery(self, 21, 0);
+  return segmentGetPropery(self, "@bpr21", 21, 0);
 }
 
 static VALUE trn01(VALUE self){
-  return segmentGetPropery(self, 1, 0);
+  return segmentGetPropery(self, "@trn01", 1, 0);
 }
 
 static VALUE trn02(VALUE self){
-  return segmentGetPropery(self, 2, 0);
+  return segmentGetPropery(self, "@trn02", 2, 0);
 }
 
 static VALUE trn03(VALUE self){
-  return segmentGetPropery(self, 3, 0);
+  return segmentGetPropery(self, "@trn03", 3, 0);
 }
 
 static VALUE trn04(VALUE self){
-  return segmentGetPropery(self, 4, 0);
+  return segmentGetPropery(self, "@trn04", 4, 0);
 }
 
 static VALUE cur01(VALUE self){
-  return segmentGetPropery(self, 1, 0);
+  return segmentGetPropery(self, "@cur01", 1, 0);
 }
 
 static VALUE cur02(VALUE self){
-  return segmentGetPropery(self, 2, 0);
+  return segmentGetPropery(self, "@cur02", 2, 0);
 }
 
 static VALUE cur03(VALUE self){
-  return segmentGetPropery(self, 3, 0);
+  return segmentGetPropery(self, "@cur03", 3, 0);
 }
 
 static VALUE cur04(VALUE self){
-  return segmentGetPropery(self, 4, 0);
+  return segmentGetPropery(self, "@cur04", 4, 0);
 }
 
 static VALUE cur05(VALUE self){
-  return segmentGetPropery(self, 5, 0);
+  return segmentGetPropery(self, "@cur05", 5, 0);
 }
 
 static VALUE cur06(VALUE self){
-  return segmentGetPropery(self, 6, 0);
+  return segmentGetPropery(self, "@cur06", 6, 0);
 }
 
 static VALUE cur07(VALUE self){
-  return segmentGetPropery(self, 7, 0);
+  return segmentGetPropery(self, "@cur07", 7, 0);
 }
 
 static VALUE cur08(VALUE self){
-  return segmentGetPropery(self, 8, 0);
+  return segmentGetPropery(self, "@cur08", 8, 0);
 }
 
 static VALUE cur09(VALUE self){
-  return segmentGetPropery(self, 9, 0);
+  return segmentGetPropery(self, "@cur09", 9, 0);
 }
 
 static VALUE cur10(VALUE self){
-  return segmentGetPropery(self, 10, 0);
+  return segmentGetPropery(self, "@cur10", 10, 0);
 }
 
 static VALUE cur11(VALUE self){
-  return segmentGetPropery(self, 11, 0);
+  return segmentGetPropery(self, "@cur11", 11, 0);
 }
 
 static VALUE cur12(VALUE self){
-  return segmentGetPropery(self, 12, 0);
+  return segmentGetPropery(self, "@cur12", 12, 0);
 }
 
 static VALUE cur13(VALUE self){
-  return segmentGetPropery(self, 13, 0);
+  return segmentGetPropery(self, "@cur13", 13, 0);
 }
 
 static VALUE cur14(VALUE self){
-  return segmentGetPropery(self, 14, 0);
+  return segmentGetPropery(self, "@cur14", 14, 0);
 }
 
 static VALUE cur15(VALUE self){
-  return segmentGetPropery(self, 15, 0);
+  return segmentGetPropery(self, "@cur15", 15, 0);
 }
 
 static VALUE cur16(VALUE self){
-  return segmentGetPropery(self, 16, 0);
+  return segmentGetPropery(self, "@cur16", 16, 0);
 }
 
 static VALUE cur17(VALUE self){
-  return segmentGetPropery(self, 17, 0);
+  return segmentGetPropery(self, "@cur17", 17, 0);
 }
 
 static VALUE cur18(VALUE self){
-  return segmentGetPropery(self, 18, 0);
+  return segmentGetPropery(self, "@cur18", 18, 0);
 }
 
 static VALUE cur19(VALUE self){
-  return segmentGetPropery(self, 19, 0);
+  return segmentGetPropery(self, "@cur19", 19, 0);
 }
 
 static VALUE cur20(VALUE self){
-  return segmentGetPropery(self, 20, 0);
+  return segmentGetPropery(self, "@cur20", 20, 0);
 }
 
 static VALUE cur21(VALUE self){
-  return segmentGetPropery(self, 21, 0);
+  return segmentGetPropery(self, "@cur21", 21, 0);
 }
 
 static VALUE dtm01(VALUE self){
-  return segmentGetPropery(self, 1, 0);
+  return segmentGetPropery(self, "@dtm01", 1, 0);
 }
 
 static VALUE dtm02(VALUE self){
-  return segmentGetPropery(self, 2, 0);
+  return segmentGetPropery(self, "@dtm02", 2, 0);
 }
 
 static VALUE dtm03(VALUE self){
-  return segmentGetPropery(self, 3, 0);
+  return segmentGetPropery(self, "@dtm03", 3, 0);
 }
 
 static VALUE dtm04(VALUE self){
-  return segmentGetPropery(self, 4, 0);
+  return segmentGetPropery(self, "@dtm04", 4, 0);
 }
 
 static VALUE dtm05(VALUE self){
-  return segmentGetPropery(self, 5, 0);
+  return segmentGetPropery(self, "@dtm05", 5, 0);
 }
 
 static VALUE dtm06(VALUE self){
-  return segmentGetPropery(self, 6, 0);
+  return segmentGetPropery(self, "@dtm06", 6, 0);
 }
 
 static VALUE per01(VALUE self){
-  return segmentGetPropery(self, 1, 0);
+  return segmentGetPropery(self, "@per01", 1, 0);
 }
 
 static VALUE per02(VALUE self){
-  return segmentGetPropery(self, 2, 0);
+  return segmentGetPropery(self, "@per02", 2, 0);
 }
 
 static VALUE per03(VALUE self){
-  return segmentGetPropery(self, 3, 0);
+  return segmentGetPropery(self, "@per03", 3, 0);
 }
 
 static VALUE per04(VALUE self){
-  return segmentGetPropery(self, 4, 0);
+  return segmentGetPropery(self, "@per04", 4, 0);
 }
 
 static VALUE per05(VALUE self){
-  return segmentGetPropery(self, 5, 0);
+  return segmentGetPropery(self, "@per05", 5, 0);
 }
 
 static VALUE per06(VALUE self){
-  return segmentGetPropery(self, 6, 0);
+  return segmentGetPropery(self, "@per06", 6, 0);
 }
 
 static VALUE per07(VALUE self){
-  return segmentGetPropery(self, 7, 0);
+  return segmentGetPropery(self, "@per07", 7, 0);
 }
 
 static VALUE per08(VALUE self){
-  return segmentGetPropery(self, 8, 0);
+  return segmentGetPropery(self, "@per08", 8, 0);
 }
 
 static VALUE per09(VALUE self){
-  return segmentGetPropery(self, 9, 0);
+  return segmentGetPropery(self, "@per09", 9, 0);
 }
 
 static VALUE mia01(VALUE self){
-  return segmentGetPropery(self, 1, 0);
+  return segmentGetPropery(self, "@mia01", 1, 0);
 }
 
 static VALUE mia02(VALUE self){
-  return segmentGetPropery(self, 2, 0);
+  return segmentGetPropery(self, "@mia02", 2, 0);
 }
 
 static VALUE mia03(VALUE self){
-  return segmentGetPropery(self, 3, 0);
+  return segmentGetPropery(self, "@mia03", 3, 0);
 }
 
 static VALUE mia04(VALUE self){
-  return segmentGetPropery(self, 4, 0);
+  return segmentGetPropery(self, "@mia04", 4, 0);
 }
 
 static VALUE mia05(VALUE self){
-  return segmentGetPropery(self, 5, 0);
+  return segmentGetPropery(self, "@mia05", 5, 0);
 }
 
 static VALUE mia06(VALUE self){
-  return segmentGetPropery(self, 6, 0);
+  return segmentGetPropery(self, "@mia06", 6, 0);
 }
 
 static VALUE mia07(VALUE self){
-  return segmentGetPropery(self, 7, 0);
+  return segmentGetPropery(self, "@mia07", 7, 0);
 }
 
 static VALUE mia08(VALUE self){
-  return segmentGetPropery(self, 8, 0);
+  return segmentGetPropery(self, "@mia08", 8, 0);
 }
 
 static VALUE mia09(VALUE self){
-  return segmentGetPropery(self, 9, 0);
+  return segmentGetPropery(self, "@mia09", 9, 0);
 }
 
 static VALUE mia10(VALUE self){
-  return segmentGetPropery(self, 10, 0);
+  return segmentGetPropery(self, "@mia10", 10, 0);
 }
 
 static VALUE mia11(VALUE self){
-  return segmentGetPropery(self, 11, 0);
+  return segmentGetPropery(self, "@mia11", 11, 0);
 }
 
 static VALUE mia12(VALUE self){
-  return segmentGetPropery(self, 12, 0);
+  return segmentGetPropery(self, "@mia12", 12, 0);
 }
 
 static VALUE mia13(VALUE self){
-  return segmentGetPropery(self, 13, 0);
+  return segmentGetPropery(self, "@mia13", 13, 0);
 }
 
 static VALUE mia14(VALUE self){
-  return segmentGetPropery(self, 14, 0);
+  return segmentGetPropery(self, "@mia14", 14, 0);
 }
 
 static VALUE mia15(VALUE self){
-  return segmentGetPropery(self, 15, 0);
+  return segmentGetPropery(self, "@mia15", 15, 0);
 }
 
 static VALUE mia16(VALUE self){
-  return segmentGetPropery(self, 16, 0);
+  return segmentGetPropery(self, "@mia16", 16, 0);
 }
 
 static VALUE mia17(VALUE self){
-  return segmentGetPropery(self, 17, 0);
+  return segmentGetPropery(self, "@mia17", 17, 0);
 }
 
 static VALUE mia18(VALUE self){
-  return segmentGetPropery(self, 18, 0);
+  return segmentGetPropery(self, "@mia18", 18, 0);
 }
 
 static VALUE mia19(VALUE self){
-  return segmentGetPropery(self, 19, 0);
+  return segmentGetPropery(self, "@mia19", 19, 0);
 }
 
 static VALUE mia20(VALUE self){
-  return segmentGetPropery(self, 20, 0);
+  return segmentGetPropery(self, "@mia20", 20, 0);
 }
 
 static VALUE mia21(VALUE self){
-  return segmentGetPropery(self, 21, 0);
+  return segmentGetPropery(self, "@mia21", 21, 0);
 }
 
 static VALUE mia22(VALUE self){
-  return segmentGetPropery(self, 22, 0);
+  return segmentGetPropery(self, "@mia22", 22, 0);
 }
 
 static VALUE mia23(VALUE self){
-  return segmentGetPropery(self, 23, 0);
+  return segmentGetPropery(self, "@mia23", 23, 0);
 }
 
 static VALUE mia24(VALUE self){
-  return segmentGetPropery(self, 24, 0);
+  return segmentGetPropery(self, "@mia24", 24, 0);
 }
 
 static VALUE ref01(VALUE self){
-  return segmentGetPropery(self, 1, 0);
+  return segmentGetPropery(self, "@ref01", 1, 0);
 }
 
 static VALUE ref02(VALUE self){
-  return segmentGetPropery(self, 2, 0);
+  return segmentGetPropery(self, "@ref02", 2, 0);
 }
 
 static VALUE ref03(VALUE self){
-  return segmentGetPropery(self, 3, 0);
+  return segmentGetPropery(self, "@ref03", 3, 0);
 }
 
 static VALUE ref04(VALUE self){
-  return segmentGetPropery(self, 4, 0);
+  return segmentGetPropery(self, "@ref04", 4, 0);
 }
 
 static VALUE cas01(VALUE self){
-  return segmentGetPropery(self, 1, 0);
+  return segmentGetPropery(self, "@cas01", 1, 0);
 }
 
 static VALUE cas02(VALUE self){
-  return segmentGetPropery(self, 2, 0);
+  return segmentGetPropery(self, "@cas02", 2, 0);
 }
 
 static VALUE cas03(VALUE self){
-  return segmentGetPropery(self, 3, 0);
+  return segmentGetPropery(self, "@cas03", 3, 0);
 }
 
 static VALUE cas04(VALUE self){
-  return segmentGetPropery(self, 4, 0);
+  return segmentGetPropery(self, "@cas04", 4, 0);
 }
 
 static VALUE cas05(VALUE self){
-  return segmentGetPropery(self, 5, 0);
+  return segmentGetPropery(self, "@cas05", 5, 0);
 }
 
 static VALUE cas06(VALUE self){
-  return segmentGetPropery(self, 6, 0);
+  return segmentGetPropery(self, "@cas06", 6, 0);
 }
 
 static VALUE cas07(VALUE self){
-  return segmentGetPropery(self, 7, 0);
+  return segmentGetPropery(self, "@cas07", 7, 0);
 }
 
 static VALUE cas08(VALUE self){
-  return segmentGetPropery(self, 8, 0);
+  return segmentGetPropery(self, "@cas08", 8, 0);
 }
 
 static VALUE cas09(VALUE self){
-  return segmentGetPropery(self, 9, 0);
+  return segmentGetPropery(self, "@cas09", 9, 0);
 }
 
 static VALUE cas10(VALUE self){
-  return segmentGetPropery(self, 10, 0);
+  return segmentGetPropery(self, "@cas10", 10, 0);
 }
 
 static VALUE cas11(VALUE self){
-  return segmentGetPropery(self, 11, 0);
+  return segmentGetPropery(self, "@cas11", 11, 0);
 }
 
 static VALUE cas12(VALUE self){
-  return segmentGetPropery(self, 12, 0);
+  return segmentGetPropery(self, "@cas12", 12, 0);
 }
 
 static VALUE cas13(VALUE self){
-  return segmentGetPropery(self, 13, 0);
+  return segmentGetPropery(self, "@cas13", 13, 0);
 }
 
 static VALUE cas14(VALUE self){
-  return segmentGetPropery(self, 14, 0);
+  return segmentGetPropery(self, "@cas14", 14, 0);
 }
 
 static VALUE cas15(VALUE self){
-  return segmentGetPropery(self, 15, 0);
+  return segmentGetPropery(self, "@cas15", 15, 0);
 }
 
 static VALUE cas16(VALUE self){
-  return segmentGetPropery(self, 16, 0);
+  return segmentGetPropery(self, "@cas16", 16, 0);
 }
 
 static VALUE cas17(VALUE self){
-  return segmentGetPropery(self, 17, 0);
+  return segmentGetPropery(self, "@cas17", 17, 0);
 }
 
 static VALUE cas18(VALUE self){
-  return segmentGetPropery(self, 18, 0);
+  return segmentGetPropery(self, "@cas18", 18, 0);
 }
 
 static VALUE cas19(VALUE self){
-  return segmentGetPropery(self, 19, 0);
+  return segmentGetPropery(self, "@cas19", 19, 0);
 }
 
 static VALUE iea01(VALUE self){
-  return segmentGetPropery(self, 1, 0);
+  return segmentGetPropery(self, "@iea01", 1, 0);
 }
 
 static VALUE iea02(VALUE self){
-  return segmentGetPropery(self, 2, 0);
+  return segmentGetPropery(self, "@iea02", 2, 0);
 }
 
 static VALUE qty01(VALUE self){
-  return segmentGetPropery(self, 1, 0);
+  return segmentGetPropery(self, "@qty01", 1, 0);
 }
 
 static VALUE qty02(VALUE self){
-  return segmentGetPropery(self, 2, 0);
+  return segmentGetPropery(self, "@qty02", 2, 0);
 }
 
 static VALUE qty03(VALUE self){
-  return segmentGetPropery(self, 3, 0);
+  return segmentGetPropery(self, "@qty03", 3, 0);
 }
 
 static VALUE qty04(VALUE self){
-  return segmentGetPropery(self, 4, 0);
+  return segmentGetPropery(self, "@qty04", 4, 0);
 }
 
 static VALUE svc01_01(VALUE self){
-  return segmentGetPropery(self, 1, 1);
+  return segmentGetPropery(self, "@svc01_01", 1, 1);
 }
 
 static VALUE svc01_02(VALUE self){
-  return segmentGetPropery(self, 1, 2);
+  return segmentGetPropery(self, "@svc01_02", 1, 2);
 }
 
 static VALUE svc01_03(VALUE self){
-  return segmentGetPropery(self, 1, 3);
+  return segmentGetPropery(self, "@svc01_03", 1, 3);
 }
 
 static VALUE svc01_04(VALUE self){
-  return segmentGetPropery(self, 1, 4);
+  return segmentGetPropery(self, "@svc01_04", 1, 4);
 }
 
 static VALUE svc01_05(VALUE self){
-  return segmentGetPropery(self, 1, 5);
+  return segmentGetPropery(self, "@svc01_05", 1, 5);
 }
 
 static VALUE svc01_06(VALUE self){
-  return segmentGetPropery(self, 1, 6);
+  return segmentGetPropery(self, "@svc01_06", 1, 6);
 }
 
 static VALUE svc01_07(VALUE self){
-  return segmentGetPropery(self, 1, 7);
+  return segmentGetPropery(self, "@svc01_07", 1, 7);
 }
 
 static VALUE svc02(VALUE self){
-  return segmentGetPropery(self, 2, 0);
+  return segmentGetPropery(self, "@svc02", 2, 0);
 }
 
 static VALUE svc03(VALUE self){
-  return segmentGetPropery(self, 3, 0);
+  return segmentGetPropery(self, "@svc03", 3, 0);
 }
 
 static VALUE svc04(VALUE self){
-  return segmentGetPropery(self, 4, 0);
+  return segmentGetPropery(self, "@svc04", 4, 0);
 }
 
 static VALUE svc05(VALUE self){
-  return segmentGetPropery(self, 5, 0);
+  return segmentGetPropery(self, "@svc05", 5, 0);
 }
 
 static VALUE svc06_01(VALUE self){
-  return segmentGetPropery(self, 6, 1);
+  return segmentGetPropery(self, "@svc06_01", 6, 1);
 }
 
 static VALUE svc06_02(VALUE self){
-  return segmentGetPropery(self, 6, 2);
+  return segmentGetPropery(self, "@svc06_02", 6, 2);
 }
 
 static VALUE svc06_03(VALUE self){
-  return segmentGetPropery(self, 6, 3);
+  return segmentGetPropery(self, "@svc06_03", 6, 3);
 }
 
 static VALUE svc06_04(VALUE self){
-  return segmentGetPropery(self, 6, 4);
+  return segmentGetPropery(self, "@svc06_04", 6, 4);
 }
 
 static VALUE svc06_05(VALUE self){
-  return segmentGetPropery(self, 6, 5);
+  return segmentGetPropery(self, "@svc06_05", 6, 5);
 }
 
 static VALUE svc06_06(VALUE self){
-  return segmentGetPropery(self, 6, 6);
+  return segmentGetPropery(self, "@svc06_06", 6, 6);
 }
 
 static VALUE svc06_07(VALUE self){
-  return segmentGetPropery(self, 6, 7);
+  return segmentGetPropery(self, "@svc06_07", 6, 7);
 }
 
 static VALUE svc06_08(VALUE self){
-  return segmentGetPropery(self, 6, 8);
+  return segmentGetPropery(self, "@svc06_08", 6, 8);
 }
 
 static VALUE svc07(VALUE self){
-  return segmentGetPropery(self, 7, 0);
+  return segmentGetPropery(self, "@svc07", 7, 0);
 }
 
 static VALUE clp01(VALUE self){
-  return segmentGetPropery(self, 1, 0);
+  return segmentGetPropery(self, "@clp01", 1, 0);
 }
 
 static VALUE clp02(VALUE self){
-  return segmentGetPropery(self, 2, 0);
+  return segmentGetPropery(self, "@clp02", 2, 0);
 }
 
 static VALUE clp03(VALUE self){
-  return segmentGetPropery(self, 3, 0);
+  return segmentGetPropery(self, "@clp03", 3, 0);
 }
 
 static VALUE clp04(VALUE self){
-  return segmentGetPropery(self, 4, 0);
+  return segmentGetPropery(self, "@clp04", 4, 0);
 }
 
 static VALUE clp05(VALUE self){
-  return segmentGetPropery(self, 5, 0);
+  return segmentGetPropery(self, "@clp05", 5, 0);
 }
 
 static VALUE clp06(VALUE self){
-  return segmentGetPropery(self, 6, 0);
+  return segmentGetPropery(self, "@clp06", 6, 0);
 }
 
 static VALUE clp07(VALUE self){
-  return segmentGetPropery(self, 7, 0);
+  return segmentGetPropery(self, "@clp07", 7, 0);
 }
 
 static VALUE clp08(VALUE self){
-  return segmentGetPropery(self, 8, 0);
+  return segmentGetPropery(self, "@clp08", 8, 0);
 }
 
 static VALUE clp09(VALUE self){
-  return segmentGetPropery(self, 9, 0);
+  return segmentGetPropery(self, "@clp09", 9, 0);
 }
 
 static VALUE clp10(VALUE self){
-  return segmentGetPropery(self, 10, 0);
+  return segmentGetPropery(self, "@clp10", 10, 0);
 }
 
 static VALUE clp11(VALUE self){
-  return segmentGetPropery(self, 11, 0);
+  return segmentGetPropery(self, "@clp11", 11, 0);
 }
 
 static VALUE clp12(VALUE self){
-  return segmentGetPropery(self, 12, 0);
+  return segmentGetPropery(self, "@clp12", 12, 0);
 }
 
 static VALUE clp13(VALUE self){
-  return segmentGetPropery(self, 13, 0);
+  return segmentGetPropery(self, "@clp13", 13, 0);
 }
 
 static VALUE clp14(VALUE self){
-  return segmentGetPropery(self, 14, 0);
+  return segmentGetPropery(self, "@clp14", 14, 0);
 }
 
 static VALUE plb01(VALUE self){
-  return segmentGetPropery(self, 1, 0);
+  return segmentGetPropery(self, "@plb01", 1, 0);
 }
 
 static VALUE plb02(VALUE self){
-  return segmentGetPropery(self, 2, 0);
+  return segmentGetPropery(self, "@plb02", 2, 0);
 }
 
 static VALUE plb03_01(VALUE self){
-  return segmentGetPropery(self, 3, 1);
+  return segmentGetPropery(self, "@plb03_01", 3, 1);
 }
 
 static VALUE plb03_02(VALUE self){
-  return segmentGetPropery(self, 3, 2);
+  return segmentGetPropery(self, "@plb03_02", 3, 2);
 }
 
 static VALUE plb04(VALUE self){
-  return segmentGetPropery(self, 4, 0);
+  return segmentGetPropery(self, "@plb04", 4, 0);
 }
 
 static VALUE plb05_01(VALUE self){
-  return segmentGetPropery(self, 5, 1);
+  return segmentGetPropery(self, "@plb05_01", 5, 1);
 }
 
 static VALUE plb05_02(VALUE self){
-  return segmentGetPropery(self, 5, 2);
+  return segmentGetPropery(self, "@plb05_02", 5, 2);
 }
 
 static VALUE plb06(VALUE self){
-  return segmentGetPropery(self, 6, 0);
+  return segmentGetPropery(self, "@plb06", 6, 0);
 }
 
 static VALUE plb07_01(VALUE self){
-  return segmentGetPropery(self, 7, 1);
+  return segmentGetPropery(self, "@plb07_01", 7, 1);
 }
 
 static VALUE plb07_02(VALUE self){
-  return segmentGetPropery(self, 7, 2);
+  return segmentGetPropery(self, "@plb07_02", 7, 2);
 }
 
 static VALUE plb08(VALUE self){
-  return segmentGetPropery(self, 8, 0);
+  return segmentGetPropery(self, "@plb08", 8, 0);
 }
 
 static VALUE plb09_01(VALUE self){
-  return segmentGetPropery(self, 9, 1);
+  return segmentGetPropery(self, "@plb09_01", 9, 1);
 }
 
 static VALUE plb09_02(VALUE self){
-  return segmentGetPropery(self, 9, 2);
+  return segmentGetPropery(self, "@plb09_02", 9, 2);
 }
 
 static VALUE plb10(VALUE self){
-  return segmentGetPropery(self, 10, 0);
+  return segmentGetPropery(self, "@plb10", 10, 0);
 }
 
 static VALUE plb11_01(VALUE self){
-  return segmentGetPropery(self, 11, 1);
+  return segmentGetPropery(self, "@plb11_01", 11, 1);
 }
 
 static VALUE plb11_02(VALUE self){
-  return segmentGetPropery(self, 11, 2);
+  return segmentGetPropery(self, "@plb11_02", 11, 2);
 }
 
 static VALUE plb12(VALUE self){
-  return segmentGetPropery(self, 12, 0);
+  return segmentGetPropery(self, "@plb12", 12, 0);
 }
 
 static VALUE plb13_01(VALUE self){
-  return segmentGetPropery(self, 13, 1);
+  return segmentGetPropery(self, "@plb13_01", 13, 1);
 }
 
 static VALUE plb13_02(VALUE self){
-  return segmentGetPropery(self, 13, 2);
+  return segmentGetPropery(self, "@plb13_02", 13, 2);
 }
 
 static VALUE plb14(VALUE self){
-  return segmentGetPropery(self, 14, 0);
+  return segmentGetPropery(self, "@plb14", 14, 0);
 }
 
 static VALUE ts301(VALUE self){
-  return segmentGetPropery(self, 1, 0);
+  return segmentGetPropery(self, "@ts301", 1, 0);
 }
 
 static VALUE ts302(VALUE self){
-  return segmentGetPropery(self, 2, 0);
+  return segmentGetPropery(self, "@ts302", 2, 0);
 }
 
 static VALUE ts303(VALUE self){
-  return segmentGetPropery(self, 3, 0);
+  return segmentGetPropery(self, "@ts303", 3, 0);
 }
 
 static VALUE ts304(VALUE self){
-  return segmentGetPropery(self, 4, 0);
+  return segmentGetPropery(self, "@ts304", 4, 0);
 }
 
 static VALUE ts305(VALUE self){
-  return segmentGetPropery(self, 5, 0);
+  return segmentGetPropery(self, "@ts305", 5, 0);
 }
 
 static VALUE ts306(VALUE self){
-  return segmentGetPropery(self, 6, 0);
+  return segmentGetPropery(self, "@ts306", 6, 0);
 }
 
 static VALUE ts307(VALUE self){
-  return segmentGetPropery(self, 7, 0);
+  return segmentGetPropery(self, "@ts307", 7, 0);
 }
 
 static VALUE ts308(VALUE self){
-  return segmentGetPropery(self, 8, 0);
+  return segmentGetPropery(self, "@ts308", 8, 0);
 }
 
 static VALUE ts309(VALUE self){
-  return segmentGetPropery(self, 9, 0);
+  return segmentGetPropery(self, "@ts309", 9, 0);
 }
 
 static VALUE ts310(VALUE self){
-  return segmentGetPropery(self, 10, 0);
+  return segmentGetPropery(self, "@ts310", 10, 0);
 }
 
 static VALUE ts311(VALUE self){
-  return segmentGetPropery(self, 11, 0);
+  return segmentGetPropery(self, "@ts311", 11, 0);
 }
 
 static VALUE ts312(VALUE self){
-  return segmentGetPropery(self, 12, 0);
+  return segmentGetPropery(self, "@ts312", 12, 0);
 }
 
 static VALUE ts313(VALUE self){
-  return segmentGetPropery(self, 13, 0);
+  return segmentGetPropery(self, "@ts313", 13, 0);
 }
 
 static VALUE ts314(VALUE self){
-  return segmentGetPropery(self, 14, 0);
+  return segmentGetPropery(self, "@ts314", 14, 0);
 }
 
 static VALUE ts315(VALUE self){
-  return segmentGetPropery(self, 15, 0);
+  return segmentGetPropery(self, "@ts315", 15, 0);
 }
 
 static VALUE ts316(VALUE self){
-  return segmentGetPropery(self, 16, 0);
+  return segmentGetPropery(self, "@ts316", 16, 0);
 }
 
 static VALUE ts317(VALUE self){
-  return segmentGetPropery(self, 17, 0);
+  return segmentGetPropery(self, "@ts317", 17, 0);
 }
 
 static VALUE ts318(VALUE self){
-  return segmentGetPropery(self, 18, 0);
+  return segmentGetPropery(self, "@ts318", 18, 0);
 }
 
 static VALUE ts319(VALUE self){
-  return segmentGetPropery(self, 19, 0);
+  return segmentGetPropery(self, "@ts319", 19, 0);
 }
 
 static VALUE ts201(VALUE self){
-  return segmentGetPropery(self, 1, 0);
+  return segmentGetPropery(self, "@ts201", 1, 0);
 }
 
 static VALUE ts202(VALUE self){
-  return segmentGetPropery(self, 2, 0);
+  return segmentGetPropery(self, "@ts202", 2, 0);
 }
 
 static VALUE ts203(VALUE self){
-  return segmentGetPropery(self, 3, 0);
+  return segmentGetPropery(self, "@ts203", 3, 0);
 }
 
 static VALUE ts204(VALUE self){
-  return segmentGetPropery(self, 4, 0);
+  return segmentGetPropery(self, "@ts204", 4, 0);
 }
 
 static VALUE ts205(VALUE self){
-  return segmentGetPropery(self, 5, 0);
+  return segmentGetPropery(self, "@ts205", 5, 0);
 }
 
 static VALUE ts206(VALUE self){
-  return segmentGetPropery(self, 6, 0);
+  return segmentGetPropery(self, "@ts206", 6, 0);
 }
 
 static VALUE ts207(VALUE self){
-  return segmentGetPropery(self, 7, 0);
+  return segmentGetPropery(self, "@ts207", 7, 0);
 }
 
 static VALUE ts208(VALUE self){
-  return segmentGetPropery(self, 8, 0);
+  return segmentGetPropery(self, "@ts208", 8, 0);
 }
 
 static VALUE ts209(VALUE self){
-  return segmentGetPropery(self, 9, 0);
+  return segmentGetPropery(self, "@ts209", 9, 0);
 }
 
 static VALUE ts210(VALUE self){
-  return segmentGetPropery(self, 10, 0);
+  return segmentGetPropery(self, "@ts210", 10, 0);
 }
 
 static VALUE ts211(VALUE self){
-  return segmentGetPropery(self, 11, 0);
+  return segmentGetPropery(self, "@ts211", 11, 0);
 }
 
 static VALUE ts212(VALUE self){
-  return segmentGetPropery(self, 12, 0);
+  return segmentGetPropery(self, "@ts212", 12, 0);
 }
 
 static VALUE ts213(VALUE self){
-  return segmentGetPropery(self, 13, 0);
+  return segmentGetPropery(self, "@ts213", 13, 0);
 }
 
 static VALUE ts214(VALUE self){
-  return segmentGetPropery(self, 14, 0);
+  return segmentGetPropery(self, "@ts214", 14, 0);
 }
 
 static VALUE ts215(VALUE self){
-  return segmentGetPropery(self, 15, 0);
+  return segmentGetPropery(self, "@ts215", 15, 0);
 }
 
 static VALUE ts216(VALUE self){
-  return segmentGetPropery(self, 16, 0);
+  return segmentGetPropery(self, "@ts216", 16, 0);
 }
 
 static VALUE ts217(VALUE self){
-  return segmentGetPropery(self, 17, 0);
+  return segmentGetPropery(self, "@ts217", 17, 0);
 }
 
 static VALUE ts218(VALUE self){
-  return segmentGetPropery(self, 18, 0);
+  return segmentGetPropery(self, "@ts218", 18, 0);
 }
 
 static VALUE ts219(VALUE self){
-  return segmentGetPropery(self, 19, 0);
+  return segmentGetPropery(self, "@ts219", 19, 0);
 }
 
 static VALUE ts220(VALUE self){
-  return segmentGetPropery(self, 20, 0);
+  return segmentGetPropery(self, "@ts220", 20, 0);
 }
 
 static VALUE ts221(VALUE self){
-  return segmentGetPropery(self, 21, 0);
+  return segmentGetPropery(self, "@ts221", 21, 0);
 }
 
 static VALUE ts222(VALUE self){
-  return segmentGetPropery(self, 22, 0);
+  return segmentGetPropery(self, "@ts222", 22, 0);
 }
 
 static VALUE ts223(VALUE self){
-  return segmentGetPropery(self, 23, 0);
+  return segmentGetPropery(self, "@ts223", 23, 0);
 }
 
 static VALUE ts224(VALUE self){
-  return segmentGetPropery(self, 24, 0);
+  return segmentGetPropery(self, "@ts224", 24, 0);
 }
 
 static VALUE moa01(VALUE self){
-  return segmentGetPropery(self, 1, 0);
+  return segmentGetPropery(self, "@moa01", 1, 0);
 }
 
 static VALUE moa02(VALUE self){
-  return segmentGetPropery(self, 2, 0);
+  return segmentGetPropery(self, "@moa02", 2, 0);
 }
 
 static VALUE moa03(VALUE self){
-  return segmentGetPropery(self, 3, 0);
+  return segmentGetPropery(self, "@moa03", 3, 0);
 }
 
 static VALUE moa04(VALUE self){
-  return segmentGetPropery(self, 4, 0);
+  return segmentGetPropery(self, "@moa04", 4, 0);
 }
 
 static VALUE moa05(VALUE self){
-  return segmentGetPropery(self, 5, 0);
+  return segmentGetPropery(self, "@moa05", 5, 0);
 }
 
 static VALUE moa06(VALUE self){
-  return segmentGetPropery(self, 6, 0);
+  return segmentGetPropery(self, "@moa06", 6, 0);
 }
 
 static VALUE moa07(VALUE self){
-  return segmentGetPropery(self, 7, 0);
+  return segmentGetPropery(self, "@moa07", 7, 0);
 }
 
 static VALUE moa08(VALUE self){
-  return segmentGetPropery(self, 8, 0);
+  return segmentGetPropery(self, "@moa08", 8, 0);
 }
 
 static VALUE moa09(VALUE self){
-  return segmentGetPropery(self, 9, 0);
+  return segmentGetPropery(self, "@moa09", 9, 0);
 }
 
 static VALUE rdm01(VALUE self){
-  return segmentGetPropery(self, 1, 0);
+  return segmentGetPropery(self, "@rdm01", 1, 0);
 }
 
 static VALUE rdm02(VALUE self){
-  return segmentGetPropery(self, 2, 0);
+  return segmentGetPropery(self, "@rdm02", 2, 0);
 }
 
 static VALUE rdm03(VALUE self){
-  return segmentGetPropery(self, 3, 0);
+  return segmentGetPropery(self, "@rdm03", 3, 0);
 }
 
 static VALUE lx01(VALUE self){
-  return segmentGetPropery(self, 1, 0);
+  return segmentGetPropery(self, "@lx01", 1, 0);
 }
 
 static VALUE lq01(VALUE self){
-  return segmentGetPropery(self, 1, 0);
+  return segmentGetPropery(self, "@lq01", 1, 0);
 }
 
 static VALUE lq02(VALUE self){
-  return segmentGetPropery(self, 2, 0);
+  return segmentGetPropery(self, "@lq02", 2, 0);
 }
 
 static VALUE n101(VALUE self){
-  return segmentGetPropery(self, 1, 0);
+  return segmentGetPropery(self, "@n101", 1, 0);
 }
 
 static VALUE n102(VALUE self){
-  return segmentGetPropery(self, 2, 0);
+  return segmentGetPropery(self, "@n102", 2, 0);
 }
 
 static VALUE n103(VALUE self){
-  return segmentGetPropery(self, 3, 0);
+  return segmentGetPropery(self, "@n103", 3, 0);
 }
 
 static VALUE n104(VALUE self){
-  return segmentGetPropery(self, 4, 0);
+  return segmentGetPropery(self, "@n104", 4, 0);
 }
 
 static VALUE n105(VALUE self){
-  return segmentGetPropery(self, 5, 0);
+  return segmentGetPropery(self, "@n105", 5, 0);
 }
 
 static VALUE n106(VALUE self){
-  return segmentGetPropery(self, 6, 0);
+  return segmentGetPropery(self, "@n106", 6, 0);
 }
 
 static VALUE n301(VALUE self){
-  return segmentGetPropery(self, 1, 0);
+  return segmentGetPropery(self, "@n301", 1, 0);
 }
 
 static VALUE n302(VALUE self){
-  return segmentGetPropery(self, 2, 0);
+  return segmentGetPropery(self, "@n302", 2, 0);
 }
 
 static VALUE n401(VALUE self){
-  return segmentGetPropery(self, 1, 0);
+  return segmentGetPropery(self, "@n401", 1, 0);
 }
 
 static VALUE n402(VALUE self){
-  return segmentGetPropery(self, 2, 0);
+  return segmentGetPropery(self, "@n402", 2, 0);
 }
 
 static VALUE n403(VALUE self){
-  return segmentGetPropery(self, 3, 0);
+  return segmentGetPropery(self, "@n403", 3, 0);
 }
 
 static VALUE n404(VALUE self){
-  return segmentGetPropery(self, 4, 0);
+  return segmentGetPropery(self, "@n404", 4, 0);
 }
 
 static VALUE n405(VALUE self){
-  return segmentGetPropery(self, 5, 0);
+  return segmentGetPropery(self, "@n405", 5, 0);
 }
 
 static VALUE n406(VALUE self){
-  return segmentGetPropery(self, 6, 0);
+  return segmentGetPropery(self, "@n406", 6, 0);
 }
 
 static VALUE gs01(VALUE self){
-  return segmentGetPropery(self, 1, 0);
+  return segmentGetPropery(self, "@gs01", 1, 0);
 }
 
 static VALUE gs02(VALUE self){
-  return segmentGetPropery(self, 2, 0);
+  return segmentGetPropery(self, "@gs02", 2, 0);
 }
 
 static VALUE gs03(VALUE self){
-  return segmentGetPropery(self, 3, 0);
+  return segmentGetPropery(self, "@gs03", 3, 0);
 }
 
 static VALUE gs04(VALUE self){
-  return segmentGetPropery(self, 4, 0);
+  return segmentGetPropery(self, "@gs04", 4, 0);
 }
 
 static VALUE gs05(VALUE self){
-  return segmentGetPropery(self, 5, 0);
+  return segmentGetPropery(self, "@gs05", 5, 0);
 }
 
 static VALUE gs06(VALUE self){
-  return segmentGetPropery(self, 6, 0);
+  return segmentGetPropery(self, "@gs06", 6, 0);
 }
 
 static VALUE gs07(VALUE self){
-  return segmentGetPropery(self, 7, 0);
+  return segmentGetPropery(self, "@gs07", 7, 0);
 }
 
 static VALUE gs08(VALUE self){
-  return segmentGetPropery(self, 8, 0);
+  return segmentGetPropery(self, "@gs08", 8, 0);
 }
 
 static VALUE st01(VALUE self){
-  return segmentGetPropery(self, 1, 0);
+  return segmentGetPropery(self, "@st01", 1, 0);
 }
 
 static VALUE st02(VALUE self){
-  return segmentGetPropery(self, 2, 0);
+  return segmentGetPropery(self, "@st02", 2, 0);
 }
 
 static VALUE st03(VALUE self){
-  return segmentGetPropery(self, 3, 0);
+  return segmentGetPropery(self, "@st03", 3, 0);
 }
 
 static VALUE ge01(VALUE self){
-  return segmentGetPropery(self, 1, 0);
+  return segmentGetPropery(self, "@ge01", 1, 0);
 }
 
 static VALUE ge02(VALUE self){
-  return segmentGetPropery(self, 2, 0);
+  return segmentGetPropery(self, "@ge02", 2, 0);
 }
 
 static VALUE se01(VALUE self){
-  return segmentGetPropery(self, 1, 0);
+  return segmentGetPropery(self, "@se01", 1, 0);
 }
 
 static VALUE se02(VALUE self){
-  return segmentGetPropery(self, 2, 0);
+  return segmentGetPropery(self, "@se02", 2, 0);
 }
 
 static VALUE nm101(VALUE self){
-  return segmentGetPropery(self, 1, 0);
+  return segmentGetPropery(self, "@nm101", 1, 0);
 }
 
 static VALUE nm102(VALUE self){
-  return segmentGetPropery(self, 2, 0);
+  return segmentGetPropery(self, "@nm102", 2, 0);
 }
 
 static VALUE nm103(VALUE self){
-  return segmentGetPropery(self, 3, 0);
+  return segmentGetPropery(self, "@nm103", 3, 0);
 }
 
 static VALUE nm104(VALUE self){
-  return segmentGetPropery(self, 4, 0);
+  return segmentGetPropery(self, "@nm104", 4, 0);
 }
 
 static VALUE nm105(VALUE self){
-  return segmentGetPropery(self, 5, 0);
+  return segmentGetPropery(self, "@nm105", 5, 0);
 }
 
 static VALUE nm106(VALUE self){
-  return segmentGetPropery(self, 6, 0);
+  return segmentGetPropery(self, "@nm106", 6, 0);
 }
 
 static VALUE nm107(VALUE self){
-  return segmentGetPropery(self, 7, 0);
+  return segmentGetPropery(self, "@nm107", 7, 0);
 }
 
 static VALUE nm108(VALUE self){
-  return segmentGetPropery(self, 8, 0);
+  return segmentGetPropery(self, "@nm108", 8, 0);
 }
 
 static VALUE nm109(VALUE self){
-  return segmentGetPropery(self, 9, 0);
+  return segmentGetPropery(self, "@nm109", 9, 0);
 }
 
 static VALUE nm110(VALUE self){
-  return segmentGetPropery(self, 10, 0);
+  return segmentGetPropery(self, "@nm110", 10, 0);
 }
 
 static VALUE nm111(VALUE self){
-  return segmentGetPropery(self, 11, 0);
+  return segmentGetPropery(self, "@nm111", 11, 0);
 }
 
 static VALUE amt01(VALUE self){
-  return segmentGetPropery(self, 1, 0);
+  return segmentGetPropery(self, "@amt01", 1, 0);
 }
 
 static VALUE amt02(VALUE self){
-  return segmentGetPropery(self, 2, 0);
+  return segmentGetPropery(self, "@amt02", 2, 0);
 }
 
 static VALUE amt03(VALUE self){
-  return segmentGetPropery(self, 3, 0);
+  return segmentGetPropery(self, "@amt03", 3, 0);
 }
 
 void init_choo_choo_segment(){
+  mEDI835 = rb_define_module("EDI835");
   mChooChoo = rb_define_module("ChooChoo");
   cSegment = rb_define_class_under(mChooChoo, "Segment", rb_cObject);
-  cISA =  rb_define_class_under(mChooChoo, "ISA", cSegment);
-  cBPR =  rb_define_class_under(mChooChoo, "BPR", cSegment);
-  cTRN =  rb_define_class_under(mChooChoo, "TRN", cSegment);
-  cCUR =  rb_define_class_under(mChooChoo, "CUR", cSegment);
-  cDTM =  rb_define_class_under(mChooChoo, "DTM", cSegment);
-  cPER =  rb_define_class_under(mChooChoo, "PER", cSegment);
-  cMIA =  rb_define_class_under(mChooChoo, "MIA", cSegment);
-  cREF =  rb_define_class_under(mChooChoo, "REF", cSegment);
-  cCAS =  rb_define_class_under(mChooChoo, "CAS", cSegment);
-  cIEA =  rb_define_class_under(mChooChoo, "IEA", cSegment);
-  cQTY =  rb_define_class_under(mChooChoo, "QTY", cSegment);
-  cSVC =  rb_define_class_under(mChooChoo, "SVC", cSegment);
-  cCLP =  rb_define_class_under(mChooChoo, "CLP", cSegment);
-  cPLB =  rb_define_class_under(mChooChoo, "PLB", cSegment);
-  cTS3 =  rb_define_class_under(mChooChoo, "TS3", cSegment);
-  cTS2 =  rb_define_class_under(mChooChoo, "TS2", cSegment);
-  cMOA =  rb_define_class_under(mChooChoo, "MOA", cSegment);
-  cRDM =  rb_define_class_under(mChooChoo, "RDM", cSegment);
-  cLX =   rb_define_class_under(mChooChoo, "LX", cSegment);
-  cLQ =   rb_define_class_under(mChooChoo, "LQ", cSegment);
-  cN1 =   rb_define_class_under(mChooChoo, "N1", cSegment);
-  cN3 =   rb_define_class_under(mChooChoo, "N3", cSegment);
-  cN4 =   rb_define_class_under(mChooChoo, "N4", cSegment);
-  cGS =   rb_define_class_under(mChooChoo, "GS", cSegment);
-  cST =   rb_define_class_under(mChooChoo, "ST", cSegment);
-  cGE =   rb_define_class_under(mChooChoo, "GE", cSegment);
-  cSE =   rb_define_class_under(mChooChoo, "SE", cSegment);
-  cNM1 =  rb_define_class_under(mChooChoo, "NM1", cSegment);
-  cAMT =  rb_define_class_under(mChooChoo, "AMT", cSegment);
+  cISA = rb_define_class_under(mChooChoo, "ISA", cSegment);
+  cBPR = rb_define_class_under(mChooChoo, "BPR", cSegment);
+  cTRN = rb_define_class_under(mChooChoo, "TRN", cSegment);
+  cCUR = rb_define_class_under(mChooChoo, "CUR", cSegment);
+  cDTM = rb_define_class_under(mChooChoo, "DTM", cSegment);
+  cPER = rb_define_class_under(mChooChoo, "PER", cSegment);
+  cMIA = rb_define_class_under(mChooChoo, "MIA", cSegment);
+  cREF = rb_define_class_under(mChooChoo, "REF", cSegment);
+  cCAS = rb_define_class_under(mChooChoo, "CAS", cSegment);
+  cIEA = rb_define_class_under(mChooChoo, "IEA", cSegment);
+  cQTY = rb_define_class_under(mChooChoo, "QTY", cSegment);
+  cSVC = rb_define_class_under(mChooChoo, "SVC", cSegment);
+  cCLP = rb_define_class_under(mChooChoo, "CLP", cSegment);
+  cPLB = rb_define_class_under(mChooChoo, "PLB", cSegment);
+  cTS3 = rb_define_class_under(mChooChoo, "TS3", cSegment);
+  cTS2 = rb_define_class_under(mChooChoo, "TS2", cSegment);
+  cMOA = rb_define_class_under(mChooChoo, "MOA", cSegment);
+  cRDM = rb_define_class_under(mChooChoo, "RDM", cSegment);
+  cLX = rb_define_class_under(mChooChoo, "LX", cSegment);
+  cLQ = rb_define_class_under(mChooChoo, "LQ", cSegment);
+  cN1 = rb_define_class_under(mChooChoo, "N1", cSegment);
+  cN3 = rb_define_class_under(mChooChoo, "N3", cSegment);
+  cN4 = rb_define_class_under(mChooChoo, "N4", cSegment);
+  cGS = rb_define_class_under(mChooChoo, "GS", cSegment);
+  cST = rb_define_class_under(mChooChoo, "ST", cSegment);
+  cGE = rb_define_class_under(mChooChoo, "GE", cSegment);
+  cSE = rb_define_class_under(mChooChoo, "SE", cSegment);
+  cNM1 = rb_define_class_under(mChooChoo, "NM1", cSegment);
+  cAMT = rb_define_class_under(mChooChoo, "AMT", cSegment);
   rb_define_method(cISA, "ISA01", isa01, 0);
   rb_define_method(cISA, "ISA02", isa02, 0);
   rb_define_method(cISA, "ISA03", isa03, 0);

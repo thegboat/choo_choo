@@ -2,7 +2,7 @@ module EDI835
   class InpatientAdjudication
 
     def initialize(mia_segment)
-      raise ArgumentError, "Initialization requires a MIA object" unless mia_segment.is_a?(EDI835::MIA)
+      raise ArgumentError, "Initialization requires a MIA object" unless mia_segment.is_a?(ChooChoo::MIA)
       @root = mia_segment
     end
 

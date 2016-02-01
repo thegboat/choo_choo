@@ -2,7 +2,7 @@ module EDI835
   class OutpatientAdjudication
 
     def initialize(moa_segment)
-      raise ArgumentError, "Initialization requires a MOA object" unless moa_segment.is_a?(EDI835::MOA)
+      raise ArgumentError, "Initialization requires a MOA object" unless moa_segment.is_a?(ChooChoo::MOA)
       @root = moa_segment
     end
 
