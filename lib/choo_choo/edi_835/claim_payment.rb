@@ -104,7 +104,7 @@ module EDI835
     end
 
     def crossover_sender_number
-      @crossover_sender_number ||=  if crossed_over_payer.upper(:NM108) == EDI835::NM1_PI
+      @crossover_sender_number ||=  if crossed_over_payer.upper(:NM108) == EDI835::CROSSOVER_SENDER_NUMBER
         crossed_over_payer.strip(:NM109, length: 30)
       end
     end
@@ -132,7 +132,7 @@ module EDI835
     end
 
     def approved
-      @approved ||= root.first_or_null(:AMT01, EDI835::APPROVED_AMOUNT).money(:AMT02)
+      @approved ||= root.first_or_null(:AMT01, EDI835::CLAIM_APPROVED).money(:AMT02)
     end
 
     def billing_provider_secondary_number2

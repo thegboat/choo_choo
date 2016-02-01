@@ -60,6 +60,5 @@ def edit_835_line(message, line, string)
   array = message.split('~')
   array[line -1] = string
   edi = EDI835::Parser.parse(array.join('~'))
-  edi.isa_segment
 end
 

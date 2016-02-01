@@ -37,7 +37,7 @@ module EDI835
     end
 
     def approved
-      @approved ||= root.first_or_null(:AMT01, EDI835::AMT_B6).money(:AMT02)
+      @approved ||= root.first_or_null(:AMT01, EDI835::SERVICE_APPROVED).money(:AMT02)
     end
 
     def amount

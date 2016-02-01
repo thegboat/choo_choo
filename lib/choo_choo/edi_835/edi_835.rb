@@ -26,8 +26,9 @@ module EDI835
   CHARGE_NUMBER           = '6R'.freeze
   N1_XX                   = 'XX'.freeze
   N1_FI                   = 'FI'.freeze
-  NM1_PI                  = 'PI'.freeze
-  APPROVED_AMOUNT         = 'AU'.freeze
+  CROSSOVER_SENDER_NUMBER = 'PI'.freeze
+  CLAIM_APPROVED          = 'AU'.freeze
+  SERVICE_APPROVED        = 'B6'.freeze
 
   SVC_HC                  = 'HC'.freeze
   DTM_150                 = '150'.freeze
@@ -35,7 +36,6 @@ module EDI835
   DTM_232                 = '232'.freeze
   DTM_233                 = '232'.freeze
   DTM_151                 = '151'.freeze
-  AMT_B6                  = 'B6'.freeze
 
   PR_CODES                = Set.new([DEDUCTIBLE, CO_INSURANCE, CO_PAYMENT])
   WITHHOLD_CODES          = Set.new(%w{104 253 105 245 144})
