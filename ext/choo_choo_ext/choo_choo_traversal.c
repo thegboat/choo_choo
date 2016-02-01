@@ -21,8 +21,8 @@ static VALUE sym_children;
 
 void buildIndexes(parser_t *parser){
   int segmentCount = 0;
-  parser->byName = ediParsingMalloc(parser->segmentCount,sizeof(segment_t*));
-  parser->primaryIndex = ediParsingMalloc(parser->segmentCount,sizeof(segment_t*));
+  parser->byName = choo_chooMalloc(parser->segmentCount,sizeof(segment_t*));
+  parser->primaryIndex = choo_chooMalloc(parser->segmentCount,sizeof(segment_t*));
   index_stat_t tmp[parser->segmentCount];
   indexSegment(parser, parser->root, &segmentCount, 0);
   qsort(parser->byName, parser->segmentCount, sizeof(segment_t*), nameSortFunc);
@@ -43,7 +43,7 @@ void buildIndexes(parser_t *parser){
   }
 
   parser->nameCount = index_i+1;
-  parser->nameIndex = ediParsingMalloc(parser->nameCount,sizeof(index_stat_t));
+  parser->nameIndex = choo_chooMalloc(parser->nameCount,sizeof(index_stat_t));
   memcpy(parser->nameIndex,tmp, parser->nameCount*sizeof(index_stat_t));
 }
 

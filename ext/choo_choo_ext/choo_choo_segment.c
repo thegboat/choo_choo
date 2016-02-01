@@ -84,7 +84,7 @@ void segmentFree(segment_t *segment){
     if(segment->propertyCache){
       propertyFree(segment);
     }
-    ediParsingDealloc(segment);
+    choo_chooDealloc(segment);
   }
 }
 
@@ -103,7 +103,7 @@ static void propertyFree(segment_t* segment){
   for(short element=1;element<=segment->elements; element++){
     for(short component=0; component<100; component++){
       if((ptr = propertyLookup(segment, element, component))){
-        if(strlen(ptr)) ediParsingDealloc(ptr);
+        if(strlen(ptr)) choo_chooDealloc(ptr);
       }else{
         break;
       }

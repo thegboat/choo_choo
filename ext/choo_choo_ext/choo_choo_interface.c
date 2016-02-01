@@ -37,23 +37,23 @@ static VALUE cDoc835;
 static ID id_force_8_bit;
 
 static void segment_free(anchor_t *anchor){
-  ediParsingDealloc(anchor);
+  choo_chooDealloc(anchor);
 }
 
 static void document_free(anchor_t *anchor){
   if(NULL != anchor){
     parserFree(anchor->parser);
-    ediParsingDealloc(anchor);
+    choo_chooDealloc(anchor);
   }
 }
 
 static VALUE segment_alloc(VALUE self){
-  anchor_t *anchor = ediParsingMalloc(1,sizeof(anchor_t));
+  anchor_t *anchor = choo_chooMalloc(1,sizeof(anchor_t));
   return Data_Wrap_Struct(self, NULL, segment_free, anchor);
 }
 
 static VALUE document_alloc(VALUE self){
-  anchor_t *anchor = ediParsingMalloc(1,sizeof(anchor_t));
+  anchor_t *anchor = choo_chooMalloc(1,sizeof(anchor_t));
   return Data_Wrap_Struct(self, NULL, document_free, anchor);
 }
 
@@ -69,7 +69,7 @@ static anchor_t *parserSetup(const char *documentType){
   anchor_t *anchor;
   VALUE doc = rb_class_new_instance(0, NULL, getDocClass(documentType));
   Data_Get_Struct(doc, anchor_t, anchor);
-  anchor->parser = ediParsingMalloc(1,sizeof(parser_t));
+  anchor->parser = choo_chooMalloc(1,sizeof(parser_t));
   anchor->parser->doc = doc;
   parserInitialization(anchor->parser);
   strcpy(anchor->parser->documentType, documentType);

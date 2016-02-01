@@ -135,8 +135,8 @@ void cacheProperty(segment_t *segment, char *data, short element, short componen
 
 // parser
 
-void *ediParsingMalloc(size_t nitems, size_t size);
-void ediParsingDealloc(void *any);
+void *choo_chooMalloc(size_t nitems, size_t size);
+void choo_chooDealloc(void *any);
 segment_t *parseSegment(parser_t *parser);
 int parseElement(segment_t *segment, char *str, const char componentSeparator[2], short seg_cnt);
 void parserInitialization(parser_t *parser);

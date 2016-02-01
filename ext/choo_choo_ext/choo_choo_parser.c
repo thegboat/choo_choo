@@ -7,7 +7,7 @@
 //
 #include "choo_choo.h"
 
-void *ediParsingMalloc(size_t nitems, size_t size){
+void *choo_chooMalloc(size_t nitems, size_t size){
   void *any = ruby_xcalloc(nitems, size);
   if(any == NULL){
     rb_raise(rb_eRuntimeError, "Memory could not be allocated");
@@ -15,7 +15,7 @@ void *ediParsingMalloc(size_t nitems, size_t size){
   return any;
 }
 
-void ediParsingDealloc(void *any){
+void choo_chooDealloc(void *any){
   if(any) {
     xfree(any);
     any = NULL;
@@ -24,7 +24,7 @@ void ediParsingDealloc(void *any){
 
 segment_t *parseSegment(parser_t *parser){
   char *ptr, *rest = parser->str;
-  segment_t *segment = ediParsingMalloc(1,sizeof(segment_t));
+  segment_t *segment = choo_chooMalloc(1,sizeof(segment_t));
   short element = 0;
   char *tok = strsep(&rest, (char*)&ELEMENT_SEPARATOR);
   segmentInitializer(segment, tok);
@@ -87,11 +87,11 @@ void parserFree(parser_t *parser){
     for(i=0; i<parser->segmentCount;i++){
       segmentFree(parser->primaryIndex[i]);
     }
-    ediParsingDealloc(parser->primaryIndex);
+    choo_chooDealloc(parser->primaryIndex);
   }
-  ediParsingDealloc(parser->nameIndex);
-  ediParsingDealloc(parser->byName);
-  ediParsingDealloc(parser);
+  choo_chooDealloc(parser->nameIndex);
+  choo_chooDealloc(parser->byName);
+  choo_chooDealloc(parser);
 }
 
 void parserFail(parser_t *parser, short error){

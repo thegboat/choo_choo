@@ -36,27 +36,27 @@ module EDI835
     end
 
     def amount1
-      @amount1 ||= root.strip(:PLB04)
+      @amount1 ||= root.money(:PLB04)
     end
 
     def amount2
-      @amount2 ||= root.strip(:PLB06)
+      @amount2 ||= root.money(:PLB06)
     end
 
     def amount3
-      @amount3 ||= root.strip(:PLB08)
+      @amount3 ||= root.money(:PLB08)
     end
 
     def amount4
-      @amount4 ||= root.strip(:PLB10)
+      @amount4 ||= root.money(:PLB10)
     end
 
     def amount5
-      @amount5 ||= root.strip(:PLB12)
+      @amount5 ||= root.money(:PLB12)
     end
 
     def amount6
-      @amount6 ||= root.strip(:PLB14)
+      @amount6 ||= root.money(:PLB14)
     end
 
     def payer_claim_number1
