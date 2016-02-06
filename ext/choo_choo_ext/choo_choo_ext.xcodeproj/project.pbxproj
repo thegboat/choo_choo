@@ -10,7 +10,6 @@
 		2FFEAA121C5D2FDF004D3F9C /* choo_choo_835.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = choo_choo_835.c; sourceTree = "<group>"; };
 		2FFEAA131C5D2FDF004D3F9C /* choo_choo_constants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = choo_choo_constants.h; sourceTree = "<group>"; };
 		2FFEAA141C5D2FDF004D3F9C /* choo_choo_errors.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = choo_choo_errors.c; sourceTree = "<group>"; };
-		2FFEAA151C5D2FDF004D3F9C /* choo_choo_inspection.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = choo_choo_inspection.c; sourceTree = "<group>"; };
 		2FFEAA161C5D2FDF004D3F9C /* choo_choo_interface.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = choo_choo_interface.c; sourceTree = "<group>"; };
 		2FFEAA171C5D2FDF004D3F9C /* choo_choo_parser.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = choo_choo_parser.c; sourceTree = "<group>"; };
 		2FFEAA181C5D2FDF004D3F9C /* choo_choo_segment.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = choo_choo_segment.c; sourceTree = "<group>"; };
@@ -26,7 +25,6 @@
 				2FFEAA121C5D2FDF004D3F9C /* choo_choo_835.c */,
 				2FFEAA131C5D2FDF004D3F9C /* choo_choo_constants.h */,
 				2FFEAA141C5D2FDF004D3F9C /* choo_choo_errors.c */,
-				2FFEAA151C5D2FDF004D3F9C /* choo_choo_inspection.c */,
 				2FFEAA161C5D2FDF004D3F9C /* choo_choo_interface.c */,
 				2FFEAA171C5D2FDF004D3F9C /* choo_choo_parser.c */,
 				2FFEAA181C5D2FDF004D3F9C /* choo_choo_segment.c */,
@@ -199,6 +197,7 @@
 				2FFEAA101C5D2E9D004D3F9C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

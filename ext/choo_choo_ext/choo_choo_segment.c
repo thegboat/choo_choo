@@ -1,7 +1,7 @@
 
 //
 //  choo_choo_segment.c
-//  choo_choo_parser
+//  choo_choo
 //
 //  Created by Grady Griffin on 1/28/16.
 //  Copyright (c) 2015 CareCloud. All rights reserved.
@@ -16,35 +16,35 @@ static VALUE mChooChoo;
 static VALUE mEDI835;
 static VALUE cSegment;
 
-static VALUE cISA;
-static VALUE cBPR;
-static VALUE cTRN;
-static VALUE cCUR;
-static VALUE cDTM;
-static VALUE cPER;
-static VALUE cMIA;
-static VALUE cREF;
-static VALUE cCAS;
-static VALUE cIEA;
-static VALUE cQTY;
-static VALUE cSVC;
-static VALUE cCLP;
-static VALUE cPLB;
-static VALUE cTS3;
-static VALUE cTS2;
-static VALUE cMOA;
-static VALUE cRDM;
-static VALUE cLX;
-static VALUE cLQ;
-static VALUE cN1;
-static VALUE cN3;
-static VALUE cN4;
-static VALUE cGS;
-static VALUE cST;
-static VALUE cGE;
-static VALUE cSE;
-static VALUE cNM1;
-static VALUE cAMT;
+// static VALUE cISA;
+// static VALUE cBPR;
+// static VALUE cTRN;
+// static VALUE cCUR;
+// static VALUE cDTM;
+// static VALUE cPER;
+// static VALUE cMIA;
+// static VALUE cREF;
+// static VALUE cCAS;
+// static VALUE cIEA;
+// static VALUE cQTY;
+// static VALUE cSVC;
+// static VALUE cCLP;
+// static VALUE cPLB;
+// static VALUE cTS3;
+// static VALUE cTS2;
+// static VALUE cMOA;
+// static VALUE cRDM;
+// static VALUE cLX;
+// static VALUE cLQ;
+// static VALUE cN1;
+// static VALUE cN3;
+// static VALUE cN4;
+// static VALUE cGS;
+// static VALUE cST;
+// static VALUE cGE;
+// static VALUE cSE;
+// static VALUE cNM1;
+// static VALUE cAMT;
 
 void segmentInitializer(segment_t *segment, char *src){
   long idx = strlen(src);
@@ -1271,35 +1271,35 @@ void init_choo_choo_segment(){
   mEDI835 = rb_define_module("EDI835");
   mChooChoo = rb_define_module("ChooChoo");
   cSegment = rb_define_class_under(mChooChoo, "Segment", rb_cObject);
-  cISA = rb_define_class_under(mChooChoo, "ISA", cSegment);
-  cBPR = rb_define_class_under(mChooChoo, "BPR", cSegment);
-  cTRN = rb_define_class_under(mChooChoo, "TRN", cSegment);
-  cCUR = rb_define_class_under(mChooChoo, "CUR", cSegment);
-  cDTM = rb_define_class_under(mChooChoo, "DTM", cSegment);
-  cPER = rb_define_class_under(mChooChoo, "PER", cSegment);
-  cMIA = rb_define_class_under(mChooChoo, "MIA", cSegment);
-  cREF = rb_define_class_under(mChooChoo, "REF", cSegment);
-  cCAS = rb_define_class_under(mChooChoo, "CAS", cSegment);
-  cIEA = rb_define_class_under(mChooChoo, "IEA", cSegment);
-  cQTY = rb_define_class_under(mChooChoo, "QTY", cSegment);
-  cSVC = rb_define_class_under(mChooChoo, "SVC", cSegment);
-  cCLP = rb_define_class_under(mChooChoo, "CLP", cSegment);
-  cPLB = rb_define_class_under(mChooChoo, "PLB", cSegment);
-  cTS3 = rb_define_class_under(mChooChoo, "TS3", cSegment);
-  cTS2 = rb_define_class_under(mChooChoo, "TS2", cSegment);
-  cMOA = rb_define_class_under(mChooChoo, "MOA", cSegment);
-  cRDM = rb_define_class_under(mChooChoo, "RDM", cSegment);
-  cLX = rb_define_class_under(mChooChoo, "LX", cSegment);
-  cLQ = rb_define_class_under(mChooChoo, "LQ", cSegment);
-  cN1 = rb_define_class_under(mChooChoo, "N1", cSegment);
-  cN3 = rb_define_class_under(mChooChoo, "N3", cSegment);
-  cN4 = rb_define_class_under(mChooChoo, "N4", cSegment);
-  cGS = rb_define_class_under(mChooChoo, "GS", cSegment);
-  cST = rb_define_class_under(mChooChoo, "ST", cSegment);
-  cGE = rb_define_class_under(mChooChoo, "GE", cSegment);
-  cSE = rb_define_class_under(mChooChoo, "SE", cSegment);
-  cNM1 = rb_define_class_under(mChooChoo, "NM1", cSegment);
-  cAMT = rb_define_class_under(mChooChoo, "AMT", cSegment);
+  VALUE cISA = rb_define_class_under(mChooChoo, "ISA", cSegment);
+  VALUE cBPR = rb_define_class_under(mChooChoo, "BPR", cSegment);
+  VALUE cTRN = rb_define_class_under(mChooChoo, "TRN", cSegment);
+  VALUE cCUR = rb_define_class_under(mChooChoo, "CUR", cSegment);
+  VALUE cDTM = rb_define_class_under(mChooChoo, "DTM", cSegment);
+  VALUE cPER = rb_define_class_under(mChooChoo, "PER", cSegment);
+  VALUE cMIA = rb_define_class_under(mChooChoo, "MIA", cSegment);
+  VALUE cREF = rb_define_class_under(mChooChoo, "REF", cSegment);
+  VALUE cCAS = rb_define_class_under(mChooChoo, "CAS", cSegment);
+  VALUE cIEA = rb_define_class_under(mChooChoo, "IEA", cSegment);
+  VALUE cQTY = rb_define_class_under(mChooChoo, "QTY", cSegment);
+  VALUE cSVC = rb_define_class_under(mChooChoo, "SVC", cSegment);
+  VALUE cCLP = rb_define_class_under(mChooChoo, "CLP", cSegment);
+  VALUE cPLB = rb_define_class_under(mChooChoo, "PLB", cSegment);
+  VALUE cTS3 = rb_define_class_under(mChooChoo, "TS3", cSegment);
+  VALUE cTS2 = rb_define_class_under(mChooChoo, "TS2", cSegment);
+  VALUE cMOA = rb_define_class_under(mChooChoo, "MOA", cSegment);
+  VALUE cRDM = rb_define_class_under(mChooChoo, "RDM", cSegment);
+  VALUE cLX = rb_define_class_under(mChooChoo, "LX", cSegment);
+  VALUE cLQ = rb_define_class_under(mChooChoo, "LQ", cSegment);
+  VALUE cN1 = rb_define_class_under(mChooChoo, "N1", cSegment);
+  VALUE cN3 = rb_define_class_under(mChooChoo, "N3", cSegment);
+  VALUE cN4 = rb_define_class_under(mChooChoo, "N4", cSegment);
+  VALUE cGS = rb_define_class_under(mChooChoo, "GS", cSegment);
+  VALUE cST = rb_define_class_under(mChooChoo, "ST", cSegment);
+  VALUE cGE = rb_define_class_under(mChooChoo, "GE", cSegment);
+  VALUE cSE = rb_define_class_under(mChooChoo, "SE", cSegment);
+  VALUE cNM1 = rb_define_class_under(mChooChoo, "NM1", cSegment);
+  VALUE cAMT = rb_define_class_under(mChooChoo, "AMT", cSegment);
   rb_define_method(cISA, "ISA01", isa01, 0);
   rb_define_method(cISA, "ISA02", isa02, 0);
   rb_define_method(cISA, "ISA03", isa03, 0);

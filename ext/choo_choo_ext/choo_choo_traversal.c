@@ -1,6 +1,6 @@
 //
 //  choo_choo_traversal.c
-//  choo_choo_parser
+//  choo_choo
 //
 //  Created by Grady Griffin on 8/3/15.
 //  Copyright (c) 2015 CareCloud. All rights reserved.
@@ -73,24 +73,29 @@ VALUE propertiesToHash(segment_t *segment){
 }
 
 VALUE segmentWhere(parser_t *parser, segment_t *segment, VALUE name_rb, VALUE element_int_rb, VALUE component_int_rb, VALUE value_rb, VALUE limit_rb){
-  VALUE result = rb_ary_new();
+  VALUE child_rb, result = rb_ary_new();
+  short element,component;
+  char *c_name, *value;
+  index_stat_t stat;
+  int limit, max, cnt = 0;
+  segment_t *descendant;
 
   if(segment->children > 0){
-    short element = NUM2SHORT(element_int_rb);
-    short component = NUM2SHORT(component_int_rb);
-    char *c_name = getCname(name_rb);
-    index_stat_t stat = nameIndexSearch(parser, c_name);
+    element = NUM2SHORT(element_int_rb);
+    component = NUM2SHORT(component_int_rb);
+    c_name = getCname(name_rb);
+    stat = nameIndexSearch(parser, c_name);
     if(stat.lower > -1 && stat.upper > -1){
-      int max = (stat.upper - stat.lower) + 1;
-      char *value = getCname(value_rb);
-      const int limit = NUM2INT(limit_rb);
-      int cnt = 0;
-      segment_t *descendant;
-      for(int i=0;i<max;i++){
+      max = (stat.upper - stat.lower);
+      value = getCname(value_rb);
+      limit = NUM2INT(limit_rb);
+      for(int i=max;i>=-1;i--){
         if(limit > -1 && cnt >= limit) break;
         descendant = parser->byName[i+stat.lower];
-        if(isDescendantOf(descendant, segment) && hasProperty(descendant, element, component, value)){
-          VALUE child_rb = buildSegmentNode(parser, descendant);
+        if(descendant->pkey <= segment->pkey){
+          break;
+        }else if(isDescendantOf(descendant, segment) && hasProperty(descendant, element, component, value)){
+          child_rb = buildSegmentNode(parser, descendant);
           rb_ary_push(result, child_rb);
           cnt++;
         }
@@ -101,18 +106,24 @@ VALUE segmentWhere(parser_t *parser, segment_t *segment, VALUE name_rb, VALUE el
 }
 
 VALUE segmentExists(parser_t *parser, segment_t *segment, VALUE name_rb, VALUE element_int_rb, VALUE component_int_rb, VALUE value_rb){
+  short element, component;
+  char *c_name, *value;
+  index_stat_t stat;
+  int max;
+  segment_t *descendant;
   if(segment->children > 0){
-    short element = NUM2SHORT(element_int_rb);
-    short component = NUM2SHORT(component_int_rb);
-    char *c_name = getCname(name_rb);
-    index_stat_t stat = nameIndexSearch(parser, c_name);
+    element = NUM2SHORT(element_int_rb);
+    component = NUM2SHORT(component_int_rb);
+    c_name = getCname(name_rb);
+    stat = nameIndexSearch(parser, c_name);
     if(stat.lower > -1 && stat.upper > -1){
-      int max = (stat.upper - stat.lower) + 1;
-      char *value = getCname(value_rb);
-      segment_t *descendant;
-      for(int i=0;i<max;i++){
+      max = (stat.upper - stat.lower);
+      value = getCname(value_rb);
+      for(int i=max;i>=-1;i--){
         descendant = parser->byName[i+stat.lower];
-        if(isDescendantOf(descendant, segment) && hasProperty(descendant, element, component, value)){
+        if(descendant->pkey <= segment->pkey){
+          break;
+        }else if(isDescendantOf(descendant, segment) && hasProperty(descendant, element, component, value)){
           return Qtrue;
         }
       }
@@ -122,11 +133,13 @@ VALUE segmentExists(parser_t *parser, segment_t *segment, VALUE name_rb, VALUE e
 }
 
 VALUE segmentChildren(parser_t *parser, segment_t *segment, VALUE names_rb, VALUE limit_rb){
-  VALUE result;
+  VALUE result, name, child_rb;
   const int length = NUM2INT(rb_funcall(names_rb, id_length, 0));
   const int limit = NUM2INT(limit_rb);
   segment_t *descendant;
-  int cnt = 0;
+  int max, lower, cnt = 0;
+  char *c_name;
+  index_stat_t stat;
 
   if(length == 0){
     result = rb_ary_new_capa(segment->children);
@@ -139,19 +152,19 @@ VALUE segmentChildren(parser_t *parser, segment_t *segment, VALUE names_rb, VALU
     }
   }else{
     result = rb_ary_new();
-    VALUE name = rb_ary_pop(names_rb);
-    char *c_name;
-    index_stat_t stat;
+    name = rb_ary_pop(names_rb);
     while(name != Qnil && (limit == -1 || cnt < limit)){
       c_name = getCname(name);
       stat = nameIndexSearch(parser, c_name);
-      int max = (stat.upper - stat.lower) + 1;
+      max = (stat.upper - stat.lower);
       if(stat.lower > -1 && stat.upper > -1){
-        for(int i=0;i<max;i++){
+        for(int i=max;i>=-1;i--){
           if(limit > -1 && cnt >= limit) break;
           descendant = parser->byName[i+stat.lower];
-          if(isChildOf(descendant, segment)){
-            VALUE child_rb = buildSegmentNode(parser, descendant);
+          if(descendant->pkey <= segment->pkey){
+            break;
+          }else if(isChildOf(descendant, segment)){
+            child_rb = buildSegmentNode(parser, descendant);
             rb_ary_push(result, child_rb);
             cnt++;
           }
@@ -181,37 +194,39 @@ VALUE segmentToHash(segment_t *segment){
 }
 
 VALUE segmentFind(parser_t *parser, segment_t *segment, VALUE names_rb, VALUE limit_rb){
-  VALUE result;
+  VALUE result, child_rb, name;
   const int length = NUM2INT(rb_funcall(names_rb, id_length, 0));
   const int limit = NUM2INT(limit_rb);
-  result = limit == 1 ? rb_ary_new_capa(1) : rb_ary_new();
   segment_t *descendant;
-  int cnt = 0;
+  int max, cnt = 0;
+  char *c_name;
+  index_stat_t stat;
 
   if(length == 0){
     int max = (segment->boundary - segment->pkey) + 1;
+    result = limit == 1 ? rb_ary_new_capa(1) : rb_ary_new_capa(max);
     for(int i=1;i<max;i++){
       if(limit > -1 && cnt >= limit) break;
       descendant = parser->primaryIndex[i+segment->pkey];
-      if(descendant->pkey > segment->pkey && descendant->pkey <= segment->boundary){
-        VALUE child_rb = buildSegmentNode(parser, descendant);
-        rb_ary_push(result, child_rb);
-      }
+      child_rb = buildSegmentNode(parser, descendant);
+      rb_ary_push(result, child_rb);
+      cnt++;
     }
   }else{
-    VALUE name = rb_ary_pop(names_rb);
-    char *c_name;
-    index_stat_t stat;
+    result = limit == 1 ? rb_ary_new_capa(1) : rb_ary_new();
+    name = rb_ary_pop(names_rb);
     while(name != Qnil && (limit == -1 || cnt < limit)){
       c_name = getCname(name);
       stat = nameIndexSearch(parser, c_name);
-      int max = (stat.upper - stat.lower) + 1;
+      max = (stat.upper - stat.lower);
       if(stat.lower >= 0 && stat.upper >= 0){
-        for(int i=0;i<max;i++){
+        for(int i=max;i>-1;i--){
           if(limit > -1 && cnt >= limit) break;
           descendant = parser->byName[i+stat.lower];
-          if(isDescendantOf(descendant, segment)){
-            VALUE child_rb = buildSegmentNode(parser, descendant);
+          if(descendant->pkey <= segment->pkey){
+            break;
+          }else if(isDescendantOf(descendant, segment)){
+            child_rb = buildSegmentNode(parser, descendant);
             rb_ary_push(result, child_rb);
             cnt++;
           }
@@ -247,11 +262,7 @@ static int nameSortFunc(const void *p1, const void*p2){
   const segment_t *seg2 = *((segment_t **)p2);
   const int cmp = strcmp(seg1->name, seg2->name);
 
-  if(cmp == 0){
-    return (seg1->pkey - seg2->pkey);
-  }else{
-    return cmp;
-  }
+  return cmp ? cmp : (seg1->pkey - seg2->pkey);
 }
 
 static int nameIndexFunc(const void *p1, const void*p2){  
