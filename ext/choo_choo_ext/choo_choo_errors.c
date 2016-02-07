@@ -291,7 +291,7 @@ VALUE getErrors(parser_t *parser){
         rb_ary_push(result, rb_str_new_cstr("INVALID_REPITITON_SEPARATOR"));
         break;
       default: 
-        rb_raise(rb_eRuntimeError, "A failure occurred while resolving errors.");
+        rb_raise(rb_eRuntimeError, "A failure occurred while rendering errors.");
     }
   }
 

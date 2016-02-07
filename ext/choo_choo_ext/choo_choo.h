@@ -74,6 +74,7 @@ struct parser_struct
   short errorCount;
   char documentType[10];
   VALUE doc;
+  segment_t *current;
   segment_t *root;
   index_stat_t *nameIndex;
   segment_t **byName;
@@ -83,6 +84,7 @@ struct parser_struct
   char repititionSeparator[2];
   unsigned long segmentCount;
   unsigned long nameCount;
+  st_table* stringTable;
   bool failure;
   bool finished;
 };
@@ -131,14 +133,12 @@ void addChildSegment(segment_t *parent, segment_t *child);
 void loopFree(segment_t *loop);
 void segmentFree(segment_t *segment);
 segment_t *rewindLoop(segment_t *loop);
-void cacheProperty(segment_t *segment, char *data, short element, short component);
 
 // parser
 
 void *choo_chooMalloc(size_t nitems, size_t size);
 void choo_chooDealloc(void *any);
 segment_t *parseSegment(parser_t *parser);
-int parseElement(segment_t *segment, char *str, const char componentSeparator[2], short seg_cnt);
 void parserInitialization(parser_t *parser);
 void parserFree(parser_t *parser);
 void parserFail(parser_t *parser, short error);
