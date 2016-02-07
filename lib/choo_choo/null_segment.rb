@@ -24,7 +24,7 @@ module ChooChoo
     alias :to_hash :to_h
     
     def to_json
-      Oj.dump(to_hash)
+      ChooChoo::EMPTY_JSON
     end
 
     def exists?(sym,val)

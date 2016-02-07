@@ -1,5 +1,3 @@
-
-
 //
 //  choo_choo_segment.c
 //  choo_choo
@@ -10,7 +8,7 @@
 
 #include "choo_choo.h"
 
-static inline VALUE segmentGetPropery(VALUE segment_rb, const char *key, short element, short component);
+static VALUE segmentGetPropery(VALUE segment_rb, const char *key, short element, short component);
 static void propertyFree(segment_t* segment);
 
 static VALUE mChooChoo;
@@ -105,7 +103,7 @@ static void propertyFree(segment_t* segment){
   segment->propertyCache = NULL;
 }
 
-static inline VALUE segmentGetPropery(VALUE segment_rb, const char *key, short element, short component){
+static VALUE segmentGetPropery(VALUE segment_rb, const char *key, short element, short component){
   ID id_key = rb_intern(key);
   VALUE rtn = rb_ivar_get(segment_rb,id_key);
   anchor_t *anchor;

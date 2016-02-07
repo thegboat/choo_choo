@@ -1,9 +1,12 @@
 module EDI835
   class InpatientAdjudication
 
-    def initialize(mia_segment)
+    attr_reader :claim_payment
+
+    def initialize(mia_segment, _claim_payment)
       raise ArgumentError, "Initialization requires a MIA object" unless mia_segment.is_a?(ChooChoo::MIA)
       @root = mia_segment
+      @claim_payment = _claim_payment
     end
 
     def visit_count

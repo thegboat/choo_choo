@@ -120,11 +120,15 @@ module EDI835
     end
 
     def inpatient_adjudications
-      root.children(:MIA)
+      @inpatient_adjudications ||= root.children(:MIA).map do |mia|
+        EDI835::InpatientAdjudication.new(mia, self)
+      end
     end
 
     def outpatient_adjudications
-      root.children(:MOA)
+      @outpatient_adjudications ||= root.children(:MOA).map do |moa|
+        EDI835::OutpatientAdjudication.new(moa, self)
+      end
     end
 
     def crossed_over_payer

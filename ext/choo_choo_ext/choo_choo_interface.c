@@ -25,6 +25,7 @@ static anchor_t *parserSetup(const char documentType[10]);
 static VALUE choo_choo_empty(VALUE self);
 static VALUE segment_root(VALUE self);
 static VALUE getDocClass(const char *doctype);
+static void segment_mark(anchor_t *anchor);
 
 static VALUE mChooChoo;
 static VALUE cSegment;
@@ -49,7 +50,13 @@ static void document_free(anchor_t *anchor){
 
 static VALUE segment_alloc(VALUE self){
   anchor_t *anchor = choo_chooMalloc(1,sizeof(anchor_t));
-  return Data_Wrap_Struct(self, NULL, segment_free, anchor);
+  return Data_Wrap_Struct(self, segment_mark, segment_free, anchor);
+}
+
+static void segment_mark(anchor_t *anchor){
+  if(!anchor) return;
+  if(!anchor->parser) return;
+  rb_gc_mark(anchor->parser->doc);
 }
 
 static VALUE document_alloc(VALUE self){

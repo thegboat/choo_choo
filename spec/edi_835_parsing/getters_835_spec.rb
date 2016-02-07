@@ -72,7 +72,7 @@ describe 'edi 835 getters' do
   end
 
   it "asserts one and only one child when accessing non native method" do
-    expect {clp.str!(:NM101) }.to raise_error(ChooChoo::AssertedValueNotFound)
+    expect {clp.str!(:NM101) }.to raise_error(ChooChoo::MultipleChildrenFound)
   end
 
 

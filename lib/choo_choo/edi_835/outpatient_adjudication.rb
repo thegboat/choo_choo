@@ -1,9 +1,12 @@
 module EDI835
   class OutpatientAdjudication
 
-    def initialize(moa_segment)
+    attr_reader :claim_payment
+
+    def initialize(moa_segment, @claim_payment)
       raise ArgumentError, "Initialization requires a MOA object" unless moa_segment.is_a?(ChooChoo::MOA)
       @root = moa_segment
+      @claim_payment = _claim_payment
     end
 
     def reimbursement_rate

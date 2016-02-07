@@ -10,7 +10,7 @@ module ChooChoo
     end
 
     def document_type
-      _c_doc.class
+      @document_type ||= document.class
     end
 
     def document
@@ -25,7 +25,7 @@ module ChooChoo
     alias :isa_segment :isa
 
     def name
-      _name
+      @name ||= _c_name
     end
     
     def parent
@@ -84,7 +84,7 @@ module ChooChoo
     end
 
     def first_or_null(sym,val)
-      _where(sym, val, 1).first || ChooChoo::NullSegment.new(_c_doc.class)
+      _where(sym, val, 1).first || ChooChoo::NullSegment.new(document_type)
     end
 
     def first!(sym,val)
@@ -214,19 +214,11 @@ module ChooChoo
     private
 
     def parse_property_key(string)
-      self.class.parse_property_key(string, _c_doc.class)
-    end
-
-    def _name
-      @name ||= _c_name
-    end
-
-    def _name_s
-      @_name_s ||= name.to_s
+      self.class.parse_property_key(string, document_type)
     end
 
     def cast(assign_type, key, options)
-      val = options[:assert] ? extract!(key) : extract(key)
+      val = extract(key, options[:assert])
       return options[:default] if options.key?(:default) && val.to_s.empty?
       return options[:blank] if options.key?(:blank) && val =~ /^\s+$/
       casted = case assign_type
@@ -242,25 +234,19 @@ module ChooChoo
       casted
     end
 
-    def extract!(key)
+    def extract(key, assert = false)
       if respond_to?(key)
         send(key)
       else
         seg_name, element, component = parse_property_key(key)
-        child!(seg_name).send(key)
-      end
-    end
-
-    def extract(key)
-      if respond_to?(key)
-        send(key)
-      else
-        seg_name, element, component = parse_property_key(key)
-        list = children(seg_name)
+        names = prepare_names([seg_name])
+        list = _c_children(names, 2)
         if list.length == 1 
           list.first.send(key.to_sym)
         elsif list.length > 1 
           raise MultipleChildrenFound, "can not cast from multiple children."
+        elsif assert
+          assert_one { list }
         else
           ChooChoo::EMPTY_STRING
         end

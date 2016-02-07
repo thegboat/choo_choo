@@ -36,7 +36,6 @@ VALUE buildSegmentNode(parser_t *parser, segment_t *segment){
     segment_rb = rb_class_new_instance(0, NULL, class_rb);
 
     Data_Get_Struct(segment_rb, anchor_t, anchor);
-    rb_gc_mark(parser->doc);
     anchor->parser = parser;
     anchor->segment = segment;
     rb_hash_aset(cache, cache_key, segment_rb);
@@ -45,9 +44,9 @@ VALUE buildSegmentNode(parser_t *parser, segment_t *segment){
 }
 
 static inline VALUE buildSegmentNodes(parser_t *parser, segment_t **segments, int len){
-  VALUE ary = len > 0 ? rb_ary_new_capa(len) : rb_ary_new();
+  VALUE ary = rb_ary_new_capa(len);
   for(int i=0; i<len;i++){
-    rb_ary_push(ary, buildSegmentNode(parser, segments[i]));
+    rb_ary_store(ary, i, buildSegmentNode(parser, segments[i]));
   }
   return ary;
 }
@@ -116,11 +115,11 @@ VALUE segmentWhere(parser_t *parser, segment_t *segment, VALUE name_rb, VALUE el
   segment_t *descendants[limit];
 
   if(segment->children > 0){
-    element = NUM2SHORT(element_int_rb);
-    component = NUM2SHORT(component_int_rb);
     c_name = getCname(name_rb);
     stat = nameIndexSearch(parser, c_name);
     if(stat.lower > -1 && stat.upper > -1){
+      element = NUM2SHORT(element_int_rb);
+      component = NUM2SHORT(component_int_rb);
       max = (stat.upper - stat.lower)+1;
       value = getCname(value_rb);
       for(int i=0;i<max;i++){

@@ -15,11 +15,13 @@ require "choo_choo/edi_835/edi_835"
 
 module ChooChoo
 
-  MONEY_ZERO      = BigDecimal('0.00')
-  EMPTY_STRING    = ""
+  MONEY_ZERO      = BigDecimal('0.00').freeze
+  EMPTY_STRING    = "".freeze
   DECIMAL_ZERO    = MONEY_ZERO
-  SEGMENT_REGEX   = /^([A-Z][A-Z][A-Z1-9]|[A-Z][A-Z]|[A-Z][1-9])/
-  PROPERTY_REGEX  = /^#{SEGMENT_REGEX}([0-9]{2})(|_([0-9]{2}))$/
-  SHEBANG         = '!'
+  SEGMENT_REGEX   = /^([A-Z][A-Z][A-Z1-9]|[A-Z][A-Z]|[A-Z][1-9])/.freeze
+  PROPERTY_REGEX  = /^#{SEGMENT_REGEX}([0-9]{2})(|_([0-9]{2}))$/.freeze
+  SHEBANG         = '!'.freeze
+  EMPTY_HASH      = {}.freeze
+  EMPTY_JSON      = '{}'.freeze
 
 end
