@@ -1,12 +1,20 @@
 module ChooChoo
   class Document
 
+    def initialize
+      @segment_cache = {}
+    end
+
     def self.name
       raise MethodImplementationRequired
     end
 
     def self.valid_segments
       raise MethodImplementationRequired
+    end
+
+    def inspect
+      to_s
     end
 
     def errors?

@@ -1,6 +1,10 @@
 module ChooChoo
   class Segment
 
+    def inspect
+      to_s
+    end
+
     def null_segment?
       false
     end

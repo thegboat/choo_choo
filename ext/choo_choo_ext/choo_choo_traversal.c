@@ -19,21 +19,28 @@ static VALUE cSegment;
 
 static ID id_force_8_bit;
 static ID id_length;
+static ID id_iv_cache;
 static VALUE sym_name;
 static VALUE sym_children;
 
 
 
 VALUE buildSegmentNode(parser_t *parser, segment_t *segment){
-  VALUE segment_rb,class_rb;
+  VALUE segment_rb,class_rb, cache, cache_key = ULONG2NUM(segment->pkey);
   anchor_t *anchor;
-  class_rb = rb_define_class_under(mChooChoo, segment->name, cSegment);
-  segment_rb = rb_class_new_instance(0, NULL, class_rb);
+  cache = rb_ivar_get(parser->doc,id_iv_cache);
+  segment_rb = rb_hash_aref(cache, cache_key);
 
-  Data_Get_Struct(segment_rb, anchor_t, anchor);
-  rb_gc_mark(parser->doc);
-  anchor->parser = parser;
-  anchor->segment = segment;
+  if(segment_rb == Qnil){
+    class_rb = rb_define_class_under(mChooChoo, segment->name, cSegment);
+    segment_rb = rb_class_new_instance(0, NULL, class_rb);
+
+    Data_Get_Struct(segment_rb, anchor_t, anchor);
+    rb_gc_mark(parser->doc);
+    anchor->parser = parser;
+    anchor->segment = segment;
+    rb_hash_aset(cache, cache_key, segment_rb);
+  }
   return segment_rb;
 }
 
@@ -338,6 +345,7 @@ char *propertyLookup(segment_t *segment,  short element, short component){
 void init_choo_choo_traversal(){
   mChooChoo = rb_define_module("ChooChoo");
   cSegment = rb_define_class_under(mChooChoo, "Segment", rb_cObject);
+  id_iv_cache = rb_intern("@segment_cache");
   id_force_8_bit = rb_intern("b");
   id_length = rb_intern("length");
   sym_children =ID2SYM(rb_intern("children"));

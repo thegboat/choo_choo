@@ -2,6 +2,10 @@ module ChooChoo
   class NullSegment
     attr_reader :document_type
 
+    def inspect
+      to_s
+    end
+
     def initialize(doc_type)
       @document_type = doc_type
     end
