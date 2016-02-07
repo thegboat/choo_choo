@@ -183,19 +183,6 @@ static VALUE segment_document_type(VALUE self){
   return getDocClass(anchor->parser->documentType);
 }
 
-VALUE buildSegmentNode(parser_t *parser, segment_t *segment){
-  VALUE segment_rb,class_rb;
-  anchor_t *anchor;
-  class_rb = rb_define_class_under(mChooChoo, segment->name, cSegment);
-  segment_rb = rb_class_new_instance(0, NULL, class_rb);
-
-  Data_Get_Struct(segment_rb, anchor_t, anchor);
-  rb_gc_mark(parser->doc);
-  anchor->parser = parser;
-  anchor->segment = segment;
-  return segment_rb;
-}
-
 static VALUE segment_root(VALUE self){
   anchor_t *anchor = getAnchor(self);
   return buildSegmentNode(anchor->parser, anchor->parser->root);

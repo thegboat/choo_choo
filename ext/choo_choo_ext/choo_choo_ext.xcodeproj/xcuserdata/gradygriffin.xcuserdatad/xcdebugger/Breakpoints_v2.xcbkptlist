@@ -381,7 +381,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "83"
             endingLineNumber = "83"
-            landmarkName = "segmentWhere()"
+            landmarkName = "propertiesToHash()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -429,7 +429,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "216"
             endingLineNumber = "216"
-            landmarkName = "segmentFind()"
+            landmarkName = "segmentToHash()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

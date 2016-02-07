@@ -14,10 +14,36 @@ static void indexSegment(parser_t *parser, segment_t *segment, int *segmentCount
 static inline bool hasProperty(segment_t *segment,  short element, short component, char *value);
 static int nameIndexFunc(const void *p1, const void*p2);
 
+static VALUE mChooChoo;
+static VALUE cSegment;
+
 static ID id_force_8_bit;
 static ID id_length;
 static VALUE sym_name;
 static VALUE sym_children;
+
+
+
+VALUE buildSegmentNode(parser_t *parser, segment_t *segment){
+  VALUE segment_rb,class_rb;
+  anchor_t *anchor;
+  class_rb = rb_define_class_under(mChooChoo, segment->name, cSegment);
+  segment_rb = rb_class_new_instance(0, NULL, class_rb);
+
+  Data_Get_Struct(segment_rb, anchor_t, anchor);
+  rb_gc_mark(parser->doc);
+  anchor->parser = parser;
+  anchor->segment = segment;
+  return segment_rb;
+}
+
+static inline VALUE buildSegmentNodes(parser_t *parser, segment_t **segments, int len){
+  VALUE ary = len > 0 ? rb_ary_new_capa(len) : rb_ary_new();
+  for(int i=0; i<len;i++){
+    rb_ary_push(ary, buildSegmentNode(parser, segments[i]));
+  }
+  return ary;
+}
 
 void buildIndexes(parser_t *parser){
   int segmentCount = 0;
@@ -73,12 +99,14 @@ VALUE propertiesToHash(segment_t *segment){
 }
 
 VALUE segmentWhere(parser_t *parser, segment_t *segment, VALUE name_rb, VALUE element_int_rb, VALUE component_int_rb, VALUE value_rb, VALUE limit_rb){
-  VALUE child_rb, result = rb_ary_new();
   short element,component;
   char *c_name, *value;
   index_stat_t stat;
-  int limit, max, cnt = 0;
+  int max, cnt = 0;
   segment_t *descendant;
+  int limit = NUM2INT(limit_rb);
+  if(limit == -1) limit = (segment->boundary-segment->pkey)+1;
+  segment_t *descendants[limit];
 
   if(segment->children > 0){
     element = NUM2SHORT(element_int_rb);
@@ -86,23 +114,23 @@ VALUE segmentWhere(parser_t *parser, segment_t *segment, VALUE name_rb, VALUE el
     c_name = getCname(name_rb);
     stat = nameIndexSearch(parser, c_name);
     if(stat.lower > -1 && stat.upper > -1){
-      max = (stat.upper - stat.lower);
+      max = (stat.upper - stat.lower)+1;
       value = getCname(value_rb);
-      limit = NUM2INT(limit_rb);
-      for(int i=max;i>=-1;i--){
-        if(limit > -1 && cnt >= limit) break;
+      for(int i=0;i<max;i++){
+        if(cnt >= limit) break;
         descendant = parser->byName[i+stat.lower];
-        if(descendant->pkey <= segment->pkey){
+        if(isDescendantOf(descendant, segment)){
+          if(hasProperty(descendant, element, component, value)){
+            descendants[cnt] = descendant;
+            cnt++;
+          }
+        }else if(descendant->pkey > segment->boundary){
           break;
-        }else if(isDescendantOf(descendant, segment) && hasProperty(descendant, element, component, value)){
-          child_rb = buildSegmentNode(parser, descendant);
-          rb_ary_push(result, child_rb);
-          cnt++;
         }
       }
     }
   }
-  return result;
+  return buildSegmentNodes(parser, descendants, cnt);
 }
 
 VALUE segmentExists(parser_t *parser, segment_t *segment, VALUE name_rb, VALUE element_int_rb, VALUE component_int_rb, VALUE value_rb){
@@ -117,12 +145,12 @@ VALUE segmentExists(parser_t *parser, segment_t *segment, VALUE name_rb, VALUE e
     c_name = getCname(name_rb);
     stat = nameIndexSearch(parser, c_name);
     if(stat.lower > -1 && stat.upper > -1){
-      max = (stat.upper - stat.lower);
+      max = (stat.upper - stat.lower)+1;
       value = getCname(value_rb);
-      for(int i=max;i>=-1;i--){
+      for(int i=0;i<max;i++){
         descendant = parser->byName[i+stat.lower];
-        if(descendant->pkey <= segment->pkey){
-          break;
+        if(descendant->pkey > segment->boundary){
+          return Qfalse;
         }else if(isDescendantOf(descendant, segment) && hasProperty(descendant, element, component, value)){
           return Qtrue;
         }
@@ -133,47 +161,45 @@ VALUE segmentExists(parser_t *parser, segment_t *segment, VALUE name_rb, VALUE e
 }
 
 VALUE segmentChildren(parser_t *parser, segment_t *segment, VALUE names_rb, VALUE limit_rb){
-  VALUE result, name, child_rb;
-  const int length = NUM2INT(rb_funcall(names_rb, id_length, 0));
-  const int limit = NUM2INT(limit_rb);
+  VALUE name, child_rb;
+  int length = NUM2INT(rb_funcall(names_rb, id_length, 0));
+  int limit = NUM2INT(limit_rb);
+  if(limit == -1) limit = segment->children;
+  segment_t *children[limit];
   segment_t *descendant;
   int max, lower, cnt = 0;
   char *c_name;
   index_stat_t stat;
 
   if(length == 0){
-    result = rb_ary_new_capa(segment->children);
     descendant = segment->firstSegment;
-    while(NULL != descendant && (limit == -1 || cnt < limit)){
-      VALUE child_rb = buildSegmentNode(parser, descendant);
-      rb_ary_push(result, child_rb);
+    while(NULL != descendant && cnt < limit){
+      children[cnt] = descendant;
       descendant = descendant->tail;
       cnt++;
     }
   }else{
-    result = rb_ary_new();
     name = rb_ary_pop(names_rb);
-    while(name != Qnil && (limit == -1 || cnt < limit)){
+    while(name != Qnil && cnt < limit){
       c_name = getCname(name);
       stat = nameIndexSearch(parser, c_name);
-      max = (stat.upper - stat.lower);
+      max = (stat.upper - stat.lower)+1;
       if(stat.lower > -1 && stat.upper > -1){
-        for(int i=max;i>=-1;i--){
+        for(int i=0;i<max;i++){
           if(limit > -1 && cnt >= limit) break;
           descendant = parser->byName[i+stat.lower];
-          if(descendant->pkey <= segment->pkey){
-            break;
-          }else if(isChildOf(descendant, segment)){
-            child_rb = buildSegmentNode(parser, descendant);
-            rb_ary_push(result, child_rb);
+          if(isChildOf(descendant, segment)){
+            children[cnt] = descendant;
             cnt++;
-          }
+          }else if(descendant->pkey > segment->boundary){
+            break;
+          } 
         }
       }
       name = rb_ary_pop(names_rb);
     }
   }
-  return result;
+  return buildSegmentNodes(parser, children, cnt);
 }
 
 VALUE segmentToHash(segment_t *segment){
@@ -194,48 +220,45 @@ VALUE segmentToHash(segment_t *segment){
 }
 
 VALUE segmentFind(parser_t *parser, segment_t *segment, VALUE names_rb, VALUE limit_rb){
-  VALUE result, child_rb, name;
-  const int length = NUM2INT(rb_funcall(names_rb, id_length, 0));
-  const int limit = NUM2INT(limit_rb);
+  VALUE name;
+  int length = NUM2INT(rb_funcall(names_rb, id_length, 0));
+  int limit = NUM2INT(limit_rb);
   segment_t *descendant;
+  if(limit == -1) limit = (segment->boundary - segment->pkey) + 1;
+  segment_t *descendants[limit];
   int max, cnt = 0;
   char *c_name;
   index_stat_t stat;
 
   if(length == 0){
     int max = (segment->boundary - segment->pkey) + 1;
-    result = limit == 1 ? rb_ary_new_capa(1) : rb_ary_new_capa(max);
     for(int i=1;i<max;i++){
       if(limit > -1 && cnt >= limit) break;
-      descendant = parser->primaryIndex[i+segment->pkey];
-      child_rb = buildSegmentNode(parser, descendant);
-      rb_ary_push(result, child_rb);
+      descendants[cnt] = parser->primaryIndex[i+segment->pkey];
       cnt++;
     }
   }else{
-    result = limit == 1 ? rb_ary_new_capa(1) : rb_ary_new();
     name = rb_ary_pop(names_rb);
-    while(name != Qnil && (limit == -1 || cnt < limit)){
+    while(name != Qnil && cnt < limit){
       c_name = getCname(name);
       stat = nameIndexSearch(parser, c_name);
-      max = (stat.upper - stat.lower);
+      max = (stat.upper - stat.lower) + 1;
       if(stat.lower >= 0 && stat.upper >= 0){
-        for(int i=max;i>-1;i--){
+        for(int i=0;i<max;i++){
           if(limit > -1 && cnt >= limit) break;
           descendant = parser->byName[i+stat.lower];
-          if(descendant->pkey <= segment->pkey){
-            break;
-          }else if(isDescendantOf(descendant, segment)){
-            child_rb = buildSegmentNode(parser, descendant);
-            rb_ary_push(result, child_rb);
+          if(isDescendantOf(descendant, segment)){
+            descendants[cnt] = descendant;
             cnt++;
-          }
+          }else if(descendant->pkey > segment->boundary){
+            break;
+          } 
         }
       }
       name = rb_ary_pop(names_rb);
     }
   }
-  return result;
+  return buildSegmentNodes(parser, descendants, cnt);
 }
 
 VALUE segmentGetProperty(segment_t *segment, VALUE element_int_rb, VALUE component_int_rb){
@@ -313,6 +336,8 @@ char *propertyLookup(segment_t *segment,  short element, short component){
 }
 
 void init_choo_choo_traversal(){
+  mChooChoo = rb_define_module("ChooChoo");
+  cSegment = rb_define_class_under(mChooChoo, "Segment", rb_cObject);
   id_force_8_bit = rb_intern("b");
   id_length = rb_intern("length");
   sym_children =ID2SYM(rb_intern("children"));
