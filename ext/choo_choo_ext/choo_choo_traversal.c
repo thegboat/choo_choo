@@ -214,8 +214,8 @@ VALUE segmentToHash(segment_t *segment){
   VALUE children = rb_ary_new_capa(segment->children);
 
   if(NULL != child){
-    while(NULL != child){
-      rb_ary_push(children, segmentToHash(child));
+    for(long i=0;i<segment->children;i++){
+      rb_ary_store(children, i, segmentToHash(child));
       child = child->tail;
     }
     rb_hash_aset(proxy, sym_children, children);
