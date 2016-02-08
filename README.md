@@ -1,8 +1,6 @@
 # ChooChoo
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/choo_choo`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+A ruby EDI parser with C extensions.
 
 ## Installation
 
@@ -22,18 +20,67 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+ChooChoo provides a single sample 835 document.
+Traversal can be via segment reference or through convenience interface.
+The convenience interface uses the segment reference and casting provided by ChooChoo to represent a more Business Object model.
+
+Segment reference example
+```ruby
+irb(main):004:0> doc = EDI835::Parser.parse(ChooChoo.sample)
+=> #<EDI835::Document:0x007ffa735e27c8>
+irb(main):005:0> isa = doc.isa
+=> #<ChooChoo::ISA:0x007ffa735de8f8>
+irb(main):006:0> isa.descendants(:CLP)
+=> [#<ChooChoo::CLP:0x007ffa735d65b8>]
+irb(main):009:0> clp = isa.descendant(:CLP)
+=> #<ChooChoo::CLP:0x007ffa735d65b8>
+irb(main):013:0> clp.CLP01
+=> "9999999"
+irb(main):012:0> clp.money(:CLP04)
+=> #<BigDecimal:7f92c6a220c8,'0.0',9(18)>
+irb(main):010:0> isa.where(:CLP01, "9999999")
+=> [#<ChooChoo::CLP:0x007ffa735d65b8>]
+irb(main):011:0> isa.exists?(:CLP01, "9999999")
+=> true
+```
+Business Model example
+```ruby
+irb(main):004:0> doc = EDI835::Parser.parse(ChooChoo.sample)
+=> #<EDI835::Document:0x007ffa735e27c8>
+irb(main):002:0> remittance = doc.remittance
+=> #<EDI835::Remittance:0x007f92c6a790a8>
+irb(main):004:0> remittance.check_number
+=> "0000010305"
+irb(main):005:0> remittance.check_amount
+=> #<BigDecimal:7f92c6a62c90,'0.0',9(18)>
+irb(main):006:0> remittance.claim_payments
+=> [#<EDI835::ClaimPayment:0x007f92c6a58ce0>]
+irb(main):007:0> claim_payment = remittance.claim_payments.first
+=> #<EDI835::ClaimPayment:0x007f92c6a58ce0>
+irb(main):008:0> claim_payment.claim_number
+=> "9999999"
+irb(main):013:0> claim_payment.amount
+=> #<BigDecimal:7f92c6a1b2c8,'0.0',9(18)>
+```
 
 ## Development
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `bin/console` for an interactive prompt that will allow you to experiment.
+To begin development, within the projects root:
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release` to create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+    $ bundle
+    $ bin/clear
+    
+To interact:
+
+    $ bin/console
+    
+Xcode has been used to develop C extensions. See a contributor on how to set up an external build environment on Xcode if support is needed.
 
 ## Contributing
 
-1. Fork it ( https://github.com/[my-github-username]/choo_choo/fork )
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create a new Pull Request
+Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/choo_choo.
+
+
+## License
+
+This gem is NOT open source.
