@@ -7,3 +7,13 @@
 /pkg/
 /spec/reports/
 /tmp/
+/lib/choo_choo_ext.bundle
+/.irb-save-history
+/ext/choo_choo_ext/choo_choo_ext.xcodeproj/
+/ext/choo_choo_ext/*.o
+/ext/choo_choo_ext/ruby
+/ext/choo_choo_ext/Makefile
+/lib/choo_choo_ext.bundle
+/ext/choo_choo_ext/choo_choo_ext.bundle
+/.ruby-version
+/*.gem
