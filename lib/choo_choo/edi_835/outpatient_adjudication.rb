@@ -9,6 +9,10 @@ module EDI835
       @claim_payment = _claim_payment
     end
 
+    def inspect
+      to_s
+    end
+
     def reimbursement_rate
       root.money(:MOA01)
     end

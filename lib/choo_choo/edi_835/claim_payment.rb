@@ -11,6 +11,10 @@ module EDI835
       @remittance = _remittance
     end
 
+    def inspect
+      to_s
+    end
+
     def claim_number
       @claim_number ||= root.strip(:CLP01)
     end

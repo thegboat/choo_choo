@@ -20,9 +20,32 @@ module EDI835
 
     def find_claim(claim_number)
       clp = isa.first!(:CLP01, claim_number)
-      remit = EDI835::Remittance.new(isa)
-      claim = EDI835::ClaimPayment.new(clp, remit)
+      claim = EDI835::ClaimPayment.new(clp, remittance)
       claim
+    end
+
+    def remittance
+      @remittance ||= EDI835::Remittance.new(isa)
+    end
+
+    def claim_payments
+      @claim_payments ||= remittance.map(&:claim_payments)
+    end
+    
+    def  provider_level_adjustments
+      provider_level_adjustments ||= remittance.map(&:provider_level_adjustments)
+    end
+
+    def service_details
+      @service_details ||= claim_payments.flat_map(&:service_details)
+    end
+
+    def inpatient_adjudications
+      @inpatient_adjudications ||= claim_payments.flat_map(&:inpatient_adjudications)
+    end
+
+    def outpatient_adjudications
+      @outpatient_adjudications ||= claim_payments.flat_map(&:outpatient_adjudications)
     end
 
   end

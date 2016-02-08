@@ -12,6 +12,10 @@ module EDI835
       @root = service_loop
     end
 
+    def inspect
+      to_s
+    end
+
     def min_date_of_service
       @min_date_of_service ||= begin
         segment   = root.first(:DTM01, EDI835::DTM_150) 

@@ -6,6 +6,10 @@ module EDI835
       @interchange_loop = isa
     end
 
+    def inspect
+      to_s
+    end
+
     def payment_method_code
       @payment_method_code ||= bpr.upper(:BPR04)
     end

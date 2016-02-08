@@ -11,6 +11,10 @@ module EDI835
       @remittance = _remittance
     end
 
+    def inspect
+      to_s
+    end
+
     def provider_adjustment1
       @provider_adjustment1 ||= root.strip(:PLB03_01)
     end
