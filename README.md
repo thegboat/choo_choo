@@ -78,6 +78,8 @@ Xcode has been used to develop C extensions. See a contributor on how to set up 
 
 ## Contributing
 
+ChooChoo currently only provides support for 5010 EDI 835 documents, however its components are generic and extensible.  Feel free to provide validator/parsing instructions.
+
 Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/choo_choo.
 
 
